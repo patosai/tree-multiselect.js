@@ -1,6 +1,6 @@
 /* 
  *  jQuery Tree Multiselect  |  Patrick Tsai
- *         v1.0, 2015        |  patosai.com
+ *     v1.0, August 2015     |  patosai.com
  *
  *        MIT Licensed
  */
@@ -29,7 +29,7 @@
   UiBuilder.prototype.build = function(el) {
     var tree = document.createElement('div');
     tree.className = "tree-multiselect";
-    el.after(tree);
+    $(el).after(tree);
 
     var selected = document.createElement('div');
     selected.className = "selected"
@@ -48,7 +48,7 @@
     var defaults = {
       sortable: false
     };
-    return $.extend(defaults, options);
+    return $.extend({}, defaults, options);
   }
 
   function fillSelections(data) {

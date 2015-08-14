@@ -117,16 +117,6 @@
       var jqSelected = $(selected);
       jqSelected.empty();
 
-      jqSelected.sortable({
-        update: function(event, ui) {
-          var selectionArr = [];
-          jqSelected.find("div.item").each(function(item) {
-            selectionArr.push($(this).attr('id'));
-          });
-          updateOriginalSelect.call(selections, selectionArr);
-        }
-      });
-      
       var selectionArr = [];
       selections.text(function(index, text) {
         var item = document.createElement('div');

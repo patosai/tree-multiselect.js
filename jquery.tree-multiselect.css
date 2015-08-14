@@ -1,0 +1,21 @@
+div.tree-multiselect > div.selected, div.tree-multiselect > div.selections {
+  display: inline-block;
+  vertical-align: top;
+}
+
+div.tree-multiselect > div.selected {
+  width: 30%;
+}
+
+div.tree-multiselect > div.selections {
+  width: 70%;
+}
+
+div.tree-multiselect div.section > div.item, div.tree-multiselect div.section > div.section {
+  padding-left: 20px;
+}
+
+div.tree-multiselect div.title {
+  background: #767676;
+  color: white;
+}

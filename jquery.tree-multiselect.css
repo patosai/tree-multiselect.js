@@ -40,3 +40,7 @@ div.tree-multiselect div.title {
   color: white;
   padding: 2px;
 }
+
+div.tree-multiselect input[type=checkbox] {
+  margin-right: 5px;
+}

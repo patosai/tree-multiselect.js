@@ -31,13 +31,13 @@
     tree.className = "tree-multiselect";
     $(el).after(tree);
 
-    var selected = document.createElement('div');
-    selected.className = "selected"
-    $(tree).append(selected);
-
     var selections = document.createElement('div');
     selections.className = "selections";
     $(tree).append(selections);
+
+    var selected = document.createElement('div');
+    selected.className = "selected"
+    $(tree).append(selected);
 
     this.tree = tree;
     this.selected = selected;

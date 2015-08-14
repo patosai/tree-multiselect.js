@@ -10,21 +10,11 @@ div.tree-multiselect > div.selected, div.tree-multiselect > div.selections {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   padding: 1%;
-}
-
-div.tree-multiselect > div.selected {
-  width: 30%;
-}
-
-div.tree-multiselect > div.selected > div.item {
-  padding: 2px 5px;
-  border-radius: 2px;
-  background: #EAEAEA;
+  width: 50%;
 }
 
 div.tree-multiselect > div.selections {
-  width: 70%;
-  border-left: solid 2px #D8D8D8;
+  border-right: solid 2px #D8D8D8;
 }
 
 div.tree-multiselect div.section > div.item, div.tree-multiselect div.section > div.section {
@@ -43,4 +33,10 @@ div.tree-multiselect div.title {
 
 div.tree-multiselect input[type=checkbox] {
   margin-right: 5px;
+}
+
+div.tree-multiselect > div.selected > div.item {
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: #EAEAEA;
 }

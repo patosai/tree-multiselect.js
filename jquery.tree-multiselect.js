@@ -1,5 +1,5 @@
 /* 
- *  jQuery Tree Multiselect v1.0
+ *  jQuery Tree Multiselect v1.1
  *
  *  Created by Patrick Tsai, August 2015
  *  MIT License

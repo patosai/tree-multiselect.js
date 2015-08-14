@@ -1,8 +1,8 @@
 /* 
- *  jQuery Tree Multiselect  |  Patrick Tsai
- *     v1.0, August 2015     |  patosai.com
+ *  jQuery Tree Multiselect v1.0
  *
- *        MIT Licensed
+ *  Created by Patrick Tsai, August 2015
+ *  MIT License
  */
 
 (function($) {
@@ -13,14 +13,14 @@
     var uiBuilder = new UiBuilder();
     uiBuilder.build(this);
 
-    var selections = uiBuilder.selections;
-    fillSelections.call(selections, data);
-    addCheckboxes.call(selections);
-    armTitleCheckboxes.call(selections);
+    var selectionContainer = uiBuilder.selections;
+    fillSelections.call(selectionContainer, data);
+    addCheckboxes(selectionContainer);
+    armTitleCheckboxes(selectionContainer);
 
-    var selected = uiBuilder.selected;
+    var selectedContainer = uiBuilder.selected;
     var isSortable = options.sortable;
-    updateSelectedOnChange.call(selections, selected, this, isSortable);
+    updateSelectedOnChange(selectionContainer, selectedContainer, this, isSortable);
 
     return this;
   };
@@ -40,8 +40,8 @@
     $(tree).append(selected);
 
     this.tree = tree;
-    this.selected = selected;
     this.selections = selections;
+    this.selected = selected;
   }
 
   function mergeDefaultOptions(options) {
@@ -87,67 +87,89 @@
     }
   }
 
-  function addCheckboxes() {
+  function addCheckboxes(selectionContainer) {
     var checkbox = $('<input />', { type: 'checkbox' });
-    var targets = $(this).find("div.title, div.item");
+    var targets = $(selectionContainer).find("div.title, div.item");
     checkbox.prependTo(targets);
   }
 
-  function armTitleCheckboxes() {
-    var titleCheckboxes = $(this).find("div.title > input[type=checkbox]");
+  function armTitleCheckboxes(selectionContainer) {
+    var titleCheckboxes = $(selectionContainer).find("div.title > input[type=checkbox]");
     titleCheckboxes.change(function() {
-      var checked = $(this).is(':checked')
       var section = $(this).closest("div.section");
       var checkboxesToBeChanged = section.find("input[type=checkbox]");
+      var checked = $(this).is(':checked')
       checkboxesToBeChanged.prop('checked', checked);
     });
   }
 
-  function updateSelectedOnChange(selected, originalSelect, isSortable) {
-    function updateOriginalSelect(selections) {
-      var jqSelected = $(this);
+  function updateSelectedOnChange(selectionContainer, selectedContainer, originalSelect, isSortable) {
+    function createSelectedDiv(text) {
+      var item = document.createElement('div');
+      item.className = "item";
+      item.id = text;
+      item.innerHTML = text;
+      $(selectedContainer).append(item);
+    }
 
+    function addNewFromSelected(selections) {
+      var currentSelections = [];
+      $(selectedContainer).find("div.item").each(function(index, itemDiv) {
+        currentSelections.push($(itemDiv).text());
+      });
+
+      var selectionsNotAdded = selections.filter(function(selection) {
+        return currentSelections.indexOf(selection) == -1;
+      });
+
+      selectionsNotAdded.forEach(function(text) {
+        createSelectedDiv(text);
+      });
+    }
+
+    function removeOldFromSelected(selections) {
+      $(selectedContainer).find("div.item").each(function(index, itemDiv) {
+        var selection = $(itemDiv).text();
+        if (selections.indexOf(selection) == -1) {
+          $(itemDiv).remove();
+        }
+      });
+    }
+
+    function updateOriginalSelect() {
       var jqOriginalSelect = $(originalSelect);
       jqOriginalSelect.empty();
 
-      selections.forEach(function(text) {
+      $(selectedContainer).find("div.item").text(function(index, text) {
         var option = document.createElement('option');
         jqOriginalSelect.append($(option).val(text).text(text).prop('selected', true));
       });
     }
 
-    var allSelections = this;
+    function update(selections) {
+      addNewFromSelected(selections);
+      removeOldFromSelected(selections);
+      updateOriginalSelect();
+    }
 
-    var allCheckboxes = $(allSelections).find("input[type=checkbox]");
-    allCheckboxes.change(function() {
-      var selections = $(allSelections).find("div.item").has("> input[type=checkbox]:checked");
+    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
+    checkboxes.change(function() {
+      var selectedBoxes = $(selectionContainer).find("div.item").has("> input[type=checkbox]:checked");
+      var selections = [];
+      selectedBoxes.text(function(index, text) {
+        selections.push(text);
+      });
 
-      var jqSelected = $(selected);
-      jqSelected.empty();
+      update(selections);
 
       if (isSortable) {
-        jqSelected.sortable({
+        var jqSelectedContainer = $(selectedContainer);
+        jqSelectedContainer.sortable({
           update: function(event, ui) {
-            var selectionArr = [];
-            jqSelected.find("div.item").each(function(item) {
-              selectionArr.push($(this).attr('id'));
-            });
-            updateOriginalSelect.call(selections, selectionArr);
+            updateOriginalSelect();
           }
         });
       }
-
-      var selectionArr = [];
-      selections.text(function(index, text) {
-        var item = document.createElement('div');
-        item.className = "item";
-        item.id = text;
-        item.innerHTML = text;
-        jqSelected.append(item);
-        selectionArr.push(text);
-      });
-
-      updateOriginalSelect.call(selections, selectionArr);
     });
   }
 })(jQuery);

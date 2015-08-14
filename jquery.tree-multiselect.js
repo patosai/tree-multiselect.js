@@ -6,7 +6,8 @@
  */
 
 (function($) {
-  $.fn.treeMultiselect = function(data) {
+  $.fn.treeMultiselect = function(data, options) {
+    options = mergeDefaultOptions(options);
     this.attr('multiple', '').css('display', 'none').empty();
 
     var uiBuilder = new UiBuilder();
@@ -18,7 +19,8 @@
     armTitleCheckboxes.call(selections);
 
     var selected = uiBuilder.selected;
-    updateSelectedOnChange.call(selections, selected, this);
+    var isSortable = options.sortable;
+    updateSelectedOnChange.call(selections, selected, this, isSortable);
 
     return this;
   };
@@ -40,6 +42,13 @@
     this.tree = tree;
     this.selected = selected;
     this.selections = selections;
+  }
+
+  function mergeDefaultOptions(options) {
+    var defaults = {
+      sortable: false
+    };
+    return $.extend(defaults, options);
   }
 
   function fillSelections(data) {
@@ -94,8 +103,7 @@
     });
   }
 
-  function updateSelectedOnChange(selected, originalSelect) {
-
+  function updateSelectedOnChange(selected, originalSelect, isSortable) {
     function updateOriginalSelect(selections) {
       var jqSelected = $(this);
 
@@ -116,6 +124,18 @@
 
       var jqSelected = $(selected);
       jqSelected.empty();
+
+      if (isSortable) {
+        jqSelected.sortable({
+          update: function(event, ui) {
+            var selectionArr = [];
+            jqSelected.find("div.item").each(function(item) {
+              selectionArr.push($(this).attr('id'));
+            });
+            updateOriginalSelect.call(selections, selectionArr);
+          }
+        });
+      }
 
       var selectionArr = [];
       selections.text(function(index, text) {

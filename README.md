@@ -39,5 +39,8 @@ Option name    | Type     | Default | Description
 ### Installation
 Put `jquery.tree-multiselect.js` and use it on your web page. The css file is optional and provides only a suggestion of what I envisioned this plugin to be.
 
+### Demo
+[My website has a simple demo running.](http://www.patosai.com/projects/tree-multiselect)
+
 ### License
 This is MIT licensed. Do as you wish :)

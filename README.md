@@ -32,9 +32,9 @@ As you can see, you can mix any combination of objects, arrays, strings, integer
 #### Options
 You can also pass in options alongside your data. ex `.treeMultiselect(data, options)`. It is an object where you can enable the following features:
 
-Option name    | What it does
--------------- | ---------------
-`sortable`     | Selected options can be sorted by dragging (requires jQuery UI)
+Option name    | Type     | Default | Description
+-------------- | -------- | ------- | ---------------
+`sortable`     | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
 
 ### Installation
 Put `jquery.tree-multiselect.js` and use it on your web page. The css file is optional and provides only a suggestion of what I envisioned this plugin to be.

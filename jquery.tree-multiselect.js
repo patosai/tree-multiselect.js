@@ -1,13 +1,15 @@
 /* 
- *  jQuery Tree Multiselect v1.1
+ *  jQuery Tree Multiselect v1.2
  *
  *  Created by Patrick Tsai, August 2015
- *  MIT License
+ *  MIT Licensed
  */
 
 (function($) {
-  $.fn.treeMultiselect = function(data, options) {
-    options = mergeDefaultOptions(options);
+  var options;
+
+  $.fn.treeMultiselect = function(data, opts) {
+    options = mergeDefaultOptions(opts);
     this.attr('multiple', '').css('display', 'none').empty();
 
     var uiBuilder = new UiBuilder();
@@ -17,6 +19,10 @@
     fillSelections.call(selectionContainer, data);
     addCheckboxes(selectionContainer);
     armTitleCheckboxes(selectionContainer);
+
+    if (options.collapsible) {
+      addCollapsibility(selectionContainer);
+    }
 
     var selectedContainer = uiBuilder.selected;
     var isSortable = options.sortable;
@@ -46,7 +52,9 @@
 
   function mergeDefaultOptions(options) {
     var defaults = {
-      sortable: false
+      sortable: false,
+      collapsible: true,
+      startCollapsed: true,
     };
     return $.extend({}, defaults, options);
   }
@@ -100,6 +108,29 @@
       var checkboxesToBeChanged = section.find("input[type=checkbox]");
       var checked = $(this).is(':checked')
       checkboxesToBeChanged.prop('checked', checked);
+    });
+  }
+
+  function addCollapsibility(selectionContainer) {
+    var hideIndicator = "-";
+    var expandIndicator = "+";
+
+    var titleDivs = $(selectionContainer).find("div.title");
+
+    var collapseSpan = document.createElement('span');
+    collapseSpan.className = "collapse";
+    if (options.startCollapsed) {
+      collapseSpan.innerHTML = expandIndicator;
+      titleDivs.siblings().toggle();
+    } else {
+      collapseSpan.innerHTML = hideIndicator;
+    }
+
+    titleDivs.prepend(collapseSpan);
+    $("span.collapse").click(function() {
+      $(this).text(($(this).text() == hideIndicator) ? expandIndicator : hideIndicator);
+      var jqTitle = $(this).parent();
+      jqTitle.siblings().toggle();
     });
   }
 

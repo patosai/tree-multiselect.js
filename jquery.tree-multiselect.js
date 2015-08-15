@@ -54,7 +54,7 @@
     var defaults = {
       sortable: false,
       collapsible: true,
-      startCollapsed: true,
+      startCollapsed: false,
     };
     return $.extend({}, defaults, options);
   }

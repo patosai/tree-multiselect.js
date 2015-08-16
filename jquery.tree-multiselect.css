@@ -31,8 +31,28 @@ div.tree-multiselect div.title {
   padding: 2px;
 }
 
+div.tree-multiselect div.title > * {
+  display: inline-block;
+}
+
+div.tree-multiselect div.title > div.collapse {
+  width: 8px;
+}
+
+div.tree-multiselect div.title > div.collapse:hover {
+  cursor: pointer;
+}
+
+div.tree-multiselect div.item {
+  margin-left: 10px;
+}
+
 div.tree-multiselect input[type=checkbox] {
   margin-right: 5px;
+}
+
+div.tree-multiselect input[type=checkbox]:hover {
+  cursor: pointer;
 }
 
 div.tree-multiselect > div.selected > div.item {
@@ -40,3 +60,4 @@ div.tree-multiselect > div.selected > div.item {
   border-radius: 2px;
   background: #EAEAEA;
 }
+

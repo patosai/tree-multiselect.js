@@ -117,7 +117,7 @@
 
     var titleDivs = $(selectionContainer).find("div.title");
 
-    var collapseSpan = document.createElement('span');
+    var collapseSpan = document.createElement('div');
     collapseSpan.className = "collapse";
     if (options.startCollapsed) {
       collapseSpan.innerHTML = expandIndicator;
@@ -127,7 +127,7 @@
     }
 
     titleDivs.prepend(collapseSpan);
-    $("span.collapse").click(function() {
+    $("div.collapse").click(function() {
       $(this).text(($(this).text() == hideIndicator) ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();
       jqTitle.siblings().toggle();

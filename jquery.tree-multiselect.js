@@ -117,16 +117,16 @@
 
     var titleDivs = $(selectionContainer).find("div.title");
 
-    var collapseSpan = document.createElement('div');
-    collapseSpan.className = "collapse";
+    var collapseDiv = document.createElement('div');
+    collapseDiv.className = "collapse";
     if (options.startCollapsed) {
-      collapseSpan.innerHTML = expandIndicator;
+      collapseDiv.innerHTML = expandIndicator;
       titleDivs.siblings().toggle();
     } else {
-      collapseSpan.innerHTML = hideIndicator;
+      collapseDiv.innerHTML = hideIndicator;
     }
+    titleDivs.prepend(collapseDiv);
 
-    titleDivs.prepend(collapseSpan);
     $("div.collapse").click(function() {
       $(this).text(($(this).text() == hideIndicator) ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();

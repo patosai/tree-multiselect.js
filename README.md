@@ -4,13 +4,13 @@
 
 Requires jQuery v1.8+
 
+### Demo
+<a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
+
 ### Usage
 ```
 $("select").treeMultiselect(data);
 ```
-
-### Demo
-<a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
 
 #### Data
 The `data` must be an object, with keys as the section names and the values as the items.

@@ -1,10 +1,3 @@
-/* 
- *  jQuery Tree Multiselect v1.2
- *
- *  Created by Patrick Tsai, August 2015
- *  MIT Licensed
- */
-
 (function($) {
   var options;
 

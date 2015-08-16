@@ -55,13 +55,15 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
   - `div.selections`
     - a lot of `div.section`, each of which has
       - `div.title`, which has
-        - `div.collapse`
-        - `input` of type `checkbox`
-        - and the title text
-      - a lot of `div.item` with the item text inside
+        - `div.collapse` holding the collapsible indicators
+        - `input` of type `checkbox` for selection
+        - the title text
+      - a lot of `div.item`, containing
+        - `input` of type `checkbox` for selection
+        - the item text
       - and possibly more `div.section`
   - `div.selected`
-    - a lot of `div.item`
+    - a lot of `div.item` containing the item text
 
 ### License
 This is MIT licensed.

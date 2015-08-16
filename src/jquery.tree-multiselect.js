@@ -129,7 +129,6 @@
 
     $("div.collapse").off().click(function() {
       var indicator = $(this).text();
-      console.log(indicator);
       $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();
       jqTitle.siblings().toggle();
@@ -140,7 +139,6 @@
     function createSelectedDiv(text) {
       var item = document.createElement('div');
       item.className = "item";
-      item.id = text;
       item.innerHTML = text;
       $(selectedContainer).append(item);
     }

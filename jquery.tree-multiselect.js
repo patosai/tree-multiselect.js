@@ -120,15 +120,17 @@
     var collapseDiv = document.createElement('div');
     collapseDiv.className = "collapse";
     if (options.startCollapsed) {
-      collapseDiv.innerHTML = expandIndicator;
+      $(collapseDiv).text(expandIndicator);
       titleDivs.siblings().toggle();
     } else {
-      collapseDiv.innerHTML = hideIndicator;
+      $(collapseDiv).text(hideIndicator);
     }
     titleDivs.prepend(collapseDiv);
 
-    $("div.collapse").click(function() {
-      $(this).text(($(this).text() == hideIndicator) ? expandIndicator : hideIndicator);
+    $("div.collapse").off().click(function() {
+      var indicator = $(this).text();
+      console.log(indicator);
+      $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();
       jqTitle.siblings().toggle();
     });

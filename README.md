@@ -2,6 +2,8 @@
 
 **This plugin allows you to replace a `select` element and replace it with a nice sortable, treeview element.**
 
+Requires jQuery v1.8+
+
 ### Usage
 ```
 $("select").treeMultiselect(data);

@@ -10,7 +10,7 @@ $("select").treeMultiselect(data);
 ```
 
 ### Demo
-[My website has a simple demo running.](http://www.patosai.com/projects/tree-multiselect)
+<a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
 
 #### Data
 The `data` must be an object, with keys as the section names and the values as the items.
@@ -54,8 +54,11 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
 - `div.tree-multiselect`
   - `div.selections`
     - a lot of `div.section`, each of which has
-      - `div.title`
-      - a lot of `div.item`
+      - `div.title`, which has
+        - `div.collapse`
+        - `input` of type `checkbox`
+        - and the title text
+      - a lot of `div.item` with the item text inside
       - and possibly more `div.section`
   - `div.selected`
     - a lot of `div.item`

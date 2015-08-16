@@ -9,6 +9,9 @@ Requires jQuery v1.8+
 $("select").treeMultiselect(data);
 ```
 
+### Demo
+[My website has a simple demo running.](http://www.patosai.com/projects/tree-multiselect)
+
 #### Data
 The `data` must be an object, with keys as the section names and the values as the items.
 
@@ -41,10 +44,21 @@ Option name      | Type     | Default | Description
 `startCollapsed` | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially
 
 ### Installation
-Put `jquery.tree-multiselect.js` and use it on your web page. The css file is optional and provides only a suggestion of what I envisioned this plugin to be.
+Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).
 
-### Demo
-[My website has a simple demo running.](http://www.patosai.com/projects/tree-multiselect)
+### Custom styling
+So, you want to exercise your css-foo. Alright then.
+
+The plugin adds a `div.tree-multiselect` immediately after the specified `select`. The hierarchy is shown below.
+
+- `div.tree-multiselect`
+  - `div.selections`
+    - a lot of `div.section`, each of which has
+      - `div.title`
+      - a lot of `div.item`
+      - and possibly more `div.section`
+  - `div.selected`
+    - a lot of `div.item`
 
 ### License
-This is MIT licensed. In other words, do whatever you want.
+This is MIT licensed.

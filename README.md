@@ -47,7 +47,7 @@ Option name      | Type     | Default | Description
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).
 
 ### Custom styling
-So, you want to exercise your css-foo. Alright then.
+So, you want to exercise your css-fu. Alright then.
 
 The plugin adds a `div.tree-multiselect` immediately after the specified `select`. The hierarchy is shown below.
 

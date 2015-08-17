@@ -4,10 +4,28 @@
   <script src="../../src/jquery.tree-multiselect.js"></script>
   <script src="../qunit-1.18.0.js"></script>
   <script>
-    QUnit.module("Options");
+    QUnit.module("Options", {
+      beforeEach: function(assert) {
+        var select = document.createElement("select");
+        $("div#qunit-fixture").append(select);
+        assert.equal($("select").length, 1);
+      }
+    });
 
-    QUnit.test("Loads the defaults", function(assert) {
+    QUnit.test("Is collapsible by default, but not collapsed", function(assert) {
+      var data = {
+        test: ["one", "two", "three"]
+      };
+      $("select").treeMultiselect(data);
 
+      $("div.section").each(function() {
+        var collapseDiv = $(this).find("> div.title > div.collapse");
+        assert.equal(collapseDiv.length, 1, "should have a collapse div");
+      });
+
+      $("div.item").each(function() {
+        assert.ok($(this).is(":visible"), "all items should be visible");
+      });
     });
   </script>
 </html>

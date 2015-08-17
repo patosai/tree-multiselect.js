@@ -1,0 +1,99 @@
+<html>
+  <div id="qunit-fixture"></div>
+  <script src="../jquery-1.11.3.min.js"></script>
+  <script src="../../src/jquery.tree-multiselect.js"></script>
+  <script src="../qunit-1.18.0.js"></script>
+  <script>
+    function titleOf(el) {
+      return $(el).clone().children().remove().end().text();
+    }
+
+    QUnit.module("Sections", {
+      beforeEach: function(assert) {
+        var select = document.createElement("select");
+        $("div#qunit-fixture").append(select);
+        assert.equal($("select").length, 1);
+      }
+    });
+
+    QUnit.test("creates the base div.tree-multiselect element", function(assert) {
+      var data = {};
+      $("select").treeMultiselect(data);
+      assert.equal($("div.tree-multiselect").length, 1, "should only be one tree-multiselect element");
+    });
+
+    QUnit.test("creates the selections and selected containers", function(assert) {
+      var data = {};
+      $("select").treeMultiselect(data);
+
+      assert.equal($("div.selections").length, 1, "should create a selections element");
+      assert.equal($("div.selected").length, 1, "should create a selected element");
+    });
+
+    QUnit.test("creates a section with title and items", function(assert) {
+      var data = {
+        section: ["item1", "item2", "item3"]
+      };
+      $("select").treeMultiselect(data);
+      
+      assert.equal($("div.selections > div.section").length, 1, "should create one section");
+
+      var title = $("div.selections > div.section > div.title");
+      assert.equal(title.length, 1, "should create one title");
+      assert.equal(titleOf(title), "section", "title is incorrect");
+
+      var collapse = title.find("div.collapse");
+      assert.equal(collapse.length, 1, "should create one collapse div");
+      assert.equal(collapse.text(), "-", "collapse indicator should show uncollapsed by default");
+
+      var checkbox = title.find("input[type=checkbox]");
+      assert.equal(checkbox.length, 1, "should create a section title checkbox");
+
+      var items = $("div.selections > div.section > div.item");
+      assert.equal(items.length, 3, "should create three items in section");
+      items.each(function(index, item) {
+        assert.equal($(item).text(), data.section[index], "item text is incorrect");
+        assert.ok($(item).is(":visible"), "item should be visible by default");
+      });
+    });
+
+    QUnit.test("can handle single string as item", function(assert) {
+      var data = {
+        section: "item"
+      };
+      $("select").treeMultiselect(data);
+
+      assert.equal($("div.section").length, 1, "should create the section");
+
+      var item = $("div.item");
+      assert.equal(item.length, 1, "should create the item");
+      assert.equal(item.text(), data.section, "item text is incorrect");
+    });
+
+    QUnit.test("creates a nested section", function(assert) {
+      var data = {
+        outer: ["item1", "item2", {
+          inner1: ["foo", "bar"]
+        }, {
+          inner2: "baz"
+        }]
+      };
+      $("select").treeMultiselect(data);
+
+      var outerSection = $("div.section").first();
+      var innerSections = $("div.section > div.section");
+
+      assert.equal($("div.section").length, 3, "there should be three sections");
+      assert.equal(innerSections.length, 2, "there should be two sections inside of the other");
+
+      var outerSectionTitle = titleOf(outerSection.find("> div.title"));
+      assert.equal(outerSectionTitle, "outer", "outer title is incorrect");
+
+      var firstInnerSection = innerSections.first();
+      assert.equal(firstInnerSection.find("> div.item").length, 2, "should be two items inside");
+
+      var secondInnerSection = innerSections.last();
+      assert.equal(secondInnerSection.find("> div.item").length, 1, "should be one item inside");
+    });
+  </script>
+</html>

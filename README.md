@@ -1,4 +1,5 @@
 ## jQuery Tree Multiselect
+[![Build Status](https://travis-ci.org/patosai/tree-multiselect.js.svg?branch=master)](https://travis-ci.org/patosai/tree-multiselect.js)
 
 **This plugin allows you to replace a `select` element and replace it with a nice sortable, treeview element.**
 

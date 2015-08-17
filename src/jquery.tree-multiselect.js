@@ -138,8 +138,8 @@
 
     function addNewFromSelected(selections) {
       var currentSelections = [];
-      $(selectedContainer).find("div.item").each(function(index, itemDiv) {
-        currentSelections.push($(itemDiv).text());
+      $(selectedContainer).find("div.item").each(function() {
+        currentSelections.push($(this).text());
       });
 
       var selectionsNotAdded = selections.filter(function(selection) {
@@ -152,8 +152,8 @@
     }
 
     function removeOldFromSelected(selections) {
-      $(selectedContainer).find("div.item").each(function(index, itemDiv) {
-        var selection = $(itemDiv).text();
+      $(selectedContainer).find("div.item").each(function() {
+        var selection = $(this).text();
         if (selections.indexOf(selection) == -1) {
           $(itemDiv).remove();
         }

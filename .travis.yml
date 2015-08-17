@@ -3,6 +3,6 @@ node_js:
   - 0.12
 
 before_script:
-  - npm install grunt -g
+  - npm install grunt-cli -g
 
 script: grunt test --verbose

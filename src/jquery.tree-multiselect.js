@@ -1,3 +1,11 @@
+/*
+ * jQuery Tree Multiselect
+ * v1.5.0
+ *
+ * (c) Patrick Tsai
+ * MIT Licensed
+ */
+
 (function($) {
   var options;
 
@@ -12,6 +20,7 @@
     fillSelections.call(selectionContainer, data);
     addCheckboxes(selectionContainer);
     armTitleCheckboxes(selectionContainer);
+    uncheckParentsOnUnselect(selectionContainer);
 
     if (options.collapsible) {
       addCollapsibility(selectionContainer);
@@ -104,6 +113,15 @@
     });
   }
 
+  function uncheckParentsOnUnselect(selectionContainer) {
+    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
+    checkboxes.change(function() {
+      if ($(this).attr('checked')) return;
+      var sectionParents = $(this).parents("div.section");
+      sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
+    });
+  }
+
   function addCollapsibility(selectionContainer) {
     var hideIndicator = "-";
     var expandIndicator = "+";
@@ -155,7 +173,7 @@
       $(selectedContainer).find("div.item").each(function() {
         var selection = $(this).text();
         if (selections.indexOf(selection) == -1) {
-          $(itemDiv).remove();
+          $(this).remove();
         }
       });
     }

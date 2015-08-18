@@ -27,5 +27,52 @@
         assert.ok($(this).is(":visible"), "all items should be visible");
       });
     });
+
+    QUnit.test("Can be collapsed if specified", function(assert) {
+      var data = {
+        test: ["one", "two", "three", {
+          inner: "four",
+          inner2: ["five", "six"]
+        }]
+      };
+
+      var options = {
+        startCollapsed: true
+      };
+
+      $("select").treeMultiselect(data, options);
+
+      $("div.item").each(function() {
+        assert.ok($(this).is(":hidden"), "all items should be hidden");
+      });
+
+      $("div.section div.section").each(function() {
+        assert.ok($(this).is(":hidden"), "all inner sections should be hidden");
+      });
+    });
+
+    QUnit.test("startCollapsed doesn't do anything if collapsible is false", function(assert) {
+      var data = {
+        test: ["one", "two", "three", {
+          inner: "four",
+          inner2: ["five", "six"]
+        }]
+      };
+
+      var options = {
+        collapsible: false,
+        startCollapsed: true
+      };
+
+      $("select").treeMultiselect(data, options);
+
+      $("div.item").each(function() {
+        assert.ok($(this).is(":visible"), "all items should be hidden");
+      });
+
+      $("div.section div.section").each(function() {
+        assert.ok($(this).is(":visible"), "all inner sections should be visible");
+      });
+    });
   </script>
 </html>

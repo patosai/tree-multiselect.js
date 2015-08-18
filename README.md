@@ -66,5 +66,13 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
   - `div.selected`
     - a lot of `div.item` containing the item text
 
+### Testing
+  1. `npm install`
+  2. Now I hope you've got `grunt-cli` installed in some place you know about, because we're about to...
+  3. `grunt`
+  4. `huff and puff` the tests go
+  5. The mettle of your code shall tested in the Battles of QUnit. Shall the dragon be slain and the damsel rescued, from the ashes will rise a green trophy, emblazoned on it the shield of `OK`, a legendary paladin enshrined in the kingdom halls.
+  6. But that probably won't happen. If not, the Architect will fire up another simulation and you shall patch your hero's weaknesses.
+
 ### License
-This is MIT licensed.
+MIT licensed.

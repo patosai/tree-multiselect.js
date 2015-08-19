@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.6.2
+ * v1.6.3
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -29,6 +29,8 @@
     addCheckboxes(selectionContainer);
     armTitleCheckboxes(selectionContainer);
     uncheckParentsOnUnselect(selectionContainer);
+
+    checkPreselectedSelections(originalSelect, selectionContainer);
 
     if (options.collapsible) {
       addCollapsibility(selectionContainer);
@@ -172,6 +174,21 @@
       var sectionParents = $(this).parents("div.section");
       sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
     });
+  }
+
+  function checkPreselectedSelections(originalSelect, selectionContainer) {
+    var selectedOptions = $(originalSelect).val();
+    if (!selectedOptions) return;
+
+    for (var i = 0; i < selectedOptions.length; ++i) {
+      var optionText = selectedOptions[i];
+      var selectionWithOption = $(selectionContainer).find("div.item").filter(function() {
+        var item = $(this);
+        var itemText = item.clone().children().remove().end().text();
+        return itemText === optionText;
+      });
+      $(selectionWithOption).find("> input[type=checkbox]").prop('checked', true);
+    }
   }
 
   function addCollapsibility(selectionContainer) {

@@ -129,5 +129,24 @@
       assert.equal(lowercaseItems.length, 1, "lowercase should have one item");
       assert.equal(lowercaseItems.first().text(), "xyz", "item should be xyz");
     });
+
+    QUnit.test("selects options that were selected in original select", function(assert) {
+      $("select").append("<option value='one' data-section='foo'>one</option>");
+      $("select").append("<option value='two' data-section='foo'>two</option>");
+
+      $("select").val(["one"]);
+
+      $("select").treeMultiselect();
+
+      var itemOne = $("div.item").filter(function() {
+        return $(this).clone().children().remove().end().text() == 'one';
+      });
+      assert.ok(itemOne.find("> input[type=checkbox]").prop('checked'), "one should be checked");
+
+      var itemTwo = $("div.item").filter(function() {
+        return $(this).clone().children().remove().end().text() == 'two';
+      });
+      assert.ok(!itemTwo.find("> input[type=checkbox]").prop('checked'), "two should not be checked");
+    });
   </script>
 </html>

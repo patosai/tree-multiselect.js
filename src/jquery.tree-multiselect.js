@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.6.3
+ * v1.7.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -27,10 +27,9 @@
       generateSelections(originalSelect, selectionContainer);
     }
     addCheckboxes(selectionContainer);
+    checkPreselectedSelections(originalSelect, selectionContainer);
     armTitleCheckboxes(selectionContainer);
     uncheckParentsOnUnselect(selectionContainer);
-
-    checkPreselectedSelections(originalSelect, selectionContainer);
 
     if (options.collapsible) {
       addCollapsibility(selectionContainer);
@@ -62,6 +61,12 @@
     this.selected = selected;
   }
 
+  var Option = function(value, text, description) {
+    this.value = value;
+    this.text = text;
+    this.description = description;
+  };
+
   function mergeDefaultOptions(options) {
     var defaults = {
       sortable: false,
@@ -75,7 +80,7 @@
   function generateSelections(originalSelect, selectionContainer) {
     var data = {};
 
-    function insertOption(path, optionName) {
+    function insertOption(path, option) {
       var currentPos = data;
       for (var i = 0; i < path.length; ++i) {
         var pathPart = path[i];
@@ -83,7 +88,7 @@
         currentPos = currentPos[pathPart] = currentPos[pathPart] || [];
         
         if (i == path.length - 1) {
-          currentPos.push(optionName);
+          currentPos.push(option);
           break;
         }
 
@@ -108,8 +113,11 @@
 
     $(originalSelect).find("> option").each(function() {
       var path = $(this).attr('data-section').split(options.sectionDelimiter);
-      var optionName = $(this).text() || $(this).value();
-      insertOption(path, optionName);
+      var optionName = $(this).text();
+      var optionValue = $(this).val();
+      var optionDescription = $(this).attr('data-description');
+      var option = new Option(optionValue, optionName, optionDescription);
+      insertOption(path, option);
     });
 
     fillSelections.call(selectionContainer, data);
@@ -129,14 +137,16 @@
       return section;
     }
 
-    function createItem(value) {
+    function createItem(value, text, description) {
       var selection = document.createElement('div');
       selection.className = "item";
-      selection.innerHTML = value;
+      $(selection).text(text || value).attr('data-value', value).attr('data-description', description);
       $(this).append(selection);
     }
 
-    if ($.isArray(data)) {
+    if (data.constructor == Option) {
+      createItem.call(this, data.value, data.text, data.description);
+    } else if ($.isArray(data)) {
       for (var i = 0; i < data.length; ++i) {
         fillSelections.call(this, data[i]);
       }
@@ -157,6 +167,20 @@
     checkbox.prependTo(targets);
   }
 
+  function checkPreselectedSelections(originalSelect, selectionContainer) {
+    var selectedOptions = $(originalSelect).val();
+    if (!selectedOptions) return;
+
+    for (var i = 0; i < selectedOptions.length; ++i) {
+      var optionValue = selectedOptions[i];
+      var selectionWithOption = $(selectionContainer).find("div.item").filter(function() {
+        var item = $(this);
+        return item.attr('data-value') === optionValue;
+      });
+      $(selectionWithOption).find("> input[type=checkbox]").prop('checked', true);
+    }
+  }
+
   function armTitleCheckboxes(selectionContainer) {
     var titleCheckboxes = $(selectionContainer).find("div.title > input[type=checkbox]");
     titleCheckboxes.change(function() {
@@ -174,21 +198,6 @@
       var sectionParents = $(this).parents("div.section");
       sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
     });
-  }
-
-  function checkPreselectedSelections(originalSelect, selectionContainer) {
-    var selectedOptions = $(originalSelect).val();
-    if (!selectedOptions) return;
-
-    for (var i = 0; i < selectedOptions.length; ++i) {
-      var optionText = selectedOptions[i];
-      var selectionWithOption = $(selectionContainer).find("div.item").filter(function() {
-        var item = $(this);
-        var itemText = item.clone().children().remove().end().text();
-        return itemText === optionText;
-      });
-      $(selectionWithOption).find("> input[type=checkbox]").prop('checked', true);
-    }
   }
 
   function addCollapsibility(selectionContainer) {

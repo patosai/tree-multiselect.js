@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.6.1
+ * v1.6.2
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -168,7 +168,7 @@
   function uncheckParentsOnUnselect(selectionContainer) {
     var checkboxes = $(selectionContainer).find("input[type=checkbox]");
     checkboxes.change(function() {
-      if ($(this).attr('checked')) return;
+      if ($(this).is(":checked")) return;
       var sectionParents = $(this).parents("div.section");
       sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
     });

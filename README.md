@@ -18,10 +18,16 @@ For example, `<option value="foo" data-section="Some Section">Foo</option>`. The
 
 You can also specify nested sections, like `data-section="outer/inner/superinner"`. The sections must be separated by the `sectionDelimiter` option which defaults to `/`.
 
-Alternatively, you can specify a `data` object directly and call the plugin like `treeMultiselect(data)`.
+Alternatively, you can specify properties directly like `treeMultiselect(pkg)`. `pkg` has the following properties, all of which are optional.
+```
+var pkg = {
+  data: { Your data here },
+  options: { Options here }
+};
+```
 
 #### Data
-The `data` must be an object, with keys as the section names and the values as the items.
+`data` must be an object, with keys as the section names and the values as the items.
 
 A simple example:
 ```

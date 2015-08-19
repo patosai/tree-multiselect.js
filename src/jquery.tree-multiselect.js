@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.6.0
+ * v1.6.1
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -9,7 +9,10 @@
 (function($) {
   var options;
 
-  $.fn.treeMultiselect = function(data, opts) {
+  $.fn.treeMultiselect = function(pkg) {
+    pkg = pkg || {};
+    var data = pkg.data;
+    var opts = pkg.options;
     options = mergeDefaultOptions(opts);
     this.attr('multiple', '').css('display', 'none');
 

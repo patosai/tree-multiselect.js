@@ -16,7 +16,7 @@
       var data = {
         test: ["one", "two", "three"]
       };
-      $("select").treeMultiselect(data);
+      $("select").treeMultiselect({data: data});
 
       $("div.section").each(function() {
         var collapseDiv = $(this).find("> div.title > div.collapse");
@@ -40,7 +40,7 @@
         startCollapsed: true
       };
 
-      $("select").treeMultiselect(data, options);
+      $("select").treeMultiselect({data: data, options: options});
 
       $("div.item").each(function() {
         assert.ok($(this).is(":hidden"), "all items should be hidden");
@@ -64,7 +64,7 @@
         startCollapsed: true
       };
 
-      $("select").treeMultiselect(data, options);
+      $("select").treeMultiselect({data: data, options: options});
 
       $("div.item").each(function() {
         assert.ok($(this).is(":visible"), "all items should be hidden");

@@ -18,13 +18,13 @@
 
     QUnit.test("creates the base div.tree-multiselect element", function(assert) {
       var data = {};
-      $("select").treeMultiselect(data);
+      $("select").treeMultiselect({data: data});
       assert.equal($("div.tree-multiselect").length, 1, "should only be one tree-multiselect element");
     });
 
     QUnit.test("creates the selections and selected containers", function(assert) {
       var data = {};
-      $("select").treeMultiselect(data);
+      $("select").treeMultiselect({data: data});
 
       assert.equal($("div.selections").length, 1, "should create a selections element");
       assert.equal($("div.selected").length, 1, "should create a selected element");
@@ -34,7 +34,7 @@
       var data = {
         section: ["item1", "item2", "item3"]
       };
-      $("select").treeMultiselect(data);
+      $("select").treeMultiselect({data: data});
       
       assert.equal($("div.selections > div.section").length, 1, "should create one section");
 
@@ -61,7 +61,7 @@
       var data = {
         section: "item"
       };
-      $("select").treeMultiselect(data);
+      $("select").treeMultiselect({data: data});
 
       assert.equal($("div.section").length, 1, "should create the section");
 
@@ -78,7 +78,7 @@
           inner2: "baz"
         }]
       };
-      $("select").treeMultiselect(data);
+      $("select").treeMultiselect({data: data});
 
       var outerSection = $("div.section").first();
       var innerSections = $("div.section > div.section");

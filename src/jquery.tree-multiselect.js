@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.5.0
+ * v1.6.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -11,13 +11,18 @@
 
   $.fn.treeMultiselect = function(data, opts) {
     options = mergeDefaultOptions(opts);
-    this.attr('multiple', '').css('display', 'none').empty();
+    this.attr('multiple', '').css('display', 'none');
 
     var uiBuilder = new UiBuilder();
     uiBuilder.build(this);
 
     var selectionContainer = uiBuilder.selections;
-    fillSelections.call(selectionContainer, data);
+    if (data) {
+      fillSelections.call(selectionContainer, data);
+    } else {
+      var originalSelect = this;
+      generateSelections(originalSelect, selectionContainer);
+    }
     addCheckboxes(selectionContainer);
     armTitleCheckboxes(selectionContainer);
     uncheckParentsOnUnselect(selectionContainer);
@@ -57,8 +62,52 @@
       sortable: false,
       collapsible: true,
       startCollapsed: false,
+      sectionDelimiter: '/'
     };
     return $.extend({}, defaults, options);
+  }
+
+  function generateSelections(originalSelect, selectionContainer) {
+    var data = {};
+
+    function insertOption(path, optionName) {
+      var currentPos = data;
+      for (var i = 0; i < path.length; ++i) {
+        var pathPart = path[i];
+
+        currentPos = currentPos[pathPart] = currentPos[pathPart] || [];
+        
+        if (i == path.length - 1) {
+          currentPos.push(optionName);
+          break;
+        }
+
+        pathPart = path[i + 1];
+        var existingObj;
+        for (var j = 0; j < currentPos.length; ++j) {
+          var arrayItem = currentPos[j];
+          if ((typeof arrayItem === 'object') && arrayItem[pathPart]) {
+            existingObj = arrayItem;
+            break;
+          }
+        }
+
+        if (existingObj) {
+          currentPos = existingObj;
+        } else {
+          currentPos.push({});
+          currentPos = currentPos[currentPos.length - 1];
+        }
+      }
+    }
+
+    $(originalSelect).find("> option").each(function() {
+      var path = $(this).attr('data-section').split(options.sectionDelimiter);
+      var optionName = $(this).text() || $(this).value();
+      insertOption(path, optionName);
+    });
+
+    fillSelections.call(selectionContainer, data);
   }
 
   function fillSelections(data) {

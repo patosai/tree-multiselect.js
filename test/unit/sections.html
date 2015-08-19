@@ -95,5 +95,39 @@
       var secondInnerSection = innerSections.last();
       assert.equal(secondInnerSection.find("> div.item").length, 1, "should be one item inside");
     });
+
+    QUnit.test("can generate sections from select 'data-section'", function(assert) {
+      $("select").append("<option value='ABC' data-section='alphabet/capitals'>ABC</option>");
+      $("select").append("<option value='xyz' data-section='alphabet/lowercase'>xyz</option>");
+      $("select").append("<option value='DEF' data-section='alphabet/capitals'>DEF</option>");
+      $("select").append("<option value='Google' data-section='alphabet'>Google</option>");
+
+      $("select").treeMultiselect();
+
+      assert.equal($("div.section").length, 3, "there should be three sections");
+      assert.equal($("div.section > div.section").length, 2, "there should be two sections inside the other");
+
+      var outerSection = $("div.section").first();
+      assert.equal(titleOf(outerSection.find("> div.title")), "alphabet", "outer section name should be 'alphabet'");
+
+      var outerItem = outerSection.find("> div.item");
+      assert.equal(outerItem.length, 1, "there should be one outer item");
+      assert.equal(outerItem.first().text(), "Google", "outer item should be Google");
+
+      var innerSections = $("div.section").slice(1);
+      var firstInnerSection = innerSections.first();
+      var lastInnerSection = innerSections.last();
+      assert.equal(titleOf(firstInnerSection.find("> div.title")), "capitals", "one inner section name should be 'capitals'");
+      assert.equal(titleOf(lastInnerSection.find("> div.title")), "lowercase", "the other inner section name should be 'lowercase'");
+
+      var capitalsItems = firstInnerSection.find("> div.item");
+      assert.equal(capitalsItems.length, 2, "capitals should have two items");
+      assert.equal(capitalsItems.first().text(), "ABC", "first item should be ABC");
+      assert.equal(capitalsItems.last().text(), "DEF", "last item should be DEF");
+
+      var lowercaseItems = lastInnerSection.find("> div.item");
+      assert.equal(lowercaseItems.length, 1, "lowercase should have one item");
+      assert.equal(lowercaseItems.first().text(), "xyz", "item should be xyz");
+    });
   </script>
 </html>

@@ -10,8 +10,15 @@ Requires jQuery v1.8+
 
 ### Usage
 ```
-$("select").treeMultiselect(data);
+$("select").treeMultiselect();
 ```
+Your `select` options must have an attribute `data-section` specifying the section the option will belong to.
+
+For example, `<option value="foo" data-section="Some Section">Foo</option>`. The `foo` option will be put under a section called `Some Section`.
+
+You can also specify nested sections, like `data-section="outer/inner/superinner"`. The sections must be separated by the `sectionDelimiter` option which defaults to `/`.
+
+Alternatively, you can specify a `data` object directly and call the plugin like `treeMultiselect(data)`.
 
 #### Data
 The `data` must be an object, with keys as the section names and the values as the items.
@@ -38,11 +45,12 @@ As you can see, you can mix any combination of objects, arrays, strings, integer
 #### Options
 You can also pass in options alongside your data. ex `.treeMultiselect(data, options)`. It is an object where you can enable the following features:
 
-Option name      | Type     | Default | Description
----------------- | -------- | ------- | ---------------
-`sortable`       | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
-`collapsible`    | boolean  | true    | Adds collapsibility to sections
-`startCollapsed` | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially
+Option name        | Type     | Default | Description
+------------------ | -------- | ------- | ---------------
+`sortable`         | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
+`collapsible`      | boolean  | true    | Adds collapsibility to sections
+`startCollapsed`   | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially
+`sectionDelimiter` | char     | `/`     | Separator between sections in the select option `data-section` attribute
 
 ### Installation
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).

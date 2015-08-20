@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.10.1
+ * v1.10.2
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -237,12 +237,12 @@
   }
 
   function addCollapsibility(selectionContainer) {
-    var hideIndicator = "-";
-    var expandIndicator = "+";
+    var hideIndicator = "↑";
+    var expandIndicator = "↓";
 
     var titleDivs = $(selectionContainer).find("div.title");
 
-    var collapseDiv = document.createElement('div');
+    var collapseDiv = document.createElement('span');
     collapseDiv.className = "collapse-section";
     if (options.startCollapsed) {
       $(collapseDiv).text(expandIndicator);
@@ -252,7 +252,7 @@
     }
     titleDivs.prepend(collapseDiv);
 
-    $("div.collapse-section").off().click(function() {
+    $("span.collapse-section").unbind().click(function() {
       var indicator = $(this).text();
       $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();
@@ -265,7 +265,7 @@
       var item = document.createElement('div');
       item.className = "item";
       item.innerHTML = text;
-      $(item).attr('data-value', value).prepend("<span class='remove-selected'>-</span>").appendTo(selectedContainer);
+      $(item).attr('data-value', value).prepend("<span class='remove-selected'>×</span>").appendTo(selectedContainer);
     }
 
     function addNewFromSelected(selections) {

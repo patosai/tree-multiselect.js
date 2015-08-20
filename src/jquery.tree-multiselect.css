@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.10.1
+ * v1.10.2
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -47,16 +47,16 @@ div.tree-multiselect div.title > * {
   display: inline-block;
 }
 
-div.tree-multiselect div.title > div.collapse-section {
-  width: 8px;
+div.tree-multiselect div.title > span.collapse-section {
+  margin: 0 3px;
 }
 
-div.tree-multiselect div.title > div.collapse-section:hover {
+div.tree-multiselect div.title > span.collapse-section:hover {
   cursor: pointer;
 }
 
 div.tree-multiselect div.item {
-  margin-left: 10px;
+  margin-left: 16px;
 }
 
 div.tree-multiselect input[type=checkbox] {

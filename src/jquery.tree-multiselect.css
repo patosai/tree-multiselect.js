@@ -49,6 +49,7 @@ div.tree-multiselect div.title > * {
 
 div.tree-multiselect div.title > span.collapse-section {
   margin: 0 3px;
+  width: 8px;
 }
 
 div.tree-multiselect div.title > span.collapse-section:hover {
@@ -71,6 +72,14 @@ div.tree-multiselect > div.selected > div.item {
   padding: 2px 5px;
   border-radius: 2px;
   background: #EAEAEA;
+}
+
+div.tree-multiselect > div.selected > div.item:hover {
+  cursor: grab;
+}
+
+div.tree-multiselect > div.selected > div.item:active {
+  cursor: grabbing;
 }
 
 div.tree-multiselect span.remove-selected, div.tree-multiselect span.description {

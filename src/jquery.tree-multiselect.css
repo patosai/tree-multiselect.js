@@ -9,6 +9,9 @@
 div.tree-multiselect {
   border: 2px solid #D8D8D8;
   border-radius: 5px;
+  display: table;
+  height: inherit;
+  width: 100%;
 }
 
 div.tree-multiselect > div.selected, div.tree-multiselect > div.selections {
@@ -17,6 +20,7 @@ div.tree-multiselect > div.selected, div.tree-multiselect > div.selections {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+  display: table-cell;
   padding: 1%;
   width: 50%;
 }

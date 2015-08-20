@@ -52,7 +52,7 @@ div.tree-multiselect div.title > span.collapse-section {
   width: 8px;
 }
 
-div.tree-multiselect div.title > span.collapse-section:hover {
+div.tree-multiselect div.title:hover {
   cursor: pointer;
 }
 

@@ -73,3 +73,14 @@ div.tree-multiselect > div.selected > div.item {
   background: #EAEAEA;
 }
 
+span.remove-selected {
+  padding: 0 3px;
+  margin-right: 5px;
+  background: #777;
+  color: white;
+}
+
+span.remove-selected:hover {
+  cursor: pointer;
+}
+

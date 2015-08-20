@@ -34,7 +34,7 @@
     var selectedContainer = uiBuilder.selected;
     updateSelectedAndOnChange(selectionContainer, selectedContainer, this);
 
-    removeSelectedOnClick(selectionContainer, selectedContainer);
+    armRemoveSelectedOnClick(selectionContainer, selectedContainer);
 
     return this;
   };
@@ -249,6 +249,8 @@
       selectionsNotAdded.forEach(function(selection) {
         createSelectedDiv(selection.text, selection.value);
       });
+
+      armRemoveSelectedOnClick(selectionContainer, selectedContainer);
     }
 
     function removeOldFromSelected(selections) {
@@ -311,9 +313,10 @@
     update();
   }
 
-  function removeSelectedOnClick(selectionContainer, selectedContainer) {
+  function armRemoveSelectedOnClick(selectionContainer, selectedContainer) {
     $(selectedContainer).find("span.remove-selected").click(function() {
       var value = $(this).parent().attr('data-value');
+      console.log(value);
       var matchingSelection = $(selectionContainer).find("div.item[data-value='" + value + "']");
       var matchingCheckbox = matchingSelection.find("> input[type=checkbox]");
       matchingCheckbox.prop('checked', false);

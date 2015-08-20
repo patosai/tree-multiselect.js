@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.9.0
+ * v1.9.1
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -62,10 +62,11 @@
     this.selected = selected;
   }
 
-  var Option = function(value, text, description) {
+  var Option = function(value, text, description, index) {
     this.value = value;
     this.text = text;
     this.description = description;
+    this.index = index;
   };
 
   function mergeDefaultOptions(options) {
@@ -120,7 +121,8 @@
       var optionValue = $(this).val();
       var optionName = $(this).text();
       var optionDescription = $(this).attr('data-description');
-      var option = new Option(optionValue, optionName, optionDescription);
+      var optionIndex = $(this).attr('data-index');
+      var option = new Option(optionValue, optionName, optionDescription, optionIndex);
       insertOption(path, option);
     });
 
@@ -141,15 +143,23 @@
       return section;
     }
 
-    function createItem(value, text, description) {
+    function createItem(option) {
+      var text = option.text
+        , value = option.value
+        , description = option.description
+        , index = option.index;
       var selection = document.createElement('div');
       selection.className = "item";
-      $(selection).text(text || value).attr('data-value', value).attr('data-description', description);
+      $(selection).text(text || value).attr({
+        'data-value': value,
+        'data-description': description,
+        'data-index': index
+      });
       $(this).append(selection);
     }
 
     if (data.constructor == Option) {
-      createItem.call(this, data.value, data.text, data.description);
+      createItem.call(this, data);
     } else if ($.isArray(data)) {
       for (var i = 0; i < data.length; ++i) {
         fillSelections.call(this, data[i]);
@@ -288,8 +298,15 @@
       selectedBoxes.each(function(box) {
         var text = textOf(this);
         var value = $(this).attr('data-value');
-        selections.push({ text: text, value: value });
+        var index = $(this).attr('data-index');
+        $(this).attr('data-index', undefined);
+        selections.push({ text: text, value: value, index: index });
       });
+      console.log("before - " + JSON.stringify(selections));
+      selections.sort(function(a, b) {
+        return a.index > b.index;
+      });
+      console.log("after - " + JSON.stringify(selections));
 
       addNewFromSelected(selections);
       removeOldFromSelected(selections);

@@ -17,8 +17,11 @@ Attribute name                | Description
 ----------------------------- | ---------------------------------
 `data-section` **(required)** | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect
+`data-index`                  | For pre-selected options, display options in this order, lowest index first
 
-Your `data-section` can have section names separated by the `section delimiter` option (which defaults to `/`). Ex. `data-section="top/middle/inner"` will show up as
+Your `data-section` can have multiple section names, separated by the `sectionDelimiter` option.
+
+Ex. `data-section="top/middle/inner"` will show up as
 - `top`
   - `middle`
     - `inner`

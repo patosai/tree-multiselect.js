@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.8.0
+ * v1.8.1
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -80,7 +80,10 @@
       for (var i = 0; i < path.length; ++i) {
         var pathPart = path[i];
 
-        currentPos = currentPos[pathPart] = currentPos[pathPart] || [];
+        if (!currentPos[pathPart]) {
+          currentPos[pathPart] = [];
+        }
+        currentPos = currentPos[pathPart];
         
         if (i == path.length - 1) {
           currentPos.push(option);
@@ -88,10 +91,10 @@
         }
 
         pathPart = path[i + 1];
-        var existingObj;
+        var existingObj = null;
         for (var j = 0; j < currentPos.length; ++j) {
           var arrayItem = currentPos[j];
-          if ((typeof arrayItem === 'object') && arrayItem[pathPart]) {
+          if ((arrayItem.constructor != Option) && $.isPlainObject(arrayItem) && arrayItem[pathPart] && (typeof arrayItem[pathPart] !== 'undefined')) {
             existingObj = arrayItem;
             break;
           }
@@ -100,8 +103,8 @@
         if (existingObj) {
           currentPos = existingObj;
         } else {
-          currentPos.push({});
-          currentPos = currentPos[currentPos.length - 1];
+          var newLength = currentPos.push({});
+          currentPos = currentPos[newLength - 1];
         }
       }
     }

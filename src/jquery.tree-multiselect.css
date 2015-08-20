@@ -75,11 +75,7 @@ div.tree-multiselect > div.selected > div.item {
 }
 
 div.tree-multiselect > div.selected > div.item:hover {
-  cursor: grab;
-}
-
-div.tree-multiselect > div.selected > div.item:active {
-  cursor: grabbing;
+  cursor: move;
 }
 
 div.tree-multiselect span.remove-selected, div.tree-multiselect span.description {

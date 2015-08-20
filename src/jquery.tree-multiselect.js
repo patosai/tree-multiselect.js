@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.10.0
+ * v1.10.1
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -178,7 +178,7 @@
 
   function addDescriptionHover(selectionContainer) {
     var description = $("<span class='description'>?</span>");
-    var targets = $(selectionContainer).find("div.item[data-description]");
+    var targets = $(selectionContainer).find("div.item[data-description!=''][data-description]");
     description.prependTo(targets);
 
     $("div.item > span.description").unbind().mouseenter(function() {

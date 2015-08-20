@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.7.0
+ * v1.8.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -9,23 +9,19 @@
 (function($) {
   var options;
 
-  $.fn.treeMultiselect = function(pkg) {
-    pkg = pkg || {};
-    var data = pkg.data;
-    var opts = pkg.options;
+  $.fn.treeMultiselect = function(opts) {
+    var originalSelect = this;
+
     options = mergeDefaultOptions(opts);
     this.attr('multiple', '').css('display', 'none');
 
     var uiBuilder = new UiBuilder();
-    uiBuilder.build(this);
+    uiBuilder.build(originalSelect);
 
     var selectionContainer = uiBuilder.selections;
-    if (data) {
-      fillSelections.call(selectionContainer, data);
-    } else {
-      var originalSelect = this;
-      generateSelections(originalSelect, selectionContainer);
-    }
+
+    generateSelections(originalSelect, selectionContainer);
+
     addCheckboxes(selectionContainer);
     checkPreselectedSelections(originalSelect, selectionContainer);
     armTitleCheckboxes(selectionContainer);
@@ -36,8 +32,7 @@
     }
 
     var selectedContainer = uiBuilder.selected;
-    var isSortable = options.sortable;
-    updateSelectedOnChange(selectionContainer, selectedContainer, this, isSortable);
+    updateSelectedAndOnChange(selectionContainer, selectedContainer, this);
 
     return this;
   };
@@ -113,8 +108,8 @@
 
     $(originalSelect).find("> option").each(function() {
       var path = $(this).attr('data-section').split(options.sectionDelimiter);
-      var optionName = $(this).text();
       var optionValue = $(this).val();
+      var optionName = $(this).text();
       var optionDescription = $(this).attr('data-description');
       var option = new Option(optionValue, optionName, optionDescription);
       insertOption(path, option);
@@ -207,7 +202,7 @@
     var titleDivs = $(selectionContainer).find("div.title");
 
     var collapseDiv = document.createElement('div');
-    collapseDiv.className = "collapse";
+    collapseDiv.className = "collapse-section";
     if (options.startCollapsed) {
       $(collapseDiv).text(expandIndicator);
       titleDivs.siblings().toggle();
@@ -216,7 +211,7 @@
     }
     titleDivs.prepend(collapseDiv);
 
-    $("div.collapse").off().click(function() {
+    $("div.collapse-section").off().click(function() {
       var indicator = $(this).text();
       $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();
@@ -224,7 +219,7 @@
     });
   }
 
-  function updateSelectedOnChange(selectionContainer, selectedContainer, originalSelect, isSortable) {
+  function updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect) {
     function createSelectedDiv(text) {
       var item = document.createElement('div');
       item.className = "item";
@@ -266,23 +261,18 @@
       });
     }
 
-    function update(selections) {
-      addNewFromSelected(selections);
-      removeOldFromSelected(selections);
-      updateOriginalSelect();
-    }
-
-    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
-    checkboxes.change(function() {
+    function update() {
       var selectedBoxes = $(selectionContainer).find("div.item").has("> input[type=checkbox]:checked");
       var selections = [];
       selectedBoxes.text(function(index, text) {
         selections.push(text);
       });
 
-      update(selections);
+      addNewFromSelected(selections);
+      removeOldFromSelected(selections);
+      updateOriginalSelect();
 
-      if (isSortable) {
+      if (options.sortable) {
         var jqSelectedContainer = $(selectedContainer);
         jqSelectedContainer.sortable({
           update: function(event, ui) {
@@ -290,6 +280,13 @@
           }
         });
       }
+    }
+
+    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
+    checkboxes.change(function() {
+      update();
     });
+
+    update();
   }
 })(jQuery);

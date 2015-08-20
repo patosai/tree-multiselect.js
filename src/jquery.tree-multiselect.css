@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.7.0
+ * v1.8.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -43,11 +43,11 @@ div.tree-multiselect div.title > * {
   display: inline-block;
 }
 
-div.tree-multiselect div.title > div.collapse {
+div.tree-multiselect div.title > div.collapse-section {
   width: 8px;
 }
 
-div.tree-multiselect div.title > div.collapse:hover {
+div.tree-multiselect div.title > div.collapse-section:hover {
   cursor: pointer;
 }
 

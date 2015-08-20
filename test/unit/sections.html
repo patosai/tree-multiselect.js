@@ -17,24 +17,22 @@
     });
 
     QUnit.test("creates the base div.tree-multiselect element", function(assert) {
-      var data = {};
-      $("select").treeMultiselect({data: data});
+      $("select").treeMultiselect();
       assert.equal($("div.tree-multiselect").length, 1, "should only be one tree-multiselect element");
     });
 
     QUnit.test("creates the selections and selected containers", function(assert) {
-      var data = {};
-      $("select").treeMultiselect({data: data});
+      $("select").treeMultiselect();
 
       assert.equal($("div.selections").length, 1, "should create a selections element");
       assert.equal($("div.selected").length, 1, "should create a selected element");
     });
 
     QUnit.test("creates a section with title and items", function(assert) {
-      var data = {
-        section: ["item1", "item2", "item3"]
-      };
-      $("select").treeMultiselect({data: data});
+      $("select").append("<option data-section='section' value='item1'></option>");
+      $("select").append("<option data-section='section' value='item2'></option>");
+      $("select").append("<option data-section='section' value='item3'></option>");
+      $("select").treeMultiselect();
       
       assert.equal($("div.selections > div.section").length, 1, "should create one section");
 
@@ -42,7 +40,7 @@
       assert.equal(title.length, 1, "should create one title");
       assert.equal(titleOf(title), "section", "title is incorrect");
 
-      var collapse = title.find("div.collapse");
+      var collapse = title.find("div.collapse-section");
       assert.equal(collapse.length, 1, "should create one collapse div");
       assert.equal(collapse.text(), "-", "collapse indicator should show uncollapsed by default");
 
@@ -51,52 +49,14 @@
 
       var items = $("div.selections > div.section > div.item");
       assert.equal(items.length, 3, "should create three items in section");
+      var itemTexts = ["item1", "item2", "item3"]
       items.each(function(index, item) {
-        assert.equal($(item).text(), data.section[index], "item text is incorrect");
+        assert.equal($(item).text(), itemTexts[index], "item text is incorrect");
         assert.ok($(item).is(":visible"), "item should be visible by default");
       });
     });
 
-    QUnit.test("can handle single string as item", function(assert) {
-      var data = {
-        section: "item"
-      };
-      $("select").treeMultiselect({data: data});
-
-      assert.equal($("div.section").length, 1, "should create the section");
-
-      var item = $("div.item");
-      assert.equal(item.length, 1, "should create the item");
-      assert.equal(item.text(), data.section, "item text is incorrect");
-    });
-
-    QUnit.test("creates a nested section", function(assert) {
-      var data = {
-        outer: ["item1", "item2", {
-          inner1: ["foo", "bar"]
-        }, {
-          inner2: "baz"
-        }]
-      };
-      $("select").treeMultiselect({data: data});
-
-      var outerSection = $("div.section").first();
-      var innerSections = $("div.section > div.section");
-
-      assert.equal($("div.section").length, 3, "there should be three sections");
-      assert.equal(innerSections.length, 2, "there should be two sections inside of the other");
-
-      var outerSectionTitle = titleOf(outerSection.find("> div.title"));
-      assert.equal(outerSectionTitle, "outer", "outer title is incorrect");
-
-      var firstInnerSection = innerSections.first();
-      assert.equal(firstInnerSection.find("> div.item").length, 2, "should be two items inside");
-
-      var secondInnerSection = innerSections.last();
-      assert.equal(secondInnerSection.find("> div.item").length, 1, "should be one item inside");
-    });
-
-    QUnit.test("can generate sections from select 'data-section'", function(assert) {
+    QUnit.test("can generate nested sections", function(assert) {
       $("select").append("<option value='ABC' data-section='alphabet/capitals'>ABC</option>");
       $("select").append("<option value='xyz' data-section='alphabet/lowercase'>xyz</option>");
       $("select").append("<option value='DEF' data-section='alphabet/capitals'>DEF</option>");

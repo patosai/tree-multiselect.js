@@ -12,44 +12,20 @@ Requires jQuery v1.8+
 ```
 $("select").treeMultiselect();
 ```
-Your `select` options must have an attribute `data-section` specifying the section the option will belong to.
 
-For example, `<option value="foo" data-section="Some Section">Foo</option>`. The `foo` option will be put under a section called `Some Section`.
+Attribute name                | Description
+----------------------------- | ---------------------------------
+`data-section` **(required)** | The section the option will be in; can be nested
+`data-description`            | A description of the attribute; will be shown on the multiselect
 
-You can also specify nested sections, like `data-section="outer/inner/superinner"`. The sections must be separated by the `sectionDelimiter` option which defaults to `/`.
-
-Alternatively, you can specify properties directly like `treeMultiselect(pkg)`. `pkg` has the following properties, all of which are optional.
-```
-var pkg = {
-  data: { Your data here },
-  options: { Options here }
-};
-```
-
-#### Data
-`data` must be an object, with keys as the section names and the values as the items.
-
-A simple example:
-```
-var data = {
-  "section1": ["item1", "item2", "item3"],
-  "section2": "super cool single element"
-};
-```
-
-You can also have nested sections.
-```
-var data = {
-  "level1": ["an item", "another item", {
-      "level2": ["whoa", "awesome"]
-    }, "more stuff"];
-};
-```
-
-As you can see, you can mix any combination of objects, arrays, strings, integers, cats, or whatever you want your selections to look like.
+Your `data-section` can have section names separated by the `section delimiter` option (which defaults to `/`). Ex. `data-section="top/middle/inner"` will show up as
+- `top`
+  - `middle`
+    - `inner`
+      - your option
 
 #### Options
-You can also pass in options alongside your data. ex `.treeMultiselect(data, options)`. It is an object where you can enable the following features:
+You can pass in options like `treeMultiselect(options)`. It is an object where you can set the following features:
 
 Option name        | Type     | Default | Description
 ------------------ | -------- | ------- | ---------------
@@ -70,7 +46,7 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
   - `div.selections`
     - a lot of `div.section`, each of which has
       - `div.title`, which has
-        - `div.collapse` holding the collapsible indicators
+        - `div.collapse-section` holding the collapsible indicators
         - `input` of type `checkbox` for selection
         - the title text
       - a lot of `div.item`, containing

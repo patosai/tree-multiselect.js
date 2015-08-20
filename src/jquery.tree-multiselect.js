@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.8.1
+ * v1.9.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -36,6 +36,10 @@
 
     return this;
   };
+
+  function textOf(el) {
+    return $(el).clone().children().remove().end().text();
+  }
 
   var UiBuilder = function() {};
   UiBuilder.prototype.build = function(el) {
@@ -223,32 +227,37 @@
   }
 
   function updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect) {
-    function createSelectedDiv(text) {
+    function createSelectedDiv(text, value) {
       var item = document.createElement('div');
       item.className = "item";
       item.innerHTML = text;
-      $(selectedContainer).append(item);
+      $(item).attr('data-value', value).prepend("<span class='remove-selected'>-</span>").appendTo(selectedContainer);
     }
 
     function addNewFromSelected(selections) {
       var currentSelections = [];
       $(selectedContainer).find("div.item").each(function() {
-        currentSelections.push($(this).text());
+        currentSelections.push(textOf(this));
       });
 
       var selectionsNotAdded = selections.filter(function(selection) {
-        return currentSelections.indexOf(selection) == -1;
+        return currentSelections.indexOf(selection.text) == -1;
       });
 
-      selectionsNotAdded.forEach(function(text) {
-        createSelectedDiv(text);
+      selectionsNotAdded.forEach(function(selection) {
+        createSelectedDiv(selection.text, selection.value);
       });
     }
 
     function removeOldFromSelected(selections) {
+      var selectionTexts = [];
+      selections.forEach(function(selection) {
+        selectionTexts.push(selection.text);
+      });
+
       $(selectedContainer).find("div.item").each(function() {
-        var selection = $(this).text();
-        if (selections.indexOf(selection) == -1) {
+        var selection = textOf(this);
+        if (selectionTexts.indexOf(selection) == -1) {
           $(this).remove();
         }
       });
@@ -256,19 +265,26 @@
 
     function updateOriginalSelect() {
       var jqOriginalSelect = $(originalSelect);
-      jqOriginalSelect.empty();
 
-      $(selectedContainer).find("div.item").text(function(index, text) {
-        var option = document.createElement('option');
-        jqOriginalSelect.append($(option).val(text).text(text).prop('selected', true));
+      var selected = []
+      $(selectedContainer).find("div.item").each(function() {
+        selected.push($(this).attr('data-value'));
       });
+
+      jqOriginalSelect.val(selected);
+
+      $(originalSelect).html($(originalSelect).find("option").sort(function(a, b) {
+        return selected.indexOf($(a).attr('value')) > selected.indexOf($(b).attr('value'));
+      }));
     }
 
     function update() {
       var selectedBoxes = $(selectionContainer).find("div.item").has("> input[type=checkbox]:checked");
       var selections = [];
-      selectedBoxes.text(function(index, text) {
-        selections.push(text);
+      selectedBoxes.each(function(box) {
+        var text = textOf(this);
+        var value = $(this).attr('data-value');
+        selections.push({ text: text, value: value });
       });
 
       addNewFromSelected(selections);

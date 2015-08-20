@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.9.1
+ * v1.10.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -22,6 +22,7 @@
 
     generateSelections(originalSelect, selectionContainer);
 
+    addDescriptionHover(selectionContainer);
     addCheckboxes(selectionContainer);
     checkPreselectedSelections(originalSelect, selectionContainer);
     armTitleCheckboxes(selectionContainer);
@@ -173,6 +174,27 @@
     } else {
       createItem.call(this, data);
     }
+  }
+
+  function addDescriptionHover(selectionContainer) {
+    var description = $("<span class='description'>?</span>");
+    var targets = $(selectionContainer).find("div.item[data-description]");
+    description.prependTo(targets);
+
+    $("div.item > span.description").unbind().mouseenter(function() {
+      var item = $(this).parent();
+      var description = item.attr('data-description');
+
+      var descriptionDiv = document.createElement('div');
+      descriptionDiv.className = "temp-description-popup";
+      descriptionDiv.innerHTML = description;
+
+      descriptionDiv.style.position = 'absolute';
+
+      item.append(descriptionDiv);
+    }).mouseleave(function() {
+      $("div.temp-description-popup").remove();
+    });
   }
 
   function addCheckboxes(selectionContainer) {

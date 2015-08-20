@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.9.1
+ * v1.10.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -73,14 +73,21 @@ div.tree-multiselect > div.selected > div.item {
   background: #EAEAEA;
 }
 
-span.remove-selected {
+div.tree-multiselect span.remove-selected, div.tree-multiselect span.description {
   padding: 0 3px;
   margin-right: 5px;
   background: #777;
   color: white;
+  border-radius: 2px;
 }
 
-span.remove-selected:hover {
+div.tree-multiselect span.remove-selected:hover, div.tree-multiselect span.description:hover {
   cursor: pointer;
 }
 
+div.tree-multiselect div.temp-description-popup {
+  background: #FAFAFA;
+  padding: 5px;
+  border: 2px solid #676767;
+  border-radius: 3px;
+}

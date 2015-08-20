@@ -302,11 +302,9 @@
         $(this).attr('data-index', undefined);
         selections.push({ text: text, value: value, index: index });
       });
-      console.log("before - " + JSON.stringify(selections));
       selections.sort(function(a, b) {
         return a.index > b.index;
       });
-      console.log("after - " + JSON.stringify(selections));
 
       addNewFromSelected(selections);
       removeOldFromSelected(selections);

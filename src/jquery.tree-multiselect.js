@@ -72,6 +72,7 @@
 
   function mergeDefaultOptions(options) {
     var defaults = {
+      allowBatchSelection: true,
       sortable: false,
       collapsible: true,
       startCollapsed: false,
@@ -199,7 +200,12 @@
 
   function addCheckboxes(selectionContainer) {
     var checkbox = $('<input />', { type: 'checkbox' });
-    var targets = $(selectionContainer).find("div.title, div.item");
+    var targets = null;
+    if (options.allowBatchSelection) {
+      targets = $(selectionContainer).find("div.title, div.item");
+    } else {
+      targets = $(selectionContainer).find("div.item");
+    }
     checkbox.prependTo(targets);
   }
 

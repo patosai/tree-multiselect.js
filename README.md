@@ -32,6 +32,7 @@ You can pass in options like `treeMultiselect(options)`. It is an object where y
 
 Option name        | Type     | Default | Description
 ------------------ | -------- | ------- | ---------------
+`allowBatchSelection` | boolean | false | Sections have checkboxes which when checked, check everything within them
 `sortable`         | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
 `collapsible`      | boolean  | true    | Adds collapsibility to sections
 `startCollapsed`   | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially

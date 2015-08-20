@@ -81,8 +81,12 @@ div.tree-multiselect span.remove-selected, div.tree-multiselect span.description
   border-radius: 2px;
 }
 
-div.tree-multiselect span.remove-selected:hover, div.tree-multiselect span.description:hover {
+div.tree-multiselect span.remove-selected:hover {
   cursor: pointer;
+}
+
+div.tree-multiselect span.description:hover  {
+  cursor: help;
 }
 
 div.tree-multiselect div.temp-description-popup {

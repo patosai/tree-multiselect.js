@@ -369,9 +369,8 @@
   }
 
   function armRemoveSelectedOnClick(selectionContainer, selectedContainer) {
-    $(selectedContainer).find("span.remove-selected").click(function() {
+    $(selectedContainer).find("span.remove-selected").unbind().click(function() {
       var value = $(this).parent().attr('data-value');
-      console.log(value);
       var matchingSelection = $(selectionContainer).find("div.item[data-value='" + value + "']");
       var matchingCheckbox = matchingSelection.find("> input[type=checkbox]");
       matchingCheckbox.prop('checked', false);

@@ -237,8 +237,8 @@
   }
 
   function addCollapsibility(selectionContainer) {
-    var hideIndicator = "↑";
-    var expandIndicator = "↓";
+    var hideIndicator = "×";
+    var expandIndicator = "+";
 
     var titleDivs = $(selectionContainer).find("div.title");
 
@@ -252,11 +252,16 @@
     }
     titleDivs.prepend(collapseDiv);
 
-    $("span.collapse-section").unbind().click(function() {
+    $("span.collapse-section").unbind().click(function(e) {
+      e.stopPropagation();
       var indicator = $(this).text();
       $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var jqTitle = $(this).parent();
       jqTitle.siblings().toggle();
+    });
+
+    $("div.title").click(function() {
+      $(this).find("> span.collapse-section").trigger('click');
     });
   }
 

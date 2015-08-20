@@ -40,9 +40,8 @@
       assert.equal(title.length, 1, "should create one title");
       assert.equal(titleOf(title), "section", "title is incorrect");
 
-      var collapse = title.find("div.collapse-section");
-      assert.equal(collapse.length, 1, "should create one collapse div");
-      assert.equal(collapse.text(), "-", "collapse indicator should show uncollapsed by default");
+      var collapse = title.find("span.collapse-section");
+      assert.equal(collapse.length, 1, "should create one collapse span");
 
       var checkbox = title.find("input[type=checkbox]");
       assert.equal(checkbox.length, 1, "should create a section title checkbox");

@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.10.2
+ * v1.10.3
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -310,7 +310,12 @@
       jqOriginalSelect.val(selected);
 
       $(originalSelect).html($(originalSelect).find("option").sort(function(a, b) {
-        return selected.indexOf($(a).attr('value')) > selected.indexOf($(b).attr('value'));
+        var aValue = selected.indexOf($(a).attr('value'));
+        var bValue = selected.indexOf($(b).attr('value'));
+
+        if (aValue > bValue) return 1;
+        if (aValue < bValue) return -1;
+        return 0;
       }));
     }
 
@@ -325,7 +330,9 @@
         selections.push({ text: text, value: value, index: index });
       });
       selections.sort(function(a, b) {
-        return a.index > b.index;
+        if (a.index > b.index) return 1;
+        if (a.index < b.index) return -1;
+        return 0;
       });
 
       addNewFromSelected(selections);

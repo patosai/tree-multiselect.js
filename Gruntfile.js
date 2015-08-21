@@ -18,11 +18,22 @@ module.exports = function(grunt) {
       dist: {
         options: {
           preserveComments: false,
-          banner: "/* jQuery Tree Multiselect v<%= pkg.version %> | " +
-                  "(c) Patrick Tsai | MIT Licensed */\n"
         },
         files: {
           'jquery.tree-multiselect.min.js': ['src/jquery.tree-multiselect.js']
+        }
+      }
+    },
+    usebanner: {
+      dist: {
+        options: {
+          position: 'top',
+          banner: "/* jQuery Tree Multiselect v<%= pkg.version %> | " +
+                  "(c) Patrick Tsai | MIT Licensed */",
+          linebreak: true
+        },
+        files: {
+          src: ['*.min.*']
         }
       }
     }
@@ -31,8 +42,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-banner');
 
   grunt.registerTask('test', 'qunit');
   grunt.registerTask('default', 'test');
-  grunt.registerTask('release', ['cssmin', 'uglify']);
+  grunt.registerTask('release', ['test', 'cssmin', 'uglify', 'usebanner']);
 };

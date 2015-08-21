@@ -13,7 +13,7 @@ Requires jQuery v1.8+
 $("select").treeMultiselect();
 ```
 
-Attribute name                | Description
+Option Attribute name         | Description
 ----------------------------- | ---------------------------------
 `data-section` **(required)** | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect

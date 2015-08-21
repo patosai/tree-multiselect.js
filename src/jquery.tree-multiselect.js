@@ -10,33 +10,33 @@
   var options;
 
   $.fn.treeMultiselect = function(opts) {
-    var originalSelect = this;
-
     options = mergeDefaultOptions(opts);
-    this.attr('multiple', '').css('display', 'none');
+    this.each(function() {
+      var originalSelect = $(this);
+      originalSelect.attr('multiple', '').css('display', 'none');
 
-    var uiBuilder = new UiBuilder();
-    uiBuilder.build(originalSelect);
+      var uiBuilder = new UiBuilder();
+      uiBuilder.build(originalSelect);
 
-    var selectionContainer = uiBuilder.selections;
+      var selectionContainer = uiBuilder.selections;
 
-    generateSelections(originalSelect, selectionContainer);
+      generateSelections(originalSelect, selectionContainer);
 
-    addDescriptionHover(selectionContainer);
-    addCheckboxes(selectionContainer);
-    checkPreselectedSelections(originalSelect, selectionContainer);
-    armTitleCheckboxes(selectionContainer);
-    uncheckParentsOnUnselect(selectionContainer);
+      addDescriptionHover(selectionContainer);
+      addCheckboxes(selectionContainer);
+      checkPreselectedSelections(originalSelect, selectionContainer);
+      armTitleCheckboxes(selectionContainer);
+      uncheckParentsOnUnselect(selectionContainer);
 
-    if (options.collapsible) {
-      addCollapsibility(selectionContainer);
-    }
+      if (options.collapsible) {
+        addCollapsibility(selectionContainer);
+      }
 
-    var selectedContainer = uiBuilder.selected;
-    updateSelectedAndOnChange(selectionContainer, selectedContainer, this);
+      var selectedContainer = uiBuilder.selected;
+      updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect);
 
-    armRemoveSelectedOnClick(selectionContainer, selectedContainer);
-
+      armRemoveSelectedOnClick(selectionContainer, selectedContainer);
+    });
     return this;
   };
 

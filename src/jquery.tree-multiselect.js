@@ -243,7 +243,7 @@
   }
 
   function addCollapsibility(selectionContainer) {
-    var hideIndicator = "×";
+    var hideIndicator = "-";
     var expandIndicator = "+";
 
     var titleDivs = $(selectionContainer).find("div.title");

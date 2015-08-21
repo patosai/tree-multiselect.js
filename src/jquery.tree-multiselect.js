@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.11.0
+ * v1.11.1
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -208,6 +208,9 @@
       targets = $(selectionContainer).find("div.item");
     }
     checkbox.prependTo(targets);
+    $(selectionContainer).find('input[type=checkbox]').click(function(e) {
+      e.stopPropagation();
+    });
   }
 
   function checkPreselectedSelections(originalSelect, selectionContainer) {

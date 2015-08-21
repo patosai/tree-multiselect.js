@@ -1,7 +1,7 @@
 ## jQuery Tree Multiselect
 [![Build Status](https://travis-ci.org/patosai/tree-multiselect.js.svg?branch=master)](https://travis-ci.org/patosai/tree-multiselect.js)
 
-**This plugin allows you to replace a `select` element and replace it with a nice sortable, treeview element.**
+**This plugin allows you to replace a `select` element and replace it with a sweet treeview element.**
 
 Requires jQuery v1.8+
 
@@ -30,13 +30,13 @@ Ex. `data-section="top/middle/inner"` will show up as
 #### Options
 You can pass in options like `treeMultiselect(options)`. It is an object where you can set the following features:
 
-Option name        | Type     | Default | Description
------------------- | -------- | ------- | ---------------
-`allowBatchSelection` | boolean | false | Sections have checkboxes which when checked, check everything within them
-`sortable`         | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
-`collapsible`      | boolean  | true    | Adds collapsibility to sections
-`startCollapsed`   | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially
-`sectionDelimiter` | char     | `/`     | Separator between sections in the select option `data-section` attribute
+Option name           | Type     | Default | Description
+--------------------- | -------- | ------- | ---------------
+`allowBatchSelection` | boolean  | true    | Sections have checkboxes which when checked, check everything within them
+`sortable`            | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
+`collapsible`         | boolean  | true    | Adds collapsibility to sections
+`startCollapsed`      | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially
+`sectionDelimiter`    | char     | `/`     | Separator between sections in the select option `data-section` attribute
 
 ### Installation
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).
@@ -50,8 +50,8 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
   - `div.selections`
     - a lot of `div.section`, each of which has
       - `div.title`, which has
-        - `div.collapse-section` holding the collapsible indicators
-        - `input` of type `checkbox` for selection
+        - `span.collapse-section` holding the collapsible indicators if collapsibility is enabled
+        - `input` of type `checkbox` for selection if allowBatchSelection is enabled
         - the title text
       - a lot of `div.item`, containing
         - `input` of type `checkbox` for selection

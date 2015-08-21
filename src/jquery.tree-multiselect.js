@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.10.3
+ * v1.10.4
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -266,7 +266,7 @@
       jqTitle.siblings().toggle();
     });
 
-    $("div.title").click(function() {
+    titleDivs.click(function() {
       $(this).find("> span.collapse-section").trigger('click');
     });
   }

@@ -11,6 +11,7 @@
     QUnit.module("Sections", {
       beforeEach: function(assert) {
         var select = document.createElement("select");
+        select.setAttribute("multiple", "multiple");
         $("div#qunit-fixture").append(select);
         assert.equal($("select").length, 1);
       }
@@ -106,6 +107,45 @@
         return $(this).clone().children().remove().end().text() == 'two';
       });
       assert.ok(!itemTwo.find("> input[type=checkbox]").prop('checked'), "two should not be checked");
+    });
+
+    QUnit.test("respects the data-index attribute", function(assert) {
+      $("select").append("<option value='one' data-section='foo' data-index='5' selected='selected'>One</option>");
+      $("select").append("<option value='two' data-section='foo' data-index='3' selected='selected'>Two</option>");
+      $("select").append("<option value='three' data-section='foo' data-index='7' selected='selected'>Three</option>");
+      $("select").treeMultiselect();
+
+      var selected = $("div.selected > div.item");
+      assert.equal(selected.length, 3, "should be three selected items");
+      var order = ["Two", "One", "Three"];
+
+      selected.each(function(i, item) {
+        assert.equal(titleOf(item), order[i], "data-index puts items in the wrong order");
+      });
+    });
+
+    QUnit.test("data-index works on nested elements", function(assert) {
+      $("select").append("<option value='one' data-section='foo/bar' data-index='5' selected='selected'>One</option>");
+      $("select").append("<option value='two' data-section='foo' data-index='3' selected='selected'>Two</option>");
+      $("select").append("<option value='three' data-section='foo/super/nested/element' data-index='7' selected='selected'>Three</option>");
+      $("select").treeMultiselect();
+
+      var selected = $("div.selected > div.item");
+      assert.equal(selected.length, 3, "should be three selected items");
+      var order = ["Two", "One", "Three"];
+
+      selected.each(function(i, item) {
+        assert.equal(titleOf(item), order[i], "data-index puts nested items in the wrong order");
+      });
+    });
+
+    QUnit.test("data-description gets put on selections", function(assert) {
+      $("select").append("<option value='one' data-section='foo' data-description='foo-description'>Foo</option>");
+      $("select").treeMultiselect();
+
+      var item = $("div.selections div.item");
+      assert.equal(item.length, 1, "should be one item");
+      assert.equal(item.first().attr('data-description'), "foo-description", "item description is not put correctly on selection");
     });
   </script>
 </html>

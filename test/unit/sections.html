@@ -4,7 +4,7 @@
   <script src="../../src/jquery.tree-multiselect.js"></script>
   <script src="../qunit-1.18.0.js"></script>
   <script>
-    function titleOf(el) {
+    function textOf(el) {
       return $(el).clone().children().remove().end().text();
     }
 
@@ -39,7 +39,7 @@
 
       var title = $("div.selections > div.section > div.title");
       assert.equal(title.length, 1, "should create one title");
-      assert.equal(titleOf(title), "section", "title is incorrect");
+      assert.equal(textOf(title), "section", "title is incorrect");
 
       var collapse = title.find("span.collapse-section");
       assert.equal(collapse.length, 1, "should create one collapse span");
@@ -68,7 +68,7 @@
       assert.equal($("div.section > div.section").length, 2, "there should be two sections inside the other");
 
       var outerSection = $("div.section").first();
-      assert.equal(titleOf(outerSection.find("> div.title")), "alphabet", "outer section name should be 'alphabet'");
+      assert.equal(textOf(outerSection.find("> div.title")), "alphabet", "outer section name should be 'alphabet'");
 
       var outerItem = outerSection.find("> div.item");
       assert.equal(outerItem.length, 1, "there should be one outer item");
@@ -77,8 +77,8 @@
       var innerSections = $("div.section").slice(1);
       var firstInnerSection = innerSections.first();
       var lastInnerSection = innerSections.last();
-      assert.equal(titleOf(firstInnerSection.find("> div.title")), "capitals", "one inner section name should be 'capitals'");
-      assert.equal(titleOf(lastInnerSection.find("> div.title")), "lowercase", "the other inner section name should be 'lowercase'");
+      assert.equal(textOf(firstInnerSection.find("> div.title")), "capitals", "one inner section name should be 'capitals'");
+      assert.equal(textOf(lastInnerSection.find("> div.title")), "lowercase", "the other inner section name should be 'lowercase'");
 
       var capitalsItems = firstInnerSection.find("> div.item");
       assert.equal(capitalsItems.length, 2, "capitals should have two items");
@@ -120,7 +120,7 @@
       var order = ["Two", "One", "Three"];
 
       selected.each(function(i, item) {
-        assert.equal(titleOf(item), order[i], "data-index puts items in the wrong order");
+        assert.equal(textOf(item), order[i], "data-index puts items in the wrong order");
       });
     });
 
@@ -135,7 +135,7 @@
       var order = ["Two", "One", "Three"];
 
       selected.each(function(i, item) {
-        assert.equal(titleOf(item), order[i], "data-index puts nested items in the wrong order");
+        assert.equal(textOf(item), order[i], "data-index puts nested items in the wrong order");
       });
     });
 

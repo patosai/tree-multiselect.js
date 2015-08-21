@@ -4,7 +4,7 @@
   "description": "jQuery multiple select with nested options",
   "main": "jquery.tree-multiselect.min.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test --verbose --force"
   },
   "repository": {
     "type": "git",

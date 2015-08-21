@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.10.4
+ * v1.10.5
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -75,8 +75,9 @@
       allowBatchSelection: true,
       sortable: false,
       collapsible: true,
-      startCollapsed: false,
-      sectionDelimiter: '/'
+      sectionDelimiter: '/',
+      showSectionOnSelected: true,
+      startCollapsed: false
     };
     return $.extend({}, defaults, options);
   }
@@ -272,11 +273,21 @@
   }
 
   function updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect) {
-    function createSelectedDiv(text, value) {
+    function createSelectedDiv(selection) {
+      var text = selection.text
+        , value = selection.value
+        , sectionName = selection.sectionName;
       var item = document.createElement('div');
       item.className = "item";
       item.innerHTML = text;
-      $(item).attr('data-value', value).prepend("<span class='remove-selected'>×</span>").appendTo(selectedContainer);
+
+      if (options.showSectionOnSelected) {
+        $(item).append("<span class='selectedSectionName'>" + sectionName + "</span>");
+      }
+
+      $(item).attr('data-value', value)
+             .prepend("<span class='remove-selected'>×</span>")
+             .appendTo(selectedContainer);
     }
 
     function addNewFromSelected(selections) {
@@ -290,7 +301,7 @@
       });
 
       selectionsNotAdded.forEach(function(selection) {
-        createSelectedDiv(selection.text, selection.value);
+        createSelectedDiv(selection);
       });
 
       armRemoveSelectedOnClick(selectionContainer, selectedContainer);
@@ -338,7 +349,10 @@
         var value = $(this).attr('data-value');
         var index = $(this).attr('data-index');
         $(this).attr('data-index', undefined);
-        selections.push({ text: text, value: value, index: index });
+        var sectionName = $.map($(this).parents("div.section").get().reverse(), function(parentSection) {
+          return textOf($(parentSection).find("> div.title"));
+        }).join("/");
+        selections.push({ text: text, value: value, index: index, sectionName: sectionName });
       });
       selections.sort(function(a, b) {
         if (a.index > b.index) return 1;

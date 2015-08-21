@@ -30,13 +30,14 @@ Ex. `data-section="top/middle/inner"` will show up as
 #### Options
 You can pass in options like `treeMultiselect(options)`. It is an object where you can set the following features:
 
-Option name           | Type     | Default | Description
---------------------- | -------- | ------- | ---------------
-`allowBatchSelection` | boolean  | true    | Sections have checkboxes which when checked, check everything within them
-`sortable`            | boolean  | false   | Selected options can be sorted by dragging (requires jQuery UI)
-`collapsible`         | boolean  | true    | Adds collapsibility to sections
-`startCollapsed`      | boolean  | false   | Activated only if `collapsible` is true; sections are collapsed initially
-`sectionDelimiter`    | char     | `/`     | Separator between sections in the select option `data-section` attribute
+Option name             | Default | Description
+----------------------- | ------- | ---------------
+`allowBatchSelection`   | true    | Sections have checkboxes which when checked, check everything within them
+`collapsible`           | true    | Adds collapsibility to sections
+`sortable`              | false   | Selected options can be sorted by dragging (requires jQuery UI)
+`sectionDelimiter`      | `/`     | Separator between sections in the select option `data-section` attribute
+`showSectionOnSelected` | true    | Show section name on the selected items
+`startCollapsed`        | false   | Activated only if `collapsible` is true; sections are collapsed initially
 
 ### Installation
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).

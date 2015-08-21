@@ -56,16 +56,16 @@ div.tree-multiselect div.title:hover {
   cursor: pointer;
 }
 
-div.tree-multiselect div.item {
-  margin-left: 16px;
-}
-
 div.tree-multiselect input[type=checkbox] {
   margin-right: 5px;
 }
 
 div.tree-multiselect input[type=checkbox]:hover {
   cursor: pointer;
+}
+
+div.tree-multiselect > div.selections div.item {
+  margin-left: 16px;
 }
 
 div.tree-multiselect > div.selected > div.item {

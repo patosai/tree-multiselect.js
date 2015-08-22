@@ -74,7 +74,7 @@ div.tree-multiselect > div.selected > div.item {
   background: #EAEAEA;
 }
 
-div.tree-multiselect > div.selected > div.item:hover {
+div.tree-multiselect > div.selected > div.item.ui-sortable-handle:hover {
   cursor: move;
 }
 

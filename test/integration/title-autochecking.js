@@ -72,3 +72,19 @@ QUnit.test("titles should unselect when a child is unselected", function(assert)
 
   assert.ok(!($("div.title > input[type=checkbox]").is(":checked")), "title should not be checked now");
 });
+
+QUnit.test("nested titles should all be checked if a title is batch selected", function(assert) {
+  $("select").append("<option value='one' data-section='top/middle/inner'>One</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($("input[type=checkbox]").length, 4, "there should be four checkboxes");
+  assert.equal($("input[type=checkbox]:checked").length, 0, "no checkboxes should be checked");
+
+  var middleSection = $("div.section").filter(function() {
+    return textOf($(this).find("> div.title")) == 'middle';
+  });
+
+  middleSection.find("> div.title > input[type=checkbox]").prop('checked', true).trigger('change');
+
+  assert.equal($("input[type=checkbox]:checked").length, 4, "all checkboxes should be checked");
+});

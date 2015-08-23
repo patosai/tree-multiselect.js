@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.12.1
+ * v1.12.2
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -267,7 +267,7 @@
       });
     }
 
-    var checkboxes = $(selectionContainer).find("div.item > input[type=checkbox]");
+    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
     checkboxes.change(function() {
       check();
     });

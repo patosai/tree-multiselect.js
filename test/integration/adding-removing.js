@@ -36,3 +36,27 @@ QUnit.test("can remove an item", function(assert) {
 
   assert.equal($("div.selected div.item").length, 0, "there should now be no selected items");
 });
+
+QUnit.test("removing an item does not remove any others", function(assert) {
+  $("select").append("<option value='one' data-section='A' selected='selected'>One</option>");
+  $("select").append("<option value='two' data-section='A' selected='selected'>Two</option>");
+  $("select").append("<option value='three' data-section='A/B' selected='selected'>Three</option>");
+  $("select").append("<option value='four' data-section='A/B' selected='selected'>Four</option>");
+  $("select").append("<option value='five' data-section='another section' selected='selected'>Five</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($("div.selected div.item").length, 5, "all five items should be selected");
+
+  var thirdItem = $("div.selected div.item").filter(function() {
+    return textOf($(this)) == 'Three';
+  });
+
+  thirdItem.find("span.remove-selected").trigger('click');
+
+  assert.equal($("div.selected div.item").length, 4, "now only four items should be selected");
+
+  var itemWithLabelThree = $("div.selected div.item").filter(function() {
+    return textOf($(this)) == 'Three';
+  });
+  assert.equal(itemWithLabelThree.length, 0, "the element should be gone now");
+});

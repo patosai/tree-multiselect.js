@@ -146,3 +146,21 @@ QUnit.test("section on selected items is displayed correctly", function(assert) 
   assert.equal(sectionSpan.length, 1, "should be one section name span");
   assert.equal(textOf(sectionSpan), "foo/bar/baz", "selected item section name is incorrect");
 });
+
+QUnit.test("handles undefined data-section input", function(assert) {
+  $("select").append("<option value='one' data-section selected='selected'>One</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($("div.selections div.item").length, 1, "stil makes the section");
+
+  var parentSection = $("div.selections div.section");
+  assert.equal(textOf(parentSection.find("> div.title")), "", "parent section title should be empty");
+});
+
+QUnit.test("blows up if no data-section is provided at all", function(assert) {
+  $("select").append("<option value='one' selected='selected'>One</option>");
+
+  assert.throws(function() {
+    $("select").treeMultiselect();
+  }, "should fail when trying to parse data-section attr");
+});

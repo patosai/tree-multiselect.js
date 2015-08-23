@@ -120,5 +120,5 @@ QUnit.test("can disable section display on selected items", function(assert) {
 
   var selectedItem = $("div.selected div.item");
   assert.equal(selectedItem.length, 1, "there should be one selected item");
-  assert.equal(selectedItem.find("span.selectedSectionName").length, 0, "there should be no description spans");
+  assert.equal(selectedItem.find("span.section-name").length, 0, "there should be no description spans");
 });

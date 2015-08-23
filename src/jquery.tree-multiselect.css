@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.12.3
+ * v1.13.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -101,7 +101,7 @@ div.tree-multiselect div.temp-description-popup {
   border-radius: 3px;
 }
 
-div.tree-multiselect span.selectedSectionName {
+div.tree-multiselect span.section-name {
   float: right;
   font-style: italic;
 }

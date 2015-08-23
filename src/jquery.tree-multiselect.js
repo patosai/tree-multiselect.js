@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.12.3
+ * v1.13.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -314,7 +314,7 @@
       item.innerHTML = text;
 
       if (options.showSectionOnSelected) {
-        $(item).append("<span class='selectedSectionName'>" + sectionName + "</span>");
+        $(item).append("<span class='section-name'>" + sectionName + "</span>");
       }
 
       $(item).attr('data-value', value)

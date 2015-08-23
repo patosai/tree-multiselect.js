@@ -61,7 +61,7 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
     - a lot of `div.item`, each containing...
       - `span.remove-selected` holding the indicator to remove element from selection
       - the option name
-      - `span.selectedSectionName` if `showSectionOnSelected` is enabled, showing the section name(s)
+      - `span.section-name` if `showSectionOnSelected` is enabled, showing the section name(s)
 
 ### Testing
   1. `npm install`

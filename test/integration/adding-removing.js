@@ -21,7 +21,7 @@ QUnit.test("can add an item", function(assert) {
   assert.equal($("div.selected div.item").length, 1, "there should be one item in the selected div");
 
   assert.equal(textOf(selectedItem), 'One', "selected item text should be 'one'");
-  assert.equal(textOf(selectedItem.find("> span.selectedSectionName")), 'section', "selected item section label should be 'section'");
+  assert.equal(textOf(selectedItem.find("> span.section-name")), 'section', "selected item section label should be 'section'");
 });
 
 QUnit.test("can remove an item", function(assert) {

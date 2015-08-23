@@ -142,7 +142,7 @@ QUnit.test("section on selected items is displayed correctly", function(assert) 
   $("select").append("<option value='one' data-section='foo/bar/baz' selected='selected'>One</option>");
   $("select").treeMultiselect();
 
-  var sectionSpan = $("div.selected div.item span.selectedSectionName");
+  var sectionSpan = $("div.selected div.item span.section-name");
   assert.equal(sectionSpan.length, 1, "should be one section name span");
   assert.equal(textOf(sectionSpan), "foo/bar/baz", "selected item section name is incorrect");
 });

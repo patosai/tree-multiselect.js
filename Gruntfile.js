@@ -5,7 +5,7 @@ module.exports = function(grunt) {
       options: {
         force: true
       },
-      all: ['test/**/*.html']
+      all: ['test/runner.html']
     },
     cssmin: {
       dist: {

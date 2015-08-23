@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.11.1
+ * v1.12.0
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -25,8 +25,12 @@
       addDescriptionHover(selectionContainer);
       addCheckboxes(selectionContainer);
       checkPreselectedSelections(originalSelect, selectionContainer);
-      armTitleCheckboxes(selectionContainer);
-      uncheckParentsOnUnselect(selectionContainer);
+
+      if (options.allowBatchSelection) {
+        armTitleCheckboxes(selectionContainer);
+        uncheckParentsOnUnselect(selectionContainer);
+        checkParentsOnAllChildrenSelected(selectionContainer);
+      }
 
       if (options.collapsible) {
         addCollapsibility(selectionContainer);
@@ -241,9 +245,34 @@
     var checkboxes = $(selectionContainer).find("input[type=checkbox]");
     checkboxes.change(function() {
       if ($(this).is(":checked")) return;
-      var sectionParents = $(this).parents("div.section");
+      var sectionParents = $(this).parentsUntil(selectionContainer, "div.section");
       sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
     });
+  }
+
+  function checkParentsOnAllChildrenSelected(selectionContainer) {
+    function check() {
+      var sections = $(selectionContainer).find("div.section");
+      sections.each(function() {
+        var section = $(this);
+        var sectionItems = section.find("div.item");
+        var unselectedItems = sectionItems.filter(function() {
+          var checkbox = $(this).find("> input[type=checkbox]"); 
+          return !(checkbox.is(":checked"));
+        });
+        if (unselectedItems.length === 0) {
+          var sectionCheckbox = $(this).find("> div.title > input[type=checkbox]");
+          sectionCheckbox.prop('checked', true);
+        }
+      });
+    }
+
+    var checkboxes = $(selectionContainer).find("div.item > input[type=checkbox]");
+    checkboxes.change(function() {
+      check();
+    });
+
+    check();
   }
 
   function addCollapsibility(selectionContainer) {
@@ -352,7 +381,7 @@
         var value = $(this).attr('data-value');
         var index = $(this).attr('data-index');
         $(this).attr('data-index', undefined);
-        var sectionName = $.map($(this).parents("div.section").get().reverse(), function(parentSection) {
+        var sectionName = $.map($(this).parentsUntil(selectionContainer, "div.section").get().reverse(), function(parentSection) {
           return textOf($(parentSection).find("> div.title"));
         }).join("/");
         selections.push({ text: text, value: value, index: index, sectionName: sectionName });

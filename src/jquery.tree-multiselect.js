@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.12.0
+ * v1.12.1
  *
  * (c) Patrick Tsai
  * MIT Licensed

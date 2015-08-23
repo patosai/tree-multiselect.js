@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.12.0
+ * v1.12.1
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -74,7 +74,7 @@ div.tree-multiselect > div.selected > div.item {
   background: #EAEAEA;
 }
 
-div.tree-multiselect > div.selected > div.item.ui-sortable-handle:hover {
+div.tree-multiselect > div.selected.ui-sortable > div.item:hover {
   cursor: move;
 }
 

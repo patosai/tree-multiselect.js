@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.12.2
+ * v1.12.3
  *
  * (c) Patrick Tsai
  * MIT Licensed
@@ -383,7 +383,7 @@
         $(this).attr('data-index', undefined);
         var sectionName = $.map($(this).parentsUntil(selectionContainer, "div.section").get().reverse(), function(parentSection) {
           return textOf($(parentSection).find("> div.title"));
-        }).join("/");
+        }).join(options.sectionDelimiter);
         selections.push({ text: text, value: value, index: index, sectionName: sectionName });
       });
       selections.sort(function(a, b) {

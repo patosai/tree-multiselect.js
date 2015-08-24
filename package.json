@@ -1,6 +1,6 @@
 {
   "name": "jquery.tree-multiselect.js",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "description": "jQuery multiple select with nested options",
   "main": "jquery.tree-multiselect.min.js",
   "scripts": {

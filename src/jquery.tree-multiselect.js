@@ -387,8 +387,10 @@
         selections.push({ text: text, value: value, index: index, sectionName: sectionName });
       });
       selections.sort(function(a, b) {
-        if (a.index > b.index) return 1;
-        if (a.index < b.index) return -1;
+        var aIndex = parseInt(a.index);
+        var bIndex = parseInt(b.index);
+        if (aIndex > bIndex) return 1;
+        if (aIndex < bIndex) return -1;
         return 0;
       });
 

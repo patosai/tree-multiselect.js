@@ -164,3 +164,13 @@ QUnit.test("blows up if no data-section is provided at all", function(assert) {
     $("select").treeMultiselect();
   }, "should fail when trying to parse data-section attr");
 });
+
+QUnit.test("can handle multi-digit data-index", function(assert) {
+  $("select").append("<option value='one' data-section='' data-index='10' selected='selected'>One</option>");
+  $("select").append("<option value='two' data-section='' data-index='2' selected='selected'>Two</option>");
+  $("select").treeMultiselect();
+
+  var items = $("div.selected div.item");
+  assert.equal(textOf(items.first()), 'Two', "index '2' should come before index '10'");
+  assert.equal(textOf(items.last()), 'One', "and index '10' should come after index '2'");
+});

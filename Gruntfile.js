@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         options: {
           position: 'top',
           banner: "/* jQuery Tree Multiselect v<%= pkg.version %> | " +
-                  "(c) Patrick Tsai | MIT Licensed */",
+                  "(c) Patrick Tsai et al. | MIT Licensed */",
           linebreak: true
         },
         files: {

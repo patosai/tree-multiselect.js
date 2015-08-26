@@ -98,7 +98,7 @@
           currentPos[pathPart] = [];
         }
         currentPos = currentPos[pathPart];
-        
+
         if (i == path.length - 1) {
           currentPos.push(option);
           break;
@@ -257,7 +257,7 @@
         var section = $(this);
         var sectionItems = section.find("div.item");
         var unselectedItems = sectionItems.filter(function() {
-          var checkbox = $(this).find("> input[type=checkbox]"); 
+          var checkbox = $(this).find("> input[type=checkbox]");
           return !(checkbox.is(":checked"));
         });
         if (unselectedItems.length === 0) {
@@ -325,11 +325,11 @@
     function addNewFromSelected(selections) {
       var currentSelections = [];
       $(selectedContainer).find("div.item").each(function() {
-        currentSelections.push(textOf(this));
+        currentSelections.push($(this).data('value'));
       });
 
       var selectionsNotAdded = selections.filter(function(selection) {
-        return currentSelections.indexOf(selection.text) == -1;
+        return currentSelections.indexOf(selection.value) == -1;
       });
 
       selectionsNotAdded.forEach(function(selection) {
@@ -342,11 +342,11 @@
     function removeOldFromSelected(selections) {
       var selectionTexts = [];
       selections.forEach(function(selection) {
-        selectionTexts.push(selection.text);
+        selectionTexts.push(selection.value);
       });
 
       $(selectedContainer).find("div.item").each(function() {
-        var selection = textOf(this);
+        var selection = $(this).data('value');
         if (selectionTexts.indexOf(selection) == -1) {
           $(this).remove();
         }

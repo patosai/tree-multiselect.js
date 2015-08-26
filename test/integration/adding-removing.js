@@ -24,6 +24,27 @@ QUnit.test("can add an item", function(assert) {
   assert.equal(textOf(selectedItem.find("> span.section-name")), 'section', "selected item section label should be 'section'");
 });
 
+QUnit.test("can add an item with the same text", function(assert) {
+  $("select").append("<option value='one' data-section='section'>One</option>");
+  $("select").append("<option value='one_more' data-section='section1'>One</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($("div.selections div.item").length, 2, "there should be two items for selection");
+  assert.equal($("div.selected div.item").length, 0, "no items should be selected");
+
+  $("div.selections div.item > input[type=checkbox]:first").prop('checked', true).trigger('change');
+  $("div.selections div.item > input[type=checkbox]:last").prop('checked', true).trigger('change');
+
+  assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 2, "two items should be checked");
+  var selectedItem = $("div.selected div.item");
+  assert.equal($("div.selected div.item").length, 2, "there should be two items in the selected div");
+
+  assert.equal(textOf(selectedItem.first()), 'One', "first selected item text should be 'One'");
+  assert.equal(textOf(selectedItem.last()), 'One', "second selected item text should be 'One'");
+  assert.equal(textOf(selectedItem.first().find("> span.section-name")), 'section', "first selected item section label should be 'section'");
+  assert.equal(textOf(selectedItem.last().find("> span.section-name")), 'section1', "second selected item section label should be 'section'");
+});
+
 QUnit.test("can remove an item", function(assert) {
   $("select").append("<option value='one' data-section='section' selected='selected'>One</option>");
   $("select").treeMultiselect();

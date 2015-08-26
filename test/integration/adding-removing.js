@@ -32,8 +32,7 @@ QUnit.test("can add an item with the same text", function(assert) {
   assert.equal($("div.selections div.item").length, 2, "there should be two items for selection");
   assert.equal($("div.selected div.item").length, 0, "no items should be selected");
 
-  $("div.selections div.item > input[type=checkbox]:first").prop('checked', true).trigger('change');
-  $("div.selections div.item > input[type=checkbox]:last").prop('checked', true).trigger('change');
+  $("div.selections div.item > input[type=checkbox]").prop('checked', true).trigger('change');
 
   assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 2, "two items should be checked");
   var selectedItem = $("div.selected div.item");
@@ -43,6 +42,13 @@ QUnit.test("can add an item with the same text", function(assert) {
   assert.equal(textOf(selectedItem.last()), 'One', "second selected item text should be 'One'");
   assert.equal(textOf(selectedItem.first().find("> span.section-name")), 'section', "first selected item section label should be 'section'");
   assert.equal(textOf(selectedItem.last().find("> span.section-name")), 'section1', "second selected item section label should be 'section'");
+
+  var correct_val = ['one', 'one_more'];
+  var select_val = $("select").val();
+  assert.equal(select_val.length, correct_val.length, "original select should have two items");
+  for (var i = 0; i < correct_val.length; ++i) {
+    assert.equal(select_val[i], correct_val[i]);
+  }
 });
 
 QUnit.test("can remove an item", function(assert) {

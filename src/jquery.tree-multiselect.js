@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.14.0
+ * v1.14.1
  *
  * (c) Patrick Tsai et al.
  * MIT Licensed
@@ -30,6 +30,7 @@
         armTitleCheckboxes(selectionContainer);
         uncheckParentsOnUnselect(selectionContainer);
         checkParentsOnAllChildrenSelected(selectionContainer);
+        showSemifilledParents(selectionContainer);
       }
 
       if (options.collapsible) {
@@ -267,12 +268,27 @@
       });
     }
 
-    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
-    checkboxes.change(function() {
-      check();
-    });
+    onCheckboxChange(selectionContainer, check);
+  }
 
-    check();
+  function showSemifilledParents(selectionContainer) {
+    function check() {
+      var sections = $(selectionContainer).find("div.section");
+      sections.each(function() {
+        var section = $(this);
+        var items = section.find("div.item");
+        var numSelected = items.filter(function() {
+          var item = $(this);
+          return item.find("> input[type=checkbox]").prop('checked');
+        }).length;
+
+        var sectionCheckbox = $(this).find("> div.title > input[type=checkbox]");
+        var isIndeterminate = (numSelected !== 0 && numSelected !== items.length)
+        sectionCheckbox.prop('indeterminate', isIndeterminate);
+      });
+    }
+
+    onCheckboxChange(selectionContainer, check);
   }
 
   function addCollapsibility(selectionContainer) {
@@ -408,12 +424,7 @@
       }
     }
 
-    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
-    checkboxes.change(function() {
-      update();
-    });
-
-    update();
+    onCheckboxChange(selectionContainer, update);
   }
 
   function armRemoveSelectedOnClick(selectionContainer, selectedContainer) {
@@ -424,5 +435,13 @@
       matchingCheckbox.prop('checked', false);
       matchingCheckbox.trigger('change');
     });
+  }
+
+  function onCheckboxChange(selectionContainer, callback) {
+    var checkboxes = $(selectionContainer).find("input[type=checkbox]");
+    checkboxes.change(function() {
+      callback();
+    });
+    callback();
   }
 })(jQuery);

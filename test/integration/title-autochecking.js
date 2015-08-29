@@ -88,3 +88,49 @@ QUnit.test("nested titles should all be checked if a title is batch selected", f
 
   assert.equal($("input[type=checkbox]:checked").length, 4, "all checkboxes should be checked");
 });
+
+QUnit.test("title checkbox is indeterminate when some but not all options are selected", function(assert) {
+  $("select").append("<option value='one' data-section='top'>One</option>");
+  $("select").append("<option value='two' data-section='top' selected='selected'>Two</option>");
+  $("select").treeMultiselect();
+
+  var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
+  assert.equal(titleCheckbox.length, 1);
+  assert.ok(titleCheckbox.prop('indeterminate'));
+});
+
+QUnit.test("title checkbox turns indeterminate when some options are selected", function(assert) {
+  $("select").append("<option value='one' data-section='top'>One</option>");
+  $("select").append("<option value='two' data-section='top'>Two</option>");
+  $("select").treeMultiselect();
+
+  var lastCheckbox = $("div.selections").find("div.item > input[type=checkbox]").last();
+  lastCheckbox.prop('checked', true).trigger('change');
+
+  var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
+  assert.ok(titleCheckbox.prop('indeterminate'));
+});
+
+QUnit.test("title checkbox is not indeterminate when all options are selected", function(assert) {
+  $("select").append("<option value='one' data-section='top'>One</option>");
+  $("select").append("<option value='two' data-section='top'>Two</option>");
+  $("select").treeMultiselect();
+
+  var checkboxes = $("div.selections").find("input[type=checkbox]");
+  checkboxes.prop('checked', true).trigger('change');
+
+  var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
+  assert.ok(!(titleCheckbox.prop('indeterminate')));
+});
+
+QUnit.test("title checkbox is not indeterminate when no options are selected", function(assert) {
+  $("select").append("<option value='one' data-section='top'>One</option>");
+  $("select").append("<option value='two' data-section='top' selected='selected'>Two</option>");
+  $("select").treeMultiselect();
+
+  var checkedCheckboxes = $("div.selections").find("input[type=checkbox]:checked");
+  checkedCheckboxes.prop('checked', false).trigger('change');
+
+  var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
+  assert.ok(!(titleCheckbox.prop('indeterminate')));
+});

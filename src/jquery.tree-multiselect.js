@@ -223,11 +223,11 @@
     var selectedOptions = $(originalSelect).val();
     if (!selectedOptions) return;
 
-    var selectionWithOption = $(selectionContainer).find("div.item").filter(function() {
+    var selectedOptionDivs = $(selectionContainer).find("div.item").filter(function() {
       var item = $(this);
       return selectedOptions.indexOf(item.attr('data-value')) !== -1;
     });
-    $(selectionWithOption).find("> input[type=checkbox]").prop('checked', true);
+    $(selectedOptionDivs).find("> input[type=checkbox]").prop('checked', true);
   }
 
   function armTitleCheckboxes(selectionContainer) {

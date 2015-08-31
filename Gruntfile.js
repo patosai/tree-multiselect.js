@@ -7,6 +7,9 @@ module.exports = function(grunt) {
       },
       all: ['test/runner.html']
     },
+    jshint: {
+      all: ['src/jquery.tree-multiselect.js']
+    },
     cssmin: {
       dist: {
         files: {
@@ -43,8 +46,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-banner');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
-  grunt.registerTask('test', 'qunit');
+  grunt.registerTask('test', ['qunit', 'jshint']);
   grunt.registerTask('default', 'test');
   grunt.registerTask('release', ['test', 'cssmin', 'uglify', 'usebanner']);
 };

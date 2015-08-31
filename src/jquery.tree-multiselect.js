@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.14.1
+ * v1.14.2
  *
  * (c) Patrick Tsai et al.
  * MIT Licensed
@@ -60,13 +60,13 @@
     $(tree).append(selections);
 
     var selected = document.createElement('div');
-    selected.className = "selected"
+    selected.className = "selected";
     $(tree).append(selected);
 
     this.tree = tree;
     this.selections = selections;
     this.selected = selected;
-  }
+  };
 
   var Option = function(value, text, description, index) {
     this.value = value;
@@ -152,10 +152,11 @@
     }
 
     function createItem(option) {
-      var text = option.text
-        , value = option.value
-        , description = option.description
-        , index = option.index;
+      var text = option.text;
+      var value = option.value;
+      var description = option.description;
+      var index = option.index;
+
       var selection = document.createElement('div');
       selection.className = "item";
       $(selection).text(text || value).attr({
@@ -222,14 +223,11 @@
     var selectedOptions = $(originalSelect).val();
     if (!selectedOptions) return;
 
-    for (var i = 0; i < selectedOptions.length; ++i) {
-      var optionValue = selectedOptions[i];
-      var selectionWithOption = $(selectionContainer).find("div.item").filter(function() {
-        var item = $(this);
-        return item.attr('data-value') === optionValue;
-      });
-      $(selectionWithOption).find("> input[type=checkbox]").prop('checked', true);
-    }
+    var selectionWithOption = $(selectionContainer).find("div.item").filter(function() {
+      var item = $(this);
+      return selectedOptions.indexOf(item.attr('data-value')) !== -1;
+    });
+    $(selectionWithOption).find("> input[type=checkbox]").prop('checked', true);
   }
 
   function armTitleCheckboxes(selectionContainer) {
@@ -237,7 +235,7 @@
     titleCheckboxes.change(function() {
       var section = $(this).closest("div.section");
       var checkboxesToBeChanged = section.find("input[type=checkbox]");
-      var checked = $(this).is(':checked')
+      var checked = $(this).is(':checked');
       checkboxesToBeChanged.prop('checked', checked);
     });
   }
@@ -283,7 +281,7 @@
         }).length;
 
         var sectionCheckbox = $(this).find("> div.title > input[type=checkbox]");
-        var isIndeterminate = (numSelected !== 0 && numSelected !== items.length)
+        var isIndeterminate = (numSelected !== 0 && numSelected !== items.length);
         sectionCheckbox.prop('indeterminate', isIndeterminate);
       });
     }
@@ -322,9 +320,10 @@
 
   function updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect) {
     function createSelectedDiv(selection) {
-      var text = selection.text
-        , value = selection.value
-        , sectionName = selection.sectionName;
+      var text = selection.text;
+      var value = selection.value;
+      var sectionName = selection.sectionName;
+
       var item = document.createElement('div');
       item.className = "item";
       item.innerHTML = text;
@@ -372,7 +371,7 @@
     function updateOriginalSelect() {
       var jqOriginalSelect = $(originalSelect);
 
-      var selected = []
+      var selected = [];
       $(selectedContainer).find("div.item").each(function() {
         selected.push($(this).attr('data-value'));
       });

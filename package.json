@@ -1,6 +1,6 @@
 {
   "name": "jquery.tree-multiselect.js",
-  "version": "1.14.1",
+  "version": "1.14.2",
   "description": "jQuery multiple select with nested options",
   "main": "jquery.tree-multiselect.min.js",
   "scripts": {
@@ -20,6 +20,7 @@
     "grunt": "^0.4.5",
     "grunt-banner": "^0.5.0",
     "grunt-contrib-cssmin": "^0.13.0",
+    "grunt-contrib-jshint": "^0.11.2",
     "grunt-contrib-qunit": "^0.7.0",
     "grunt-contrib-uglify": "^0.9.1"
   }

@@ -87,3 +87,12 @@ QUnit.test("removing an item does not remove any others", function(assert) {
   });
   assert.equal(itemWithLabelThree.length, 0, "the element should be gone now");
 });
+
+QUnit.test("can add items with digit values", function(assert) {
+  $("select").append("<option value='10712' data-section='107'>10712</option>");
+  $("select").append("<option value='10796' data-section='107' selected='selected'>10796</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($('div.selections div.item').length, 2);
+  assert.equal($('div.selected div.item').length, 1);
+});

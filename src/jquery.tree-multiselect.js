@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.14.2
+ * v1.14.3
  *
  * (c) Patrick Tsai et al.
  * MIT Licensed
@@ -340,7 +340,7 @@
     function addNewFromSelected(selections) {
       var currentSelections = [];
       $(selectedContainer).find("div.item").each(function() {
-        currentSelections.push($(this).data('value'));
+        currentSelections.push($(this).attr('data-value'));
       });
 
       var selectionsNotAdded = selections.filter(function(selection) {
@@ -361,7 +361,7 @@
       });
 
       $(selectedContainer).find("div.item").each(function() {
-        var selection = $(this).data('value');
+        var selection = $(this).attr('data-value');
         if (selectionTexts.indexOf(selection) == -1) {
           $(this).remove();
         }

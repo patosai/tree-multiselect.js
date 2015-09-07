@@ -11,17 +11,17 @@ QUnit.test("can add an item", function(assert) {
   $("select").append("<option value='one' data-section='section'>One</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("div.selections div.item").length, 1, "there should be one item for selection");
-  assert.equal($("div.selected div.item").length, 0, "no items should be selected");
+  assert.equal($("div.selections div.item").length, 1);
+  assert.equal($("div.selected div.item").length, 0);
 
   $("div.selections div.item > input[type=checkbox]").prop('checked', true).trigger('change');
 
-  assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 1, "the one item should be checked");
+  assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 1);
   var selectedItem = $("div.selected div.item");
-  assert.equal($("div.selected div.item").length, 1, "there should be one item in the selected div");
+  assert.equal($("div.selected div.item").length, 1);
 
-  assert.equal(textOf(selectedItem), 'One', "selected item text should be 'one'");
-  assert.equal(textOf(selectedItem.find("> span.section-name")), 'section', "selected item section label should be 'section'");
+  assert.equal(textOf(selectedItem), 'One');
+  assert.equal(textOf(selectedItem.find("> span.section-name")), 'section');
 });
 
 QUnit.test("can add an item with the same text", function(assert) {
@@ -29,23 +29,23 @@ QUnit.test("can add an item with the same text", function(assert) {
   $("select").append("<option value='one_more' data-section='section1'>One</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("div.selections div.item").length, 2, "there should be two items for selection");
-  assert.equal($("div.selected div.item").length, 0, "no items should be selected");
+  assert.equal($("div.selections div.item").length, 2);
+  assert.equal($("div.selected div.item").length, 0);
 
   $("div.selections div.item > input[type=checkbox]").prop('checked', true).trigger('change');
 
-  assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 2, "two items should be checked");
+  assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 2);
   var selectedItem = $("div.selected div.item");
-  assert.equal($("div.selected div.item").length, 2, "there should be two items in the selected div");
+  assert.equal($("div.selected div.item").length, 2);
 
-  assert.equal(textOf(selectedItem.first()), 'One', "first selected item text should be 'One'");
-  assert.equal(textOf(selectedItem.last()), 'One', "second selected item text should be 'One'");
-  assert.equal(textOf(selectedItem.first().find("> span.section-name")), 'section', "first selected item section label should be 'section'");
-  assert.equal(textOf(selectedItem.last().find("> span.section-name")), 'section1', "second selected item section label should be 'section'");
+  assert.equal(textOf(selectedItem.first()), 'One');
+  assert.equal(textOf(selectedItem.last()), 'One');
+  assert.equal(textOf(selectedItem.first().find("> span.section-name")), 'section');
+  assert.equal(textOf(selectedItem.last().find("> span.section-name")), 'section1');
 
   var correct_val = ['one', 'one_more'];
   var select_val = $("select").val();
-  assert.equal(select_val.length, correct_val.length, "original select should have two items");
+  assert.equal(select_val.length, correct_val.length);
   for (var i = 0; i < correct_val.length; ++i) {
     assert.equal(select_val[i], correct_val[i]);
   }
@@ -56,12 +56,12 @@ QUnit.test("can remove an item", function(assert) {
   $("select").treeMultiselect();
 
   var selectedItem = $("div.selected div.item");
-  assert.equal(selectedItem.length, 1, "there should be one selected item");
+  assert.equal(selectedItem.length, 1);
 
   var removeSpan = selectedItem.find("> span.remove-selected");
   removeSpan.trigger('click');
 
-  assert.equal($("div.selected div.item").length, 0, "there should now be no selected items");
+  assert.equal($("div.selected div.item").length, 0);
 });
 
 QUnit.test("removing an item does not remove any others", function(assert) {
@@ -72,7 +72,7 @@ QUnit.test("removing an item does not remove any others", function(assert) {
   $("select").append("<option value='five' data-section='another section' selected='selected'>Five</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("div.selected div.item").length, 5, "all five items should be selected");
+  assert.equal($("div.selected div.item").length, 5);
 
   var thirdItem = $("div.selected div.item").filter(function() {
     return textOf($(this)) == 'Three';
@@ -80,12 +80,12 @@ QUnit.test("removing an item does not remove any others", function(assert) {
 
   thirdItem.find("span.remove-selected").trigger('click');
 
-  assert.equal($("div.selected div.item").length, 4, "now only four items should be selected");
+  assert.equal($("div.selected div.item").length, 4);
 
   var itemWithLabelThree = $("div.selected div.item").filter(function() {
     return textOf($(this)) == 'Three';
   });
-  assert.equal(itemWithLabelThree.length, 0, "the element should be gone now");
+  assert.equal(itemWithLabelThree.length, 0);
 });
 
 QUnit.test("can add items with digit values", function(assert) {

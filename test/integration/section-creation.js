@@ -9,14 +9,14 @@ QUnit.module("Section Creation", {
 
 QUnit.test("creates the base div.tree-multiselect element", function(assert) {
   $("select").treeMultiselect();
-  assert.equal($("div.tree-multiselect").length, 1, "should only be one tree-multiselect element");
+  assert.equal($("div.tree-multiselect").length, 1);
 });
 
 QUnit.test("creates the selections and selected containers", function(assert) {
   $("select").treeMultiselect();
 
-  assert.equal($("div.selections").length, 1, "should create a selections element");
-  assert.equal($("div.selected").length, 1, "should create a selected element");
+  assert.equal($("div.selections").length, 1);
+  assert.equal($("div.selected").length, 1);
 });
 
 QUnit.test("creates a section with title and items", function(assert) {
@@ -28,21 +28,21 @@ QUnit.test("creates a section with title and items", function(assert) {
   assert.equal($("div.selections > div.section").length, 1, "should create one section");
 
   var title = $("div.selections > div.section > div.title");
-  assert.equal(title.length, 1, "should create one title");
-  assert.equal(textOf(title), "section", "title is incorrect");
+  assert.equal(title.length, 1);
+  assert.equal(textOf(title), "section");
 
   var collapse = title.find("span.collapse-section");
-  assert.equal(collapse.length, 1, "should create one collapse span");
+  assert.equal(collapse.length, 1);
 
   var checkbox = title.find("input[type=checkbox]");
-  assert.equal(checkbox.length, 1, "should create a section title checkbox");
+  assert.equal(checkbox.length, 1);
 
   var items = $("div.selections > div.section > div.item");
-  assert.equal(items.length, 3, "should create three items in section");
+  assert.equal(items.length, 3);
   var itemTexts = ["item1", "item2", "item3"]
   items.each(function(index, item) {
-    assert.equal($(item).text(), itemTexts[index], "item text is incorrect");
-    assert.ok($(item).is(":visible"), "item should be visible by default");
+    assert.equal($(item).text(), itemTexts[index]);
+    assert.ok($(item).is(":visible"));
   });
 });
 
@@ -54,30 +54,30 @@ QUnit.test("can generate nested sections", function(assert) {
 
   $("select").treeMultiselect();
 
-  assert.equal($("div.section").length, 3, "there should be three sections");
-  assert.equal($("div.section > div.section").length, 2, "there should be two sections inside the other");
+  assert.equal($("div.section").length, 3);
+  assert.equal($("div.section > div.section").length, 2);
 
   var outerSection = $("div.section").first();
-  assert.equal(textOf(outerSection.find("> div.title")), "alphabet", "outer section name should be 'alphabet'");
+  assert.equal(textOf(outerSection.find("> div.title")), "alphabet");
 
   var outerItem = outerSection.find("> div.item");
-  assert.equal(outerItem.length, 1, "there should be one outer item");
-  assert.equal(outerItem.first().text(), "Google", "outer item should be Google");
+  assert.equal(outerItem.length, 1);
+  assert.equal(outerItem.first().text(), "Google");
 
   var innerSections = $("div.section").slice(1);
   var firstInnerSection = innerSections.first();
   var lastInnerSection = innerSections.last();
-  assert.equal(textOf(firstInnerSection.find("> div.title")), "capitals", "one inner section name should be 'capitals'");
-  assert.equal(textOf(lastInnerSection.find("> div.title")), "lowercase", "the other inner section name should be 'lowercase'");
+  assert.equal(textOf(firstInnerSection.find("> div.title")), "capitals");
+  assert.equal(textOf(lastInnerSection.find("> div.title")), "lowercase");
 
   var capitalsItems = firstInnerSection.find("> div.item");
-  assert.equal(capitalsItems.length, 2, "capitals should have two items");
-  assert.equal(capitalsItems.first().text(), "ABC", "first item should be ABC");
-  assert.equal(capitalsItems.last().text(), "DEF", "last item should be DEF");
+  assert.equal(capitalsItems.length, 2);
+  assert.equal(capitalsItems.first().text(), "ABC");
+  assert.equal(capitalsItems.last().text(), "DEF");
 
   var lowercaseItems = lastInnerSection.find("> div.item");
-  assert.equal(lowercaseItems.length, 1, "lowercase should have one item");
-  assert.equal(lowercaseItems.first().text(), "xyz", "item should be xyz");
+  assert.equal(lowercaseItems.length, 1);
+  assert.equal(lowercaseItems.first().text(), "xyz");
 });
 
 QUnit.test("selects options that were selected in original select", function(assert) {
@@ -91,12 +91,12 @@ QUnit.test("selects options that were selected in original select", function(ass
   var itemOne = $("div.item").filter(function() {
     return $(this).clone().children().remove().end().text() == 'one';
   });
-  assert.ok(itemOne.find("> input[type=checkbox]").prop('checked'), "one should be checked");
+  assert.ok(itemOne.find("> input[type=checkbox]").prop('checked'));
 
   var itemTwo = $("div.item").filter(function() {
     return $(this).clone().children().remove().end().text() == 'two';
   });
-  assert.ok(!itemTwo.find("> input[type=checkbox]").prop('checked'), "two should not be checked");
+  assert.ok(!itemTwo.find("> input[type=checkbox]").prop('checked'));
 });
 
 QUnit.test("respects the data-index attribute", function(assert) {
@@ -106,11 +106,11 @@ QUnit.test("respects the data-index attribute", function(assert) {
   $("select").treeMultiselect();
 
   var selected = $("div.selected > div.item");
-  assert.equal(selected.length, 3, "should be three selected items");
+  assert.equal(selected.length, 3);
   var order = ["Two", "One", "Three"];
 
   selected.each(function(i, item) {
-    assert.equal(textOf(item), order[i], "data-index puts items in the wrong order");
+    assert.equal(textOf(item), order[i]);
   });
 });
 
@@ -121,11 +121,11 @@ QUnit.test("data-index works on nested elements", function(assert) {
   $("select").treeMultiselect();
 
   var selected = $("div.selected > div.item");
-  assert.equal(selected.length, 3, "should be three selected items");
+  assert.equal(selected.length, 3);
   var order = ["Two", "One", "Three"];
 
   selected.each(function(i, item) {
-    assert.equal(textOf(item), order[i], "data-index puts nested items in the wrong order");
+    assert.equal(textOf(item), order[i]);
   });
 });
 
@@ -135,7 +135,7 @@ QUnit.test("data-description gets put on selections", function(assert) {
 
   var item = $("div.selections div.item");
   assert.equal(item.length, 1, "should be one item");
-  assert.equal(item.first().attr('data-description'), "foo-description", "item description is not put correctly on selection");
+  assert.equal(item.first().attr('data-description'), "foo-description");
 });
 
 QUnit.test("section on selected items is displayed correctly", function(assert) {
@@ -143,18 +143,18 @@ QUnit.test("section on selected items is displayed correctly", function(assert) 
   $("select").treeMultiselect();
 
   var sectionSpan = $("div.selected div.item span.section-name");
-  assert.equal(sectionSpan.length, 1, "should be one section name span");
-  assert.equal(textOf(sectionSpan), "foo/bar/baz", "selected item section name is incorrect");
+  assert.equal(sectionSpan.length, 1);
+  assert.equal(textOf(sectionSpan), "foo/bar/baz");
 });
 
 QUnit.test("handles undefined data-section input", function(assert) {
   $("select").append("<option value='one' data-section selected='selected'>One</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("div.selections div.item").length, 1, "stil makes the section");
+  assert.equal($("div.selections div.item").length, 1);
 
   var parentSection = $("div.selections div.section");
-  assert.equal(textOf(parentSection.find("> div.title")), "", "parent section title should be empty");
+  assert.equal(textOf(parentSection.find("> div.title")), "");
 });
 
 QUnit.test("blows up if no data-section is provided at all", function(assert) {
@@ -162,7 +162,7 @@ QUnit.test("blows up if no data-section is provided at all", function(assert) {
 
   assert.throws(function() {
     $("select").treeMultiselect();
-  }, "should fail when trying to parse data-section attr");
+  });
 });
 
 QUnit.test("can handle multi-digit data-index", function(assert) {
@@ -171,6 +171,6 @@ QUnit.test("can handle multi-digit data-index", function(assert) {
   $("select").treeMultiselect();
 
   var items = $("div.selected div.item");
-  assert.equal(textOf(items.first()), 'Two', "index '2' should come before index '10'");
-  assert.equal(textOf(items.last()), 'One', "and index '10' should come after index '2'");
+  assert.equal(textOf(items.first()), 'Two');
+  assert.equal(textOf(items.last()), 'One');
 });

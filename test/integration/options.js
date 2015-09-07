@@ -15,11 +15,11 @@ QUnit.test("Is collapsible by default, but not collapsed", function(assert) {
 
   $("div.section").each(function() {
     var collapseSpan = $(this).find("> div.title > span.collapse-section");
-    assert.equal(collapseSpan.length, 1, "should have a collapse element");
+    assert.equal(collapseSpan.length, 1);
   });
 
   $("div.item").each(function() {
-    assert.ok($(this).is(":visible"), "all items should be visible");
+    assert.ok($(this).is(":visible"));
   });
 });
 
@@ -39,11 +39,11 @@ QUnit.test("Can be collapsed if specified", function(assert) {
   $("select").treeMultiselect(options);
 
   $("div.item").each(function() {
-    assert.ok($(this).is(":hidden"), "all items should be hidden");
+    assert.ok($(this).is(":hidden"));
   });
 
   $("div.section div.section").each(function() {
-    assert.ok($(this).is(":hidden"), "all inner sections should be hidden");
+    assert.ok($(this).is(":hidden"));
   });
 });
 
@@ -64,11 +64,11 @@ QUnit.test("startCollapsed doesn't do anything if collapsible is false", functio
   $("select").treeMultiselect(options);
 
   $("div.item").each(function() {
-    assert.ok($(this).is(":visible"), "all items should be hidden");
+    assert.ok($(this).is(":visible"));
   });
 
   $("div.section div.section").each(function() {
-    assert.ok($(this).is(":visible"), "all inner sections should be visible");
+    assert.ok($(this).is(":visible"));
   });
 });
 
@@ -88,8 +88,8 @@ QUnit.test("can set a different section delimiter", function(assert) {
   var innerSections = $("div.selections div.section > div.section");
   assert.equal(innerSections.length, 2, "should be two inner sections");
 
-  assert.equal(textOf(innerSections.first().find("div.title")), "inner", "first inner section name is incorrect");
-  assert.equal(textOf(innerSections.last().find("div.title")), "inner2", "first inner section name is incorrect");
+  assert.equal(textOf(innerSections.first().find("div.title")), "inner");
+  assert.equal(textOf(innerSections.last().find("div.title")), "inner2");
 });
 
 QUnit.test("can disable batch select", function(assert) {
@@ -108,7 +108,7 @@ QUnit.test("can disable batch select", function(assert) {
 
   var title = $("div.selections > div.section > div.title");
 
-  assert.equal(title.find("> input[type=checkbox]").length, 0, "should be no checkboxes on titles anywhere");
+  assert.equal(title.find("> input[type=checkbox]").length, 0);
 });
 
 QUnit.test("can disable section display on selected items", function(assert) {
@@ -119,6 +119,6 @@ QUnit.test("can disable section display on selected items", function(assert) {
   $("select").treeMultiselect(options);
 
   var selectedItem = $("div.selected div.item");
-  assert.equal(selectedItem.length, 1, "there should be one selected item");
-  assert.equal(selectedItem.find("span.section-name").length, 0, "there should be no description spans");
+  assert.equal(selectedItem.length, 1);
+  assert.equal(selectedItem.find("span.section-name").length, 0);
 });

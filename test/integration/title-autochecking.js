@@ -12,9 +12,9 @@ QUnit.test("section checkboxes should be checked when all children are selected 
   $("select").append("<option value='two' data-section='foo' selected='selected'>Two</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("input[type=checkbox]").length, 3, "there should be three checkboxes");
-  assert.equal($("div.item > input[type=checkbox]").length, 2, "two checkboxes should be item checkboxes");
-  assert.equal($("input[type=checkbox]:checked").length, 3, "all three should be checked");
+  assert.equal($("input[type=checkbox]").length, 3);
+  assert.equal($("div.item > input[type=checkbox]").length, 2);
+  assert.equal($("input[type=checkbox]:checked").length, 3);
 });
 
 QUnit.test("section checkboxes should be checked when all children are selected", function(assert) {
@@ -22,12 +22,12 @@ QUnit.test("section checkboxes should be checked when all children are selected"
   $("select").append("<option value='two' data-section='foo'>Two</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("input[type=checkbox]:checked").length, 1, "only one item should be checked");
+  assert.equal($("input[type=checkbox]:checked").length, 1);
 
   var lastItem = $("div.selections div.item").last();
   lastItem.find("> input[type=checkbox]").prop('checked', true).trigger('change');
 
-  assert.equal($("input[type=checkbox]:checked").length, 3, "both items and the title should be checked");
+  assert.equal($("input[type=checkbox]:checked").length, 3);
 });
 
 QUnit.test("top level parent should not be checked if only one child section is completely checked", function(assert) {
@@ -36,7 +36,7 @@ QUnit.test("top level parent should not be checked if only one child section is 
   $("select").treeMultiselect();
 
   var topLevel = $("div.section").first();
-  assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")), "top level parent should not checked");
+  assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")));
 });
 
 QUnit.test("top level parent checking with only one child section completely checked, now with triggers", function(assert) {
@@ -46,39 +46,39 @@ QUnit.test("top level parent checking with only one child section completely che
   $("select").treeMultiselect();
 
   var topLevel = $("div.section").first();
-  assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")), "top level parent should not checked");
+  assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")));
 
   var barSection = $("div.section").filter(function() {
     return textOf($(this).find("> div.title")) == 'bar';
   });
-  assert.equal(barSection.length, 1, "should be on 'bar' section");
-  assert.ok(!(barSection.find("> div.title > input[type=checkbox]").is(":checked")), "bar section is not checked yet");
+  assert.equal(barSection.length, 1);
+  assert.ok(!(barSection.find("> div.title > input[type=checkbox]").is(":checked")));
 
   barSection.find("div.item > input[type=checkbox]").prop('checked', true).trigger('change');
 
-  assert.ok(barSection.find("> div.title > input[type=checkbox]").is(":checked"), "bar section should be checked now");
-  assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")), "top level section should still not be checked");
+  assert.ok(barSection.find("> div.title > input[type=checkbox]").is(":checked"));
+  assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")));
 });
 
 QUnit.test("titles should unselect when a child is unselected", function(assert) {
   $("select").append("<option value='one' data-section='foo' selected='selected'>One</option>");
   $("select").treeMultiselect();
 
-  assert.ok($("div.title > input[type=checkbox]").is(":checked"), "title should initially be checked");
+  assert.ok($("div.title > input[type=checkbox]").is(":checked"));
 
   var item = $("div.item > input[type=checkbox]").first();
   item.prop("checked", false);
   item.trigger('change');
 
-  assert.ok(!($("div.title > input[type=checkbox]").is(":checked")), "title should not be checked now");
+  assert.ok(!($("div.title > input[type=checkbox]").is(":checked")));
 });
 
 QUnit.test("nested titles should all be checked if a title is batch selected", function(assert) {
   $("select").append("<option value='one' data-section='top/middle/inner'>One</option>");
   $("select").treeMultiselect();
 
-  assert.equal($("input[type=checkbox]").length, 4, "there should be four checkboxes");
-  assert.equal($("input[type=checkbox]:checked").length, 0, "no checkboxes should be checked");
+  assert.equal($("input[type=checkbox]").length, 4);
+  assert.equal($("input[type=checkbox]:checked").length, 0);
 
   var middleSection = $("div.section").filter(function() {
     return textOf($(this).find("> div.title")) == 'middle';
@@ -86,7 +86,7 @@ QUnit.test("nested titles should all be checked if a title is batch selected", f
 
   middleSection.find("> div.title > input[type=checkbox]").prop('checked', true).trigger('change');
 
-  assert.equal($("input[type=checkbox]:checked").length, 4, "all checkboxes should be checked");
+  assert.equal($("input[type=checkbox]:checked").length, 4);
 });
 
 QUnit.test("title checkbox is indeterminate when some but not all options are selected", function(assert) {

@@ -123,7 +123,7 @@ QUnit.test("can disable section display on selected items", function(assert) {
   assert.equal(selectedItem.find("span.section-name").length, 0);
 });
 
-QUnit.test("can freeze checkboxes", function(assert) {
+QUnit.test("can freeze selections", function(assert) {
   $("select").append("<option value='one' data-section='test'>One</option>");
   $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
   var options = {

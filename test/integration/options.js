@@ -122,3 +122,22 @@ QUnit.test("can disable section display on selected items", function(assert) {
   assert.equal(selectedItem.length, 1);
   assert.equal(selectedItem.find("span.section-name").length, 0);
 });
+
+QUnit.test("can freeze checkboxes", function(assert) {
+  $("select").append("<option value='one' data-section='test'>One</option>");
+  $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+  var options = {
+    freeze: true
+  };
+  $("select").treeMultiselect(options);
+
+  var checkboxes = $("div.selections div.item > input[type=checkbox]");
+  assert.equal(checkboxes.length, 2);
+  checkboxes.each(function() {
+    var checkbox = $(this);
+    assert.ok(checkbox.attr('disabled'));
+  });
+
+  var removeSpans = $("div.selected span.remove-selected");
+  assert.equal(removeSpans.length, 0);
+});

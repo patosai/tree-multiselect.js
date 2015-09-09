@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.14.3
+ * v1.14.4
  *
  * (c) Patrick Tsai et al.
  * MIT Licensed
@@ -80,6 +80,7 @@
       allowBatchSelection: true,
       sortable: false,
       collapsible: true,
+      freeze: false,
       sectionDelimiter: '/',
       showSectionOnSelected: true,
       startCollapsed: false
@@ -207,12 +208,17 @@
 
   function addCheckboxes(selectionContainer) {
     var checkbox = $('<input />', { type: 'checkbox' });
+    if (options.freeze) {
+      checkbox.attr('disabled', 'disabled');
+    }
+
     var targets = null;
     if (options.allowBatchSelection) {
       targets = $(selectionContainer).find("div.title, div.item");
     } else {
       targets = $(selectionContainer).find("div.item");
     }
+
     checkbox.prependTo(targets);
     $(selectionContainer).find('input[type=checkbox]').click(function(e) {
       e.stopPropagation();
@@ -332,8 +338,11 @@
         $(item).append("<span class='section-name'>" + sectionName + "</span>");
       }
 
+      if (!options.freeze) {
+        $(item).prepend("<span class='remove-selected'>×</span>");
+      }
+
       $(item).attr('data-value', value)
-             .prepend("<span class='remove-selected'>×</span>")
              .appendTo(selectedContainer);
     }
 

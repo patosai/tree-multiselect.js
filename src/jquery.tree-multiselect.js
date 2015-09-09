@@ -45,10 +45,6 @@
     return this;
   };
 
-  function textOf(el) {
-    return $(el).clone().children().remove().end().text();
-  }
-
   var UiBuilder = function() {};
   UiBuilder.prototype.build = function(el) {
     var tree = document.createElement('div');
@@ -422,7 +418,7 @@
       removeOldFromSelected(selections);
       updateOriginalSelect();
 
-      if (options.sortable) {
+      if (options.sortable && !options.freeze) {
         var jqSelectedContainer = $(selectedContainer);
         jqSelectedContainer.sortable({
           update: function(event, ui) {
@@ -451,5 +447,9 @@
       callback();
     });
     callback();
+  }
+
+  function textOf(el) {
+    return $(el).clone().children().remove().end().text();
   }
 })(jQuery);

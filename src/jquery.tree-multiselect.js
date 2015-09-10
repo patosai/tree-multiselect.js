@@ -1,16 +1,14 @@
 /*
  * jQuery Tree Multiselect
- * v1.14.4
+ * v1.14.5
  *
  * (c) Patrick Tsai et al.
  * MIT Licensed
  */
 
 (function($) {
-  var options;
-
   $.fn.treeMultiselect = function(opts) {
-    options = mergeDefaultOptions(opts);
+    var options = mergeDefaultOptions(opts);
     this.each(function() {
       var originalSelect = $(this);
       originalSelect.attr('multiple', '').css('display', 'none');
@@ -20,27 +18,27 @@
 
       var selectionContainer = uiBuilder.selections;
 
-      generateSelections(originalSelect, selectionContainer);
+      generateSelections(originalSelect, selectionContainer, options);
 
-      addDescriptionHover(selectionContainer);
-      addCheckboxes(selectionContainer);
-      checkPreselectedSelections(originalSelect, selectionContainer);
+      addDescriptionHover(selectionContainer, options);
+      addCheckboxes(selectionContainer, options);
+      checkPreselectedSelections(originalSelect, selectionContainer, options);
 
       if (options.allowBatchSelection) {
-        armTitleCheckboxes(selectionContainer);
-        uncheckParentsOnUnselect(selectionContainer);
-        checkParentsOnAllChildrenSelected(selectionContainer);
-        showSemifilledParents(selectionContainer);
+        armTitleCheckboxes(selectionContainer, options);
+        uncheckParentsOnUnselect(selectionContainer, options);
+        checkParentsOnAllChildrenSelected(selectionContainer, options);
+        showSemifilledParents(selectionContainer, options);
       }
 
       if (options.collapsible) {
-        addCollapsibility(selectionContainer);
+        addCollapsibility(selectionContainer, options);
       }
 
       var selectedContainer = uiBuilder.selected;
-      updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect);
+      updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect, options);
 
-      armRemoveSelectedOnClick(selectionContainer, selectedContainer);
+      armRemoveSelectedOnClick(selectionContainer, selectedContainer, options);
     });
     return this;
   };
@@ -84,7 +82,7 @@
     return $.extend({}, defaults, options);
   }
 
-  function generateSelections(originalSelect, selectionContainer) {
+  function generateSelections(originalSelect, selectionContainer, options) {
     var data = {};
 
     function insertOption(path, option) {
@@ -202,7 +200,7 @@
     });
   }
 
-  function addCheckboxes(selectionContainer) {
+  function addCheckboxes(selectionContainer, options) {
     var checkbox = $('<input />', { type: 'checkbox' });
     if (options.freeze) {
       checkbox.attr('disabled', 'disabled');
@@ -291,7 +289,7 @@
     onCheckboxChange(selectionContainer, check);
   }
 
-  function addCollapsibility(selectionContainer) {
+  function addCollapsibility(selectionContainer, options) {
     var hideIndicator = "-";
     var expandIndicator = "+";
 
@@ -320,7 +318,7 @@
     });
   }
 
-  function updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect) {
+  function updateSelectedAndOnChange(selectionContainer, selectedContainer, originalSelect, options) {
     function createSelectedDiv(selection) {
       var text = selection.text;
       var value = selection.value;

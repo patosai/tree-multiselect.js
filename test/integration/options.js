@@ -141,3 +141,27 @@ QUnit.test("can freeze selections", function(assert) {
   var removeSpans = $("div.selected span.remove-selected");
   assert.equal(removeSpans.length, 0);
 });
+
+QUnit.test("freeze does not affect other treeMultiselects", function(assert) {
+  $("select").append("<option value='one' data-section='test'>One</option>");
+  var options = {
+    freeze: true
+  };
+  $("select").treeMultiselect(options);
+
+  $("div#qunit-fixture").append("<select id='frozen'></select>");
+  $("select#frozen").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+  $("select#frozen").treeMultiselect();
+
+  var frozenOption = $("div.selections div.item:contains(One)");
+  assert.equal(frozenOption.length, 1);
+  assert.ok(!!frozenOption.find("input[type=checkbox]").attr('disabled'));
+
+  var unfrozenOption = $("div.selections div.item:contains(Two)");
+  assert.equal(unfrozenOption.length, 1);
+  unfrozenOption.find("input[type=checkbox]").prop('checked', 'true').trigger('change');
+
+  var unfrozenSelection = $("div.selected div.item:contains(Two)");
+  assert.equal(unfrozenSelection.length, 1);
+  assert.equal(unfrozenSelection.find("span.remove-selected").length, 1);
+});

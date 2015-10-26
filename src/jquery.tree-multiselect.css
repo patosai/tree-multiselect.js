@@ -29,6 +29,10 @@ div.tree-multiselect > div.selections {
   border-right: solid 2px #D8D8D8;
 }
 
+div.tree-multiselect > div.selections.no-border {
+  border-right: none;
+}
+
 div.tree-multiselect div.section > div.item, div.tree-multiselect div.section > div.section {
   padding-left: 20px;
 }

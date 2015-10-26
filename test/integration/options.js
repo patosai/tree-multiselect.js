@@ -165,3 +165,20 @@ QUnit.test("freeze does not affect other treeMultiselects", function(assert) {
   assert.equal(unfrozenSelection.length, 1);
   assert.equal(unfrozenSelection.find("span.remove-selected").length, 1);
 });
+
+QUnit.test("Selected panel is not removed by default", function(assert) {
+  $("select").append("<option value='one' data-section='test'>One</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($("div.selected").length, 1);
+});
+
+QUnit.test("hideSidePanel removes the selected panel", function(assert) {
+  $("select").append("<option value='one' data-section='test'>One</option>");
+  var options = {
+    hideSidePanel: true
+  };
+  $("select").treeMultiselect(options);
+
+  assert.equal($("div.selected").length, 0);
+});

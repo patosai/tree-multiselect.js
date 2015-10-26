@@ -13,7 +13,7 @@ module.exports = function(grunt) {
     cssmin: {
       dist: {
         files: {
-          'jquery.tree-multiselect.min.css': ['src/jquery.tree-multiselect.css']
+          'dist/jquery.tree-multiselect.min.css': ['src/jquery.tree-multiselect.css']
         }
       }
     },
@@ -23,7 +23,7 @@ module.exports = function(grunt) {
           preserveComments: false,
         },
         files: {
-          'jquery.tree-multiselect.min.js': ['src/jquery.tree-multiselect.js']
+          'dist/jquery.tree-multiselect.min.js': ['src/jquery.tree-multiselect.js']
         }
       }
     },
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
           linebreak: true
         },
         files: {
-          src: ['*.min.*']
+          src: ['dist/*.min.*']
         }
       }
     }

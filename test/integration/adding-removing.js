@@ -108,3 +108,16 @@ QUnit.test("fires change event when original select is modified", function(asser
 
   $("div.item input[type=checkbox]").click();
 });
+
+QUnit.test("change event also fires for plain Javascript callbacks", function(assert) {
+  $("select").append("<option value='10712' data-section='107'>10712</option>");
+  $("select").treeMultiselect();
+
+  var done = assert.async();
+  var selectEl = $("select")[0];
+  selectEl.onchange = function() {
+    done();
+  };
+
+  $("div.item input[type=checkbox]").click();
+});

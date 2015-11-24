@@ -1,4 +1,11 @@
 var saucelabsPort = 3000;
+var saucelabsBrowsers = [
+  ['Windows 7', 'internet explorer', ''],
+  ['Linux', 'firefox', ''],
+  ['Linux', 'chrome', ''],
+  ['OSX 10.11', 'safari', ''],
+  ['Linux', 'opera', ''],
+];
 
 module.exports = function(grunt) {
   grunt.initConfig({
@@ -14,7 +21,8 @@ module.exports = function(grunt) {
         options: {
           urls: ['http://127.0.0.1:' + saucelabsPort + '/test/runner.html'],
           testname: 'Tree Multiselect sauce tests',
-          build: process.env.TRAVIS_JOB_ID
+          build: process.env.TRAVIS_JOB_ID,
+          browsers: saucelabsBrowsers
         }
       }
     },

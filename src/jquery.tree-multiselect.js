@@ -1,6 +1,6 @@
 /*
  * jQuery Tree Multiselect
- * v1.15.0
+ * v1.15.1
  *
  * (c) Patrick Tsai et al.
  * MIT Licensed
@@ -385,7 +385,7 @@
         selected.push($(this).attr('data-value'));
       });
 
-      jqOriginalSelect.val(selected);
+      jqOriginalSelect.val(selected).change();
 
       $(originalSelect).html($(originalSelect).find("option").sort(function(a, b) {
         var aValue = selected.indexOf($(a).attr('value'));

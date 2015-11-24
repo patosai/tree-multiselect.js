@@ -96,3 +96,15 @@ QUnit.test("can add items with digit values", function(assert) {
   assert.equal($('div.selections div.item').length, 2);
   assert.equal($('div.selected div.item').length, 1);
 });
+
+QUnit.test("fires change event when original select is modified", function(assert) {
+  $("select").append("<option value='10712' data-section='107'>10712</option>");
+  $("select").treeMultiselect();
+
+  var done = assert.async();
+  $("select").change(function() {
+    done();
+  });
+
+  $("div.item input[type=checkbox]").click();
+});

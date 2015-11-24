@@ -23,7 +23,8 @@ module.exports = function(grunt) {
       server: {
         options: {
           base: "",
-          port: saucelabsPort
+          port: saucelabsPort,
+          keepalive: true
         }
       }
     },

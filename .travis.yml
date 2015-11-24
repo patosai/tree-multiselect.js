@@ -5,7 +5,7 @@ node_js:
 
 before_script:
   - npm install grunt-cli -g
-  - grunt connect
+  - grunt connect &
 
 script: grunt test-travis --verbose
 

@@ -3,6 +3,7 @@
 **This plugin allows you to replace a `select` element with a sweet treeview element.**
 
 Requires jQuery v1.8+
+
 [![Sauce Test Status](https://saucelabs.com/buildstatus/tree-multiselect)](https://saucelabs.com/u/tree-multiselect)
 
 ### Demo

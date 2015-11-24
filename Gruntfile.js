@@ -7,6 +7,15 @@ module.exports = function(grunt) {
       },
       all: ['test/runner.html']
     },
+    'saucelabs-qunit': {
+      all: {
+        options: {
+          urls: ['http://localhost/test/runner.html'],
+          testname: 'Tree Multiselect sauce tests',
+          build: process.env.TRAVIS_BUILD_ID
+        }
+      }
+    },
     jshint: {
       all: ['src/jquery.tree-multiselect.js']
     },
@@ -47,8 +56,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-saucelabs');
 
   grunt.registerTask('test', ['qunit', 'jshint']);
+  grunt.registerTask('test-travis', ['test', 'saucelabs-qunit']);
   grunt.registerTask('default', 'test');
   grunt.registerTask('release', ['test', 'cssmin', 'uglify', 'usebanner']);
 };

@@ -27,20 +27,20 @@ var saucelabsBrowsers = [
   ['Windows XP', 'internet explorer', '7'],
   ['Windows XP', 'internet explorer', '6'],
   // iOS
-  ['OS X 10.8', 'ipad', '9.2'],
-  ['OS X 10.8', 'ipad', '8.4'],
-  ['OS X 10.8', 'ipad', '7.1'],
-  ['OS X 10.8', 'ipad', '6.1'],
+  ['OS X 10.10', 'ipad', '9.2'],
+  ['OS X 10.10', 'ipad', '8.4'],
+  ['OS X 10.9', 'ipad', '7.1'],
+  ['OS X 10.9', 'ipad', '6.1'],
   ['OS X 10.8', 'ipad', '5.1'],
-  ['OS X 10.8', 'iphone', '9.2'],
-  ['OS X 10.8', 'iphone', '8.4'],
-  ['OS X 10.8', 'iphone', '7.1'],
-  ['OS X 10.8', 'iphone', '6.1'],
+  ['OS X 10.10', 'iphone', '9.2'],
+  ['OS X 10.10', 'iphone', '8.4'],
+  ['OS X 10.9', 'iphone', '7.1'],
+  ['OS X 10.9', 'iphone', '6.1'],
   ['OS X 10.8', 'iphone', '5.1'],
   // Android
-  ['Android', 'Android', '5.1'],
-  ['Android', 'Android', '4.4'],
-  ['Android', 'Android', '2.3'],
+  ['Linux', 'android', '5.1'],
+  ['Linux', 'android', '4.4'],
+  ['Linux', 'android', '2.3'],
 ];
 
 module.exports = function(grunt) {
@@ -58,7 +58,9 @@ module.exports = function(grunt) {
           urls: ['http://127.0.0.1:' + saucelabsPort + '/test/runner.html'],
           testname: 'Tree Multiselect sauce tests',
           build: process.env.TRAVIS_JOB_ID,
-          browsers: saucelabsBrowsers
+          browsers: saucelabsBrowsers,
+          statusCheckAttempts: 150,
+          max-duration: 300
         }
       }
     },

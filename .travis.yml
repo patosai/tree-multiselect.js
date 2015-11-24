@@ -5,8 +5,7 @@ node_js:
 
 before_script:
   - npm install grunt-cli -g
-  - npm install express -g
-  - node test/node-web-server.js  # start a Web server
+  - grunt connect
 
 script: grunt test-travis --verbose
 

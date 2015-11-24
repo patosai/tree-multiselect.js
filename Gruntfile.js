@@ -1,3 +1,5 @@
+var saucelabsPort = 3000;
+
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -10,10 +12,18 @@ module.exports = function(grunt) {
     'saucelabs-qunit': {
       all: {
         options: {
-          urls: ['http://127.0.0.1:3000/test/runner.html'],
+          urls: ['http://127.0.0.1:' + saucelabsPort + '/test/runner.html'],
           testname: 'Tree Multiselect sauce tests',
           build: process.env.TRAVIS_JOB_ID,
           browsers: [["Windows 7", "chrome", ""]]
+        }
+      }
+    },
+    connect: {
+      server: {
+        options: {
+          base: "",
+          port: saucelabsPort
         }
       }
     },
@@ -58,6 +68,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-saucelabs');
+  grunt.loadNpmTasks('grunt--contrib-connect');
 
   grunt.registerTask('test', ['qunit', 'jshint']);
   grunt.registerTask('test-travis', ['test', 'saucelabs-qunit']);

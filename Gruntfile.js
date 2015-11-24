@@ -1,10 +1,10 @@
 var saucelabsPort = 3000;
 var saucelabsBrowsers = [
-  ['Windows 7', 'internet explorer', ''],
-  ['Linux', 'firefox', ''],
-  ['Linux', 'chrome', ''],
+  ['Windows 7', 'chrome', ''],
   ['OSX 10.11', 'safari', ''],
+  ['Linux', 'firefox', ''],
   ['Linux', 'opera', ''],
+  ['Windows 7', 'internet explorer', ''],
 ];
 
 module.exports = function(grunt) {

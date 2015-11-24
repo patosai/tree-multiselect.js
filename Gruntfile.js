@@ -60,7 +60,7 @@ module.exports = function(grunt) {
           build: process.env.TRAVIS_JOB_ID,
           browsers: saucelabsBrowsers,
           statusCheckAttempts: 150,
-          max-duration: 300
+          'max-duration': 300
         }
       }
     },

@@ -10,7 +10,7 @@ module.exports = function(grunt) {
     'saucelabs-qunit': {
       all: {
         options: {
-          urls: ['http://127.0.0.1:9000/test/runner.html'],
+          urls: ['http://127.0.0.1:3000/test/runner.html'],
           testname: 'Tree Multiselect sauce tests',
           build: process.env.TRAVIS_JOB_ID,
           browsers: [["Windows 7", "chrome", ""]]

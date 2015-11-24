@@ -19,7 +19,7 @@ var saucelabsBrowsers = [
   // Opera
   ['Linux', 'opera', '12'],
   // IE
-  ['Windows 10', 'microsoft edge', '20'],
+  ['Windows 10', 'edge', '20'],
   ['Windows 7', 'internet explorer', '11'],
   ['Windows 7', 'internet explorer', '10'],
   ['Windows 7', 'internet explorer', '9'],
@@ -27,20 +27,20 @@ var saucelabsBrowsers = [
   ['Windows XP', 'internet explorer', '7'],
   ['Windows XP', 'internet explorer', '6'],
   // iOS
-  ['iOS Simulator', 'iPad Simulator', '9.2'],
-  ['iOS Simulator', 'iPad Simulator', '8.4'],
-  ['iOS Simulator', 'iPad Simulator', '7.1'],
-  ['iOS Simulator', 'iPad Simulator', '6.1'],
-  ['iOS Simulator', 'iPad Simulator', '5.1'],
-  ['iOS Simulator', 'iPhone Simulator', '9.2'],
-  ['iOS Simulator', 'iPhone Simulator', '8.4'],
-  ['iOS Simulator', 'iPhone Simulator', '7.1'],
-  ['iOS Simulator', 'iPhone Simulator', '6.1'],
-  ['iOS Simulator', 'iPhone Simulator', '5.1'],
+  ['OS X 10.8', 'ipad', '9.2'],
+  ['OS X 10.8', 'ipad', '8.4'],
+  ['OS X 10.8', 'ipad', '7.1'],
+  ['OS X 10.8', 'ipad', '6.1'],
+  ['OS X 10.8', 'ipad', '5.1'],
+  ['OS X 10.8', 'iphone', '9.2'],
+  ['OS X 10.8', 'iphone', '8.4'],
+  ['OS X 10.8', 'iphone', '7.1'],
+  ['OS X 10.8', 'iphone', '6.1'],
+  ['OS X 10.8', 'iphone', '5.1'],
   // Android
-  ['Android 5.1', 'Android 5.1 Emulator', ''],
-  ['Android 4.4', 'Android 4.4 Emulator', ''],
-  ['Android 2.3', 'Android 2.3 Emulator', ''],
+  ['Android', 'Android', '5.1'],
+  ['Android', 'Android', '4.4'],
+  ['Android', 'Android', '2.3'],
 ];
 
 module.exports = function(grunt) {
@@ -66,8 +66,7 @@ module.exports = function(grunt) {
       server: {
         options: {
           base: "",
-          port: saucelabsPort,
-          keepalive: true
+          port: saucelabsPort
         }
       }
     },
@@ -115,7 +114,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   grunt.registerTask('test', ['qunit', 'jshint']);
-  grunt.registerTask('test-travis', ['test', 'saucelabs-qunit']);
+  grunt.registerTask('test-travis', ['test', 'connect', 'saucelabs-qunit']);
   grunt.registerTask('default', 'test');
   grunt.registerTask('release', ['test', 'cssmin', 'uglify', 'usebanner']);
 };

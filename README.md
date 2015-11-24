@@ -4,7 +4,7 @@
 
 Requires jQuery v1.8+
 
-[![Sauce Test Status](https://saucelabs.com/buildstatus/tree-multiselect)](https://saucelabs.com/u/tree-multiselect)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/tree-multiselect.svg)](https://saucelabs.com/u/tree-multiselect)
 
 ### Demo
 <a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>

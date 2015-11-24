@@ -14,8 +14,7 @@ module.exports = function(grunt) {
         options: {
           urls: ['http://127.0.0.1:' + saucelabsPort + '/test/runner.html'],
           testname: 'Tree Multiselect sauce tests',
-          build: process.env.TRAVIS_JOB_ID,
-          browsers: [["Windows 7", "chrome", ""]]
+          build: process.env.TRAVIS_JOB_ID
         }
       }
     },

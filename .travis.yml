@@ -5,11 +5,8 @@ node_js:
 
 before_script:
   - npm install grunt-cli -g
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
-  - rackup  # start a Web server
-  - sleep 3 # give Web server some time to bind to sockets, etc
+  - npm install express -g
+  - node test/node-web-server.js  # start a Web server
 
 script: grunt test-travis --verbose
 

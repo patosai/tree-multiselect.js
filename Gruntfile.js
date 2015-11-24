@@ -13,7 +13,7 @@ module.exports = function(grunt) {
           urls: ['http://127.0.0.1:9000/test/runner.html'],
           testname: 'Tree Multiselect sauce tests',
           build: process.env.TRAVIS_JOB_ID,
-          browser: [["Windows 7", "chrome", ""]]
+          browsers: [["Windows 7", "chrome", ""]]
         }
       }
     },

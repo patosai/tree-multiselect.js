@@ -16,7 +16,7 @@ module.exports = {
     ie_10: { base: 'SauceLabs', browserName: 'internet explorer', platform: 'Windows 7', version: '10' },
     ie_9: { base: 'SauceLabs', browserName: 'internet explorer', platform: 'Windows 7', version: '9' },
     ie_8: { base: 'SauceLabs', browserName: 'internet explorer', platform: 'Windows 7', version: '8' },
-    ios_92: { base: 'SauceLabs', browserName: 'iphone', platform: 'OS X 10.10', version: '9.2' },
+    ios_91: { base: 'SauceLabs', browserName: 'iphone', platform: 'OS X 10.10', version: '9.1' },
     ios_71: { base: 'SauceLabs', browserName: 'iphone', platform: 'OS X 10.9', version: '7.1' },
     opera_12: { base: 'SauceLabs', browserName: 'opera', version: '12' },
     opera_11: { base: 'SauceLabs', browserName: 'opera', version: '11' },

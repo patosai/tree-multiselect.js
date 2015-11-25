@@ -2,9 +2,9 @@
 
 module.exports = {
   browsers: {
-    android_51: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '5.1' }
-    android_44: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '4.4' }
-    android_23: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '2.3' }
+    android_51: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '5.1' },
+    android_44: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '4.4' },
+    android_23: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '2.3' },
     chrome_46: { base: 'SauceLabs', browserName: 'chrome', version: '46' },
     chrome_36: { base: 'SauceLabs', browserName: 'chrome', version: '36' },
     chrome_26: { base: 'SauceLabs', browserName: 'chrome', version: '26' },
@@ -21,8 +21,8 @@ module.exports = {
     opera_12: { base: 'SauceLabs', browserName: 'opera', version: '12' },
     opera_11: { base: 'SauceLabs', browserName: 'opera', version: '11' },
     safari_9: { base: 'SauceLabs', browserName: 'safari', platform: 'OS X 10.11', version: '9' },
-    safari_8: { base: 'SauceLabs', browserName: 'safari', platform: 'OS X 10.10', version: '8' }
-    safari_7: { base: 'SauceLabs', browserName: 'safari', platform: 'OS X 10.9', version: '7' }
+    safari_8: { base: 'SauceLabs', browserName: 'safari', platform: 'OS X 10.10', version: '8' },
+    safari_7: { base: 'SauceLabs', browserName: 'safari', platform: 'OS X 10.9', version: '7' },
     safari_6: { base: 'SauceLabs', browserName: 'safari', platform: 'OS X 10.8', version: '6' }
   }
 };

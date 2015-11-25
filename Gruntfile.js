@@ -19,7 +19,8 @@ module.exports = function(grunt) {
       saucelabs: {
         reporters: ['saucelabs'],
         sauceLabs: {
-          testName: "Tree Multiselect tests"
+          testName: "Tree Multiselect tests",
+          startConnect: false
         },
         customLaunchers: saucelabsConfig.browsers,
         browsers: Object.keys(saucelabsConfig.browsers)

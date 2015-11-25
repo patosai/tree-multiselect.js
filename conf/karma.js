@@ -1,5 +1,7 @@
 // Karma configuration
 
+var config = require('./config');
+
 module.exports = function(config) {
   config.set({
 
@@ -48,7 +50,7 @@ module.exports = function(config) {
 
 
     // web server port
-    port: 9876,
+    port: config.port,
 
 
     // enable / disable colors in the output (reporters and logs)

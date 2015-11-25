@@ -24,7 +24,7 @@ QUnit.test("creates a section with title and items", function(assert) {
   $("select").append("<option data-section='section' value='item2'></option>");
   $("select").append("<option data-section='section' value='item3'></option>");
   $("select").treeMultiselect();
-  
+
   assert.equal($("div.selections > div.section").length, 1, "should create one section");
 
   var title = $("div.selections > div.section > div.title");

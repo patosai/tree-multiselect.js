@@ -4,7 +4,7 @@ module.exports = {
   browsers: {
     android_51: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '5.1' },
     android_44: { base: 'SauceLabs', browserName: 'android', platform: 'Linux', version: '4.4' },
-    android_23: { base: 'SauceLabs', browserName: 'Amazon Kindle Fire', platform: 'Linux', version: '2.3' },
+    android_23: { base: 'SauceLabs', browserName: 'android', version: '2.3' },
     chrome_46: { base: 'SauceLabs', browserName: 'chrome', version: '46' },
     chrome_36: { base: 'SauceLabs', browserName: 'chrome', version: '36' },
     chrome_26: { base: 'SauceLabs', browserName: 'chrome', version: '26' },

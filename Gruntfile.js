@@ -75,9 +75,11 @@ module.exports = function(grunt) {
 
     // Upload LCOV data to coveralls.io
     coveralls: {
+      options: {
+        force: true
+      },
       ci: {
-        src: 'coverage/**/lcov.info',
-        force: false
+        src: 'coverage/**/lcov.info'
       }
     }
   });
@@ -90,8 +92,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-coveralls');
 
   grunt.registerTask('test-local', ['karma:local', 'jshint']);
+  grunt.registerTask('test-travis', ['test-local', 'coveralls']);
   grunt.registerTask('test-watch', ['karma:continuous']);
-  grunt.registerTask('test-travis', ['test-local', 'coveralls', 'karma:saucelabs']);
   grunt.registerTask('release', ['test-local', 'cssmin', 'uglify', 'usebanner']);
 
   grunt.registerTask('default', 'test-local');

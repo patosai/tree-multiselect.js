@@ -6,7 +6,9 @@ node_js:
 before_script:
   - npm install grunt-cli -g
 
-script: grunt test-travis --verbose
+script:
+  - grunt test-travis --verbose
+  - grunt karma:saucelabs --force --verbose
 
 notifications:
   email:

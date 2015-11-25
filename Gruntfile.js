@@ -5,8 +5,14 @@ module.exports = function(grunt) {
 
     // Karma runner
     karma: {
-      unit: {
-        configFile: 'karma.conf.js'
+      options: {
+        configFile: 'karma.conf.js',
+      },
+      local: {
+      },
+      continuous: {
+        autoWatch: true,
+        singleRun: false
       }
     },
 
@@ -49,6 +55,14 @@ module.exports = function(grunt) {
           src: ['dist/*.min.*']
         }
       }
+    },
+
+    // Upload LCOV data to coveralls.io
+    coveralls: {
+      ci: {
+        src: 'coverage/**/lcov.info',
+        force: false
+      }
     }
   });
 
@@ -57,10 +71,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-banner');
+  grunt.loadNpmTasks('grunt-coveralls');
 
-  grunt.registerTask('test', ['karma', 'jshint']);
-  grunt.registerTask('test-travis', ['test']);
-  grunt.registerTask('release', ['test', 'cssmin', 'uglify', 'usebanner']);
+  grunt.registerTask('test-local', ['karma:local', 'jshint']);
+  grunt.registerTask('test-watch', ['karma:continuous']);
+  grunt.registerTask('test-travis', ['test-local', 'coveralls']);
+  grunt.registerTask('release', ['test-local', 'cssmin', 'uglify', 'usebanner']);
 
-  grunt.registerTask('default', 'test');
+  grunt.registerTask('default', 'test-local');
 };

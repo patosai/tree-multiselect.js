@@ -4,7 +4,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: '../',
 
 
     // frameworks to use
@@ -15,7 +15,8 @@ module.exports = function(config) {
     plugins: [
       'karma-qunit',
       'karma-phantomjs-launcher',
-      'karma-coverage'
+      'karma-coverage',
+      'karma-sauce-launcher'
     ],
 
 
@@ -84,7 +85,7 @@ module.exports = function(config) {
         { type: 'text-summary' },
         { type: 'lcovonly' }
       ]
-    }
+    },
 
-  })
+  });
 }

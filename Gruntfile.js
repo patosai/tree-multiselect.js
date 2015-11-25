@@ -1,3 +1,5 @@
+var saucelabsConfig = require('./conf/saucelabs.js');
+
 module.exports = function(grunt) {
   grunt.initConfig({
 
@@ -6,13 +8,21 @@ module.exports = function(grunt) {
     // Karma runner
     karma: {
       options: {
-        configFile: 'karma.conf.js',
+        configFile: 'conf/karma.js',
       },
       local: {
       },
       continuous: {
         autoWatch: true,
         singleRun: false
+      },
+      saucelabs: {
+        reporters: ['saucelabs'],
+        sauceLabs: {
+          testName: "Tree Multiselect tests"
+        },
+        customLaunchers: saucelabsConfig.browsers,
+        browsers: Object.keys(saucelabsConfig.browsers)
       }
     },
 
@@ -75,7 +85,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test-local', ['karma:local', 'jshint']);
   grunt.registerTask('test-watch', ['karma:continuous']);
-  grunt.registerTask('test-travis', ['test-local', 'coveralls']);
+  grunt.registerTask('test-travis', ['test-local', 'coveralls', 'karma:saucelabs']);
   grunt.registerTask('release', ['test-local', 'cssmin', 'uglify', 'usebanner']);
 
   grunt.registerTask('default', 'test-local');

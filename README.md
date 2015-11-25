@@ -1,6 +1,8 @@
 ## jQuery Tree Multiselect
 [![Build Status](https://travis-ci.org/patosai/tree-multiselect.js.svg?branch=master)](https://travis-ci.org/patosai/tree-multiselect.js)
 [![Coverage Status](https://coveralls.io/repos/patosai/tree-multiselect.js/badge.svg?branch=master&service=github)](https://coveralls.io/github/patosai/tree-multiselect.js?branch=master)
+[![devDependency Status](https://david-dm.org/patosai/tree-multiselect.js/dev-status.svg)](https://david-dm.org/patosai/tree-multiselect.js#info=devDependencies)
+
 
 **This plugin allows you to replace a `select` element with a sweet treeview element.**
 

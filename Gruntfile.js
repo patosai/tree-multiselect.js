@@ -91,7 +91,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-coveralls');
 
   grunt.registerTask('test', ['qunit', 'jshint']);
-  grunt.registerTask('test-travis', ['test', 'connect', 'saucelabs-qunit', 'coveralls']);
+  grunt.registerTask('test-travis', ['test', 'coveralls', 'connect', 'saucelabs-qunit']);
   grunt.registerTask('default', 'test');
   grunt.registerTask('release', ['test', 'cssmin', 'uglify', 'usebanner']);
 };

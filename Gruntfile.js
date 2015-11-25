@@ -57,8 +57,8 @@ module.exports = function(grunt) {
           testname: 'Tree Multiselect sauce tests',
           build: process.env.TRAVIS_JOB_ID,
           browsers: saucelabsConfig.browsers,
-          statusCheckAttempts: 150,
-          'max-duration': 300
+          statusCheckAttempts: 240,
+          'max-duration': 480
         }
       }
     },

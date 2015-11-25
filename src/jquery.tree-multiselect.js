@@ -194,7 +194,7 @@
 
       item.append(descriptionDiv);
     }).mouseleave(function() {
-      $("div.temp-description-popup").remove();
+      $(this).parent().find("div.temp-description-popup").remove();
     });
   }
 
@@ -307,8 +307,8 @@
       e.stopPropagation();
       var indicator = $(this).text();
       $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
-      var jqTitle = $(this).parent();
-      jqTitle.siblings().toggle();
+      var $title = $(this).parent();
+      $title.siblings().toggle();
     });
 
     titleDivs.click(function() {
@@ -370,14 +370,14 @@
     }
 
     function updateOriginalSelect() {
-      var jqOriginalSelect = $(originalSelect);
+      var $originalSelect = $(originalSelect);
 
       var selected = [];
       $(selectedContainer).find("div.item").each(function() {
         selected.push($(this).attr('data-value'));
       });
 
-      jqOriginalSelect.val(selected).change();
+      $originalSelect.val(selected).change();
 
       $(originalSelect).html($(originalSelect).find("option").sort(function(a, b) {
         var aValue = selected.indexOf($(a).attr('value'));
@@ -415,8 +415,7 @@
       updateOriginalSelect();
 
       if (options.sortable && !options.freeze) {
-        var jqSelectedContainer = $(selectedContainer);
-        jqSelectedContainer.sortable({
+        $(selectedContainer).sortable({
           update: function(event, ui) {
             updateOriginalSelect();
           }

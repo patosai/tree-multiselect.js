@@ -182,3 +182,16 @@ QUnit.test("hideSidePanel removes the selected panel", function(assert) {
 
   assert.equal($("div.selected").length, 0);
 });
+
+QUnit.test("onlyBatchSelection adds checkboxes to only sections", function(assert) {
+  $("select").append("<option value='one' data-section='test'>One</option>");
+  var options = {
+    onlyBatchSelection: true
+  };
+  $("select").treeMultiselect(options);
+  assert.equal($("div.title").length, 1);
+  assert.equal($("div.item").length, 1);
+
+  assert.equal($("div.title > input[type=checkbox]").length, 1);
+  assert.equal($("div.item > input[type=checkbox]").length, 0);
+});

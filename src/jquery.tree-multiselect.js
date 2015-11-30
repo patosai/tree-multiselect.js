@@ -73,6 +73,7 @@
       collapsible: true,
       freeze: false,
       hideSidePanel: false,
+      onlyBatchSelection: false,
       sectionDelimiter: '/',
       showSectionOnSelected: true,
       startCollapsed: false
@@ -204,7 +205,9 @@
     }
 
     var targets = null;
-    if (options.allowBatchSelection) {
+    if (options.onlyBatchSelection) {
+      targets = $(selectionContainer).find("div.title");
+    } else if (options.allowBatchSelection) {
       targets = $(selectionContainer).find("div.title, div.item");
     } else {
       targets = $(selectionContainer).find("div.item");

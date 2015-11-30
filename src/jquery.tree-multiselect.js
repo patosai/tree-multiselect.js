@@ -81,6 +81,7 @@
   }
 
   function generateSelections(originalSelect, selectionContainer, options) {
+    // nested objects and arrays
     var data = {};
 
     function insertOption(path, option) {
@@ -166,14 +167,12 @@
       for (var i = 0; i < data.length; ++i) {
         fillSelections.call(this, data[i]);
       }
-    } else if (typeof data === 'object') {
+    } else {
       for (var key in data) {
         if (!data.hasOwnProperty(key)) continue;
         var section = createSection.call(this, key);
         fillSelections.call(section, data[key]);
       }
-    } else {
-      createItem.call(this, data);
     }
   }
 
@@ -432,7 +431,7 @@
       var matchingSelection = $(selectionContainer).find("div.item[data-value='" + value + "']");
       var matchingCheckbox = matchingSelection.find("> input[type=checkbox]");
       matchingCheckbox.prop('checked', false);
-      matchingCheckbox.trigger('change');
+      matchingCheckbox.change();
     });
   }
 

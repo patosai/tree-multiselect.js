@@ -37,37 +37,6 @@
     return this;
   };
 
-  var UiBuilder = function() {};
-  UiBuilder.prototype.build = function(el, hideSidePanel) {
-    var tree = document.createElement('div');
-    tree.className = "tree-multiselect";
-    $(el).after(tree);
-
-    var selections = document.createElement('div');
-    selections.className = "selections";
-    if (hideSidePanel) {
-      selections.className += " no-border";
-    }
-    $(tree).append(selections);
-
-    var selected = document.createElement('div');
-    selected.className = "selected";
-    if (!hideSidePanel) {
-      $(tree).append(selected);
-    }
-
-    this.tree = tree;
-    this.selections = selections;
-    this.selected = selected;
-  };
-
-  var Option = function(value, text, description, index) {
-    this.value = value;
-    this.text = text;
-    this.description = description;
-    this.index = index;
-  };
-
   function mergeDefaultOptions(options) {
     var defaults = {
       allowBatchSelection: true,
@@ -187,7 +156,8 @@
     var targets = $selectionContainer.find("div.item[data-description!=''][data-description]");
     description.prependTo(targets);
 
-    $("div.item > span.description").unbind().mouseenter(function() {
+    $("div.item > span.description").unbind()
+      .mouseenter(function() {
       var item = $(this).parent();
       var description = item.attr('data-description');
 
@@ -342,7 +312,7 @@
       }
 
       $(item).attr('data-value', value)
-             .appendTo($selectedContainer);
+        .appendTo($selectedContainer);
     }
 
     function addNewFromSelected(selections) {
@@ -440,6 +410,38 @@
       matchingCheckbox.change();
     });
   }
+
+  // Helpers
+  var UiBuilder = function() {};
+  UiBuilder.prototype.build = function(el, hideSidePanel) {
+    var tree = document.createElement('div');
+    tree.className = "tree-multiselect";
+    $(el).after(tree);
+
+    var selections = document.createElement('div');
+    selections.className = "selections";
+    if (hideSidePanel) {
+      selections.className += " no-border";
+    }
+    $(tree).append(selections);
+
+    var selected = document.createElement('div');
+    selected.className = "selected";
+    if (!hideSidePanel) {
+      $(tree).append(selected);
+    }
+
+    this.tree = tree;
+    this.selections = selections;
+    this.selected = selected;
+  };
+
+  var Option = function(value, text, description, index) {
+    this.value = value;
+    this.text = text;
+    this.description = description;
+    this.index = index;
+  };
 
   function onCheckboxChange($selectionContainer, callback) {
     var checkboxes = $selectionContainer.find("input[type=checkbox]");

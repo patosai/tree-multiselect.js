@@ -103,11 +103,11 @@
       insertOption(path, option);
     });
 
-    fillSelections.call($selectionContainer, data);
+    fillSelections($selectionContainer, data);
   }
 
-  function fillSelections(data) {
-    function createSection(title) {
+  function fillSelections($selectionContainer, data) {
+    function createSection($sectionContainer, title) {
       var section = document.createElement('div');
       section.className = "section";
 
@@ -116,11 +116,11 @@
       sectionTitle.innerHTML = title;
 
       $(section).append(sectionTitle);
-      $(this).append(section);
+      $sectionContainer.append(section);
       return section;
     }
 
-    function createItem(option) {
+    function createItem($itemContainer, option) {
       var text = option.text;
       var value = option.value;
       var description = option.description;
@@ -133,20 +133,20 @@
         'data-description': description,
         'data-index': index
       });
-      $(this).append(selection);
+      $itemContainer.append(selection);
     }
 
     if (data.constructor == Option) {
-      createItem.call(this, data);
+      createItem($selectionContainer, data);
     } else if ($.isArray(data)) {
       for (var i = 0; i < data.length; ++i) {
-        fillSelections.call(this, data[i]);
+        fillSelections($selectionContainer, data[i]);
       }
     } else {
       for (var key in data) {
         if (!data.hasOwnProperty(key)) continue;
-        var section = createSection.call(this, key);
-        fillSelections.call(section, data[key]);
+        var $section = $(createSection($selectionContainer, key));
+        fillSelections($section, data[key]);
       }
     }
   }

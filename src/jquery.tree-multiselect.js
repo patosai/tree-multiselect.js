@@ -104,7 +104,10 @@
         var existingObj = null;
         for (var j = 0; j < currentPos.length; ++j) {
           var arrayItem = currentPos[j];
-          if ((arrayItem.constructor != Option) && $.isPlainObject(arrayItem) && arrayItem[pathPart] && (typeof arrayItem[pathPart] !== 'undefined')) {
+          if ((arrayItem.constructor != Option) &&
+              $.isPlainObject(arrayItem) &&
+              arrayItem[pathPart] &&
+              (typeof arrayItem[pathPart] !== 'undefined')) {
             existingObj = arrayItem;
             break;
           }

@@ -94,11 +94,13 @@
     }
 
     $originalSelect.find("> option").each(function() {
-      var path = $(this).attr('data-section').split(options.sectionDelimiter);
-      var optionValue = $(this).val();
-      var optionName = $(this).text();
-      var optionDescription = $(this).attr('data-description');
-      var optionIndex = $(this).attr('data-index');
+      var $option = $(this);
+      var path = $option.attr('data-section').split(options.sectionDelimiter);
+
+      var optionValue = $option.val();
+      var optionName = $option.text();
+      var optionDescription = $option.attr('data-description');
+      var optionIndex = $option.attr('data-index');
       var option = new Option(optionValue, optionName, optionDescription, optionIndex);
       insertOption(path, option);
     });
@@ -120,7 +122,7 @@
       return section;
     }
 
-    function createItem($itemContainer, option) {
+    function createSelection($itemContainer, option) {
       var text = option.text;
       var value = option.value;
       var description = option.description;
@@ -134,10 +136,11 @@
         'data-index': index
       });
       $itemContainer.append(selection);
+      return selection;
     }
 
     if (data.constructor == Option) {
-      createItem($selectionContainer, data);
+      createSelection($selectionContainer, data);
     } else if ($.isArray(data)) {
       for (var i = 0; i < data.length; ++i) {
         fillSelections($selectionContainer, data[i]);
@@ -152,14 +155,13 @@
   }
 
   function addDescriptionHover($selectionContainer) {
-    var description = $("<span class='description'>?</span>");
+    var $description = $("<span class='description'>?</span>");
     var targets = $selectionContainer.find("div.item[data-description!=''][data-description]");
-    description.prependTo(targets);
+    $description.prependTo(targets);
 
-    $("div.item > span.description").unbind()
-      .mouseenter(function() {
-      var item = $(this).parent();
-      var description = item.attr('data-description');
+    $("div.item > span.description").unbind().mouseenter(function() {
+      var $item = $(this).parent();
+      var description = $item.attr('data-description');
 
       var descriptionDiv = document.createElement('div');
       descriptionDiv.className = "temp-description-popup";
@@ -167,28 +169,29 @@
 
       descriptionDiv.style.position = 'absolute';
 
-      item.append(descriptionDiv);
+      $item.append(descriptionDiv);
     }).mouseleave(function() {
-      $(this).parent().find("div.temp-description-popup").remove();
+      var $item = $(this).parent();
+      $item.find("div.temp-description-popup").remove();
     });
   }
 
   function addCheckboxes($selectionContainer, options) {
-    var checkbox = $('<input />', { type: 'checkbox' });
+    var $checkbox = $('<input />', { type: 'checkbox' });
     if (options.freeze) {
-      checkbox.attr('disabled', 'disabled');
+      $checkbox.attr('disabled', 'disabled');
     }
 
-    var targets = null;
+    var $targets = null;
     if (options.onlyBatchSelection) {
-      targets = $selectionContainer.find("div.title");
+      $targets = $selectionContainer.find("div.title");
     } else if (options.allowBatchSelection) {
-      targets = $selectionContainer.find("div.title, div.item");
+      $targets = $selectionContainer.find("div.title, div.item");
     } else {
-      targets = $selectionContainer.find("div.item");
+      $targets = $selectionContainer.find("div.item");
     }
 
-    checkbox.prependTo(targets);
+    $checkbox.prependTo($targets);
     $selectionContainer.find('input[type=checkbox]').click(function(e) {
       e.stopPropagation();
     });
@@ -198,29 +201,31 @@
     var selectedOptions = $originalSelect.val();
     if (!selectedOptions) return;
 
-    var selectedOptionDivs = $selectionContainer.find("div.item").filter(function() {
+    var $selectedOptionDivs = $selectionContainer.find("div.item").filter(function() {
       var item = $(this);
       return selectedOptions.indexOf(item.attr('data-value')) !== -1;
     });
-    $(selectedOptionDivs).find("> input[type=checkbox]").prop('checked', true);
+    $selectedOptionDivs.find("> input[type=checkbox]").prop('checked', true);
   }
 
   function armTitleCheckboxes($selectionContainer) {
-    var titleCheckboxes = $selectionContainer.find("div.title > input[type=checkbox]");
-    titleCheckboxes.change(function() {
-      var section = $(this).closest("div.section");
-      var checkboxesToBeChanged = section.find("input[type=checkbox]");
-      var checked = $(this).is(':checked');
-      checkboxesToBeChanged.prop('checked', checked);
+    var $titleCheckboxes = $selectionContainer.find("div.title > input[type=checkbox]");
+    $titleCheckboxes.change(function() {
+      var $titleCheckbox = $(this);
+      var $section = $titleCheckbox.closest("div.section");
+      var $checkboxesToBeChanged = $section.find("input[type=checkbox]");
+      var checked = $titleCheckbox.is(':checked');
+      $checkboxesToBeChanged.prop('checked', checked);
     });
   }
 
   function uncheckParentsOnUnselect($selectionContainer) {
-    var checkboxes = $selectionContainer.find("input[type=checkbox]");
-    checkboxes.change(function() {
-      if ($(this).is(":checked")) return;
-      var sectionParents = $(this).parentsUntil($selectionContainer, "div.section");
-      sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
+    var $checkboxes = $selectionContainer.find("input[type=checkbox]");
+    $checkboxes.change(function() {
+      var $checkbox = $(this);
+      if ($checkbox.is(":checked")) return;
+      var $sectionParents = $checkbox.parentsUntil($selectionContainer, "div.section");
+      $sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
     });
   }
 
@@ -228,13 +233,13 @@
     function check() {
       var sections = $selectionContainer.find("div.section");
       sections.each(function() {
-        var section = $(this);
-        var sectionItems = section.find("div.item");
-        var unselectedItems = sectionItems.filter(function() {
-          var checkbox = $(this).find("> input[type=checkbox]");
-          return !(checkbox.is(":checked"));
+        var $section = $(this);
+        var $sectionItems = $section.find("div.item");
+        var $unselectedItems = $sectionItems.filter(function() {
+          var $checkbox = $(this).find("> input[type=checkbox]");
+          return !($checkbox.is(":checked"));
         });
-        if (unselectedItems.length === 0) {
+        if ($unselectedItems.length === 0) {
           var sectionCheckbox = $(this).find("> div.title > input[type=checkbox]");
           sectionCheckbox.prop('checked', true);
         }
@@ -248,16 +253,16 @@
     function check() {
       var sections = $selectionContainer.find("div.section");
       sections.each(function() {
-        var section = $(this);
-        var items = section.find("div.item");
-        var numSelected = items.filter(function() {
+        var $section = $(this);
+        var $items = $section.find("div.item");
+        var numSelected = $items.filter(function() {
           var item = $(this);
           return item.find("> input[type=checkbox]").prop('checked');
         }).length;
 
-        var sectionCheckbox = $(this).find("> div.title > input[type=checkbox]");
-        var isIndeterminate = (numSelected !== 0 && numSelected !== items.length);
-        sectionCheckbox.prop('indeterminate', isIndeterminate);
+        var $sectionCheckbox = $section.find("> div.title > input[type=checkbox]");
+        var isIndeterminate = (numSelected !== 0 && numSelected !== $items.length);
+        $sectionCheckbox.prop('indeterminate', isIndeterminate);
       });
     }
 
@@ -268,27 +273,28 @@
     var hideIndicator = "-";
     var expandIndicator = "+";
 
-    var titleDivs = $selectionContainer.find("div.title");
+    var $titleDivs = $selectionContainer.find("div.title");
 
     var collapseDiv = document.createElement('span');
     collapseDiv.className = "collapse-section";
     if (options.startCollapsed) {
       $(collapseDiv).text(expandIndicator);
-      titleDivs.siblings().toggle();
+      $titleDivs.siblings().toggle();
     } else {
       $(collapseDiv).text(hideIndicator);
     }
-    titleDivs.prepend(collapseDiv);
+    $titleDivs.prepend(collapseDiv);
 
     $("span.collapse-section").unbind().click(function(e) {
       e.stopPropagation();
-      var indicator = $(this).text();
-      $(this).text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
-      var $title = $(this).parent();
+      var $collapseSection = $(this);
+      var indicator = $collapseSection.text();
+      $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
+      var $title = $collapseSection.parent();
       $title.siblings().toggle();
     });
 
-    titleDivs.click(function() {
+    $titleDivs.click(function() {
       $(this).find("> span.collapse-section").trigger('click');
     });
   }
@@ -339,9 +345,10 @@
       });
 
       $selectedContainer.find("div.item").each(function() {
-        var selection = $(this).attr('data-value');
-        if (selectionTexts.indexOf(selection) == -1) {
-          $(this).remove();
+        var $item = $(this);
+        var value = $item.attr('data-value');
+        if (selectionTexts.indexOf(value) == -1) {
+          $item.remove();
         }
       });
     }
@@ -365,9 +372,9 @@
     }
 
     function update() {
-      var selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
+      var $selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
       var selections = [];
-      selectedBoxes.each(function(box) {
+      $selectedBoxes.each(function(box) {
         var text = textOf(this);
         var value = $(this).attr('data-value');
         var index = $(this).attr('data-index');
@@ -404,10 +411,10 @@
   function armRemoveSelectedOnClick($selectionContainer, $selectedContainer) {
     $selectedContainer.find("span.remove-selected").unbind().click(function() {
       var value = $(this).parent().attr('data-value');
-      var matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
-      var matchingCheckbox = matchingSelection.find("> input[type=checkbox]");
-      matchingCheckbox.prop('checked', false);
-      matchingCheckbox.change();
+      var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
+      var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
+      $matchingCheckbox.prop('checked', false);
+      $matchingCheckbox.change();
     });
   }
 

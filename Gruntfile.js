@@ -1,5 +1,4 @@
-var config = require('./conf/config.js'),
-    saucelabsConfig = require('./conf/saucelabs.js');
+var config = require('./conf/config.js');
 
 module.exports = function(grunt) {
   grunt.initConfig({
@@ -16,19 +15,6 @@ module.exports = function(grunt) {
       continuous: {
         autoWatch: true,
         singleRun: false
-      },
-      saucelabs: {
-        reporters: ['saucelabs'],
-        sauceLabs: {
-          testName: "Tree Multiselect tests",
-          startConnect: false,
-          tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-          connectOptions: {
-            port: config.port
-          }
-        },
-        customLaunchers: saucelabsConfig.browsers,
-        browsers: Object.keys(saucelabsConfig.browsers)
       }
     },
 

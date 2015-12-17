@@ -17,8 +17,7 @@ module.exports = function(config) {
     plugins: [
       'karma-qunit',
       'karma-phantomjs-launcher',
-      'karma-coverage',
-      'karma-sauce-launcher'
+      'karma-coverage'
     ],
 
 

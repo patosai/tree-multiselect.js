@@ -8,7 +8,6 @@ before_script:
 
 script:
   - grunt test-travis --verbose
-  - grunt karma:saucelabs --force --verbose
 
 notifications:
   email:

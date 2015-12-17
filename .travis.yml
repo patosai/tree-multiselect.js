@@ -12,6 +12,3 @@ script:
 notifications:
   email:
     on_success: never
-
-addons:
-  sauce_connect: true

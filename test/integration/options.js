@@ -195,3 +195,61 @@ QUnit.test("onlyBatchSelection adds checkboxes to only sections", function(asser
   assert.equal($("div.title > input[type=checkbox]").length, 1);
   assert.equal($("div.item > input[type=checkbox]").length, 0);
 });
+
+QUnit.test("onChange callback is called with correct args when item is added", function(assert) {
+  var done = assert.async();
+  $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+  $("select").append("<option value='two' data-section='test'>Two</option>");
+  var options = {
+    onChange: function(all, added, removed) {
+                assert.equal(all.length, 2);
+                assert.equal(added.length, 1);
+                assert.equal(removed.length, 0);
+                var expectedSecondSelections = [all[1], added[0]];
+                for (var i = 0; i < expectedSecondSelections.length; ++i) {
+                  var selection = expectedSecondSelections[i];
+                  assert.equal(selection.text, 'Two');
+                  assert.equal(selection.value, 'two');
+                  assert.equal(selection.initialIndex, undefined);
+                  assert.equal(selection.sectionName, 'test');
+                }
+                assert.equal(all[0].text, 'One');
+                assert.equal(all[0].value, 'one');
+                assert.equal(all[0].initialIndex, undefined);
+                assert.equal(all[0].sectionName, 'test');
+                done();
+              }
+  };
+  $("select").treeMultiselect(options);
+
+  var item = $("div.selections div.item").filter(function() {
+    return textOf($(this)) == 'Two';
+  });
+  item.find("input[type=checkbox]").click();
+});
+
+QUnit.test("onChange callback is called with correct args when item is removed", function(assert) {
+  var done = assert.async();
+  $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+  $("select").append("<option value='two' data-section='test'>Two</option>");
+  var options = {
+    onChange: function(all, added, removed) {
+                assert.equal(all.length, 0);
+                assert.equal(added.length, 0);
+                assert.equal(removed.length, 1);
+
+                var removedSelection = removed[0];
+                assert.equal(removedSelection.text, 'One');
+                assert.equal(removedSelection.value, 'one');
+                assert.equal(removedSelection.initialIndex, undefined);
+                assert.equal(removedSelection.sectionName, 'test');
+                done();
+              }
+  };
+  $("select").treeMultiselect(options);
+
+  var item = $("div.selections div.item").filter(function() {
+    return textOf($(this)) == 'One';
+  });
+  item.find("input[type=checkbox]").click();
+});

@@ -40,13 +40,14 @@
   function mergeDefaultOptions(options) {
     var defaults = {
       allowBatchSelection: true,
-      sortable: false,
       collapsible: true,
       freeze: false,
       hideSidePanel: false,
+      onChange: null,
       onlyBatchSelection: false,
       sectionDelimiter: '/',
       showSectionOnSelected: true,
+      sortable: false,
       startCollapsed: false
     };
     return $.extend({}, defaults, options);
@@ -327,15 +328,17 @@
         currentSelections.push($(this).attr('data-value'));
       });
 
-      var selectionsNotAdded = selections.filter(function(selection) {
+      var selectionsNotYetAdded = selections.filter(function(selection) {
         return currentSelections.indexOf(selection.value) == -1;
       });
 
-      selectionsNotAdded.forEach(function(selection) {
+      selectionsNotYetAdded.forEach(function(selection) {
         createSelectedDiv(selection);
       });
 
       armRemoveSelectedOnClick($selectionContainer, $selectedContainer);
+
+      return selectionsNotYetAdded;
     }
 
     function removeOldFromSelected(selections) {
@@ -344,13 +347,26 @@
         selectionTexts.push(selection.value);
       });
 
-      $selectedContainer.find("div.item").each(function() {
-        var $item = $(this);
+      var removedValues = [];
+
+      $selectedContainer.find("div.item").each(function(index, el) {
+        var $item = $(el);
         var value = $item.attr('data-value');
         if (selectionTexts.indexOf(value) == -1) {
+          removedValues.push(value);
           $item.remove();
         }
       });
+
+      var unselectedSelections = [];
+      var allSelections = $selectionContainer.find("div.item");
+      allSelections.each(function() {
+        var $this = $(this);
+        if (removedValues.indexOf($this.attr('data-value')) !== -1) {
+          unselectedSelections.push(elToSelectionObject($this));
+        }
+      });
+      return unselectedSelections;
     }
 
     function updateOriginalSelect() {
@@ -371,30 +387,51 @@
       }));
     }
 
+    function elToSelectionObject($el) {
+      var text = textOf($el);
+      var value = $el.attr('data-value');
+      var initialIndex = $el.attr('data-index');
+      $el.attr('data-index', undefined);
+
+      var sectionName = $.map($el.parentsUntil($selectionContainer, "div.section").get().reverse(), function(parentSection) {
+        return textOf($(parentSection).find("> div.title"));
+      }).join(options.sectionDelimiter);
+
+      return {
+        text: text,
+        value: value,
+        initialIndex: initialIndex,
+        sectionName: sectionName
+      };
+    }
+
+    var initialRun = true;
     function update() {
       var $selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
       var selections = [];
-      $selectedBoxes.each(function(box) {
-        var text = textOf(this);
-        var value = $(this).attr('data-value');
-        var index = $(this).attr('data-index');
-        $(this).attr('data-index', undefined);
-        var sectionName = $.map($(this).parentsUntil($selectionContainer, "div.section").get().reverse(), function(parentSection) {
-          return textOf($(parentSection).find("> div.title"));
-        }).join(options.sectionDelimiter);
-        selections.push({ text: text, value: value, index: index, sectionName: sectionName });
+
+      $selectedBoxes.each(function() {
+        var $el = $(this);
+        selections.push(elToSelectionObject($el));
       });
+
       selections.sort(function(a, b) {
-        var aIndex = parseInt(a.index);
-        var bIndex = parseInt(b.index);
+        var aIndex = parseInt(a.initialIndex);
+        var bIndex = parseInt(b.initialIndex);
         if (aIndex > bIndex) return 1;
         if (aIndex < bIndex) return -1;
         return 0;
       });
 
-      addNewFromSelected(selections);
-      removeOldFromSelected(selections);
+      var newlyAddedSelections = addNewFromSelected(selections);
+      var newlyRemovedSelections = removeOldFromSelected(selections);
       updateOriginalSelect();
+
+      if (initialRun) {
+        initialRun = false;
+      } else if (options.onChange) {
+        options.onChange(selections, newlyAddedSelections, newlyRemovedSelections);
+      }
 
       if (options.sortable && !options.freeze) {
         $selectedContainer.sortable({

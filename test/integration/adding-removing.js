@@ -14,7 +14,7 @@ QUnit.test("can add an item", function(assert) {
   assert.equal($("div.selections div.item").length, 1);
   assert.equal($("div.selected div.item").length, 0);
 
-  $("div.selections div.item > input[type=checkbox]").prop('checked', true).trigger('change');
+  $("div.selections div.item > input[type=checkbox]").click();
 
   assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 1);
   var selectedItem = $("div.selected div.item");
@@ -32,7 +32,7 @@ QUnit.test("can add an item with the same text", function(assert) {
   assert.equal($("div.selections div.item").length, 2);
   assert.equal($("div.selected div.item").length, 0);
 
-  $("div.selections div.item > input[type=checkbox]").prop('checked', true).trigger('change');
+  $("div.selections div.item > input[type=checkbox]").click();
 
   assert.equal($("div.selections div.item > input[type=checkbox]:checked").length, 2);
   var selectedItem = $("div.selected div.item");

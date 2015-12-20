@@ -385,6 +385,10 @@
         if (aValue < bValue) return -1;
         return 0;
       }));
+      
+      //on chnage callback
+      if (options.onchange)
+    	  options.onchange(selected);
     }
 
     function elToSelectionObject($el) {

@@ -17,6 +17,8 @@
 $("select").treeMultiselect();
 ```
 
+Make sure your `select` has the `multiple` attribute set.
+
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------
 `data-section` **(required)** | The section the option will be in; can be nested

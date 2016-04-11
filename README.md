@@ -17,7 +17,7 @@
 $("select").treeMultiselect();
 ```
 
-Make sure your `select` has the `multiple` attribute set.
+Make sure your `select` has the `multiple` attribute set. Also, make sure you've got `<meta charset="UTF-8">` or some of the symbols may look strange.
 
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------

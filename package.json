@@ -19,11 +19,11 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-banner": "^0.6.0",
-    "grunt-contrib-cssmin": "^1.0.1",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-uglify": "^1.0.1",
     "grunt-coveralls": "^1.0.0",
     "grunt-karma": "^0.12.2",
+    "grunt-sass": "^1.1.0",
     "karma": "^0.13.22",
     "karma-coverage": "^0.5.5",
     "karma-phantomjs-launcher": "^1.0.0",

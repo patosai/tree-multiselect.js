@@ -23,11 +23,15 @@ module.exports = function(grunt) {
       all: ['src/jquery.tree-multiselect.js']
     },
 
-    // Minify CSS
-    cssmin: {
+    // SASS compiler
+    sass: {
+      options: {
+        sourceMap: false,
+        outputStyle: 'compressed'
+      },
       dist: {
         files: {
-          'dist/jquery.tree-multiselect.min.css': ['src/jquery.tree-multiselect.css']
+          'dist/jquery.tree-multiselect.min.css': 'src/jquery.tree-multiselect.scss'
         }
       }
     },
@@ -72,15 +76,15 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-coveralls');
 
   grunt.registerTask('test-local', ['karma:local', 'jshint']);
   grunt.registerTask('test-travis', ['test-local', 'coveralls']);
   grunt.registerTask('test-watch', ['karma:continuous']);
-  grunt.registerTask('release', ['test-local', 'cssmin', 'uglify', 'usebanner']);
+  grunt.registerTask('release', ['test-local', 'sass', 'uglify', 'usebanner']);
 
   grunt.registerTask('default', 'test-local');
 };

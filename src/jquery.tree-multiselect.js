@@ -306,16 +306,23 @@
   }
 
   function createSelectAllButtons($selectionContainer, options) {
-    $selectionContainer.prepend("<span class='unselect-all'>Unselect All</span>");
-    $selectionContainer.prepend("<span class='select-all'>Select All</span>");
+    var $selectAll = $("<span class='select-all'>Select All</span>");
+    var $unselectAll = $("<span class='unselect-all'>Unselect All</span>");
+
+    var $selectAllContainer = $("<div class='select-all-container'></div>");
+
+    $selectAllContainer.prepend($unselectAll);
+    $selectAllContainer.prepend($selectAll);
+
+    $selectionContainer.prepend($selectAllContainer);
 
     var $checkboxes = $selectionContainer.find("div.item").find("> input[type=checkbox]");
 
-    $(".select-all").unbind().click(function(e) {
+    $selectAll.unbind().click(function(e) {
       $checkboxes.prop('checked', true).change();
     });
 
-    $(".unselect-all").unbind().click(function(e) {
+    $unselectAll.unbind().click(function(e) {
       $checkboxes.prop('checked', false).change();
     });
   }

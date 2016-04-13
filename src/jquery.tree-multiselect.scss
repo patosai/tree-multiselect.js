@@ -112,4 +112,13 @@ div.tree-multiselect {
     float: right;
     font-style: italic;
   }
+
+  span.select-all,
+  span.unselect-all {
+    margin-right: 10px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }

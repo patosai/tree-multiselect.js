@@ -29,6 +29,10 @@
         addCollapsibility($selectionContainer, options);
       }
 
+      if (options.enableSelectAll) {
+        createSelectAllButtons($selectionContainer, options);
+      }
+
       var $selectedContainer = $(uiBuilder.selected);
       updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
 
@@ -41,6 +45,7 @@
     var defaults = {
       allowBatchSelection: true,
       collapsible: true,
+      enableSelectAll: false,
       freeze: false,
       hideSidePanel: false,
       onChange: null,
@@ -297,6 +302,21 @@
 
     $titleDivs.click(function() {
       $(this).find("> span.collapse-section").trigger('click');
+    });
+  }
+
+  function createSelectAllButtons($selectionContainer, options) {
+    $selectionContainer.prepend("<span class='unselect-all'>Unselect All</span>");
+    $selectionContainer.prepend("<span class='select-all'>Select All</span>");
+
+    var $checkboxes = $selectionContainer.find("div.item").find("> input[type=checkbox]");
+
+    $(".select-all").unbind().click(function(e) {
+      $checkboxes.prop('checked', true).change();
+    });
+
+    $(".unselect-all").unbind().click(function(e) {
+      $checkboxes.prop('checked', false).change();
     });
   }
 

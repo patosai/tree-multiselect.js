@@ -253,3 +253,37 @@ QUnit.test("onChange callback is called with correct args when item is removed",
   });
   item.find("input[type=checkbox]").click();
 });
+
+QUnit.test("select all button is created and it works", function(assert) {
+  $("select").append("<option value='one' data-section='test'>One</option>");
+  $("select").append("<option value='two' data-section='test'>Two</option>");
+  $("select").treeMultiselect({ enableSelectAll: true });
+
+  $selectAll = $(".select-all");
+  assert.equal($selectAll.length, 1);
+
+  var $selectedItems = $("div.selected div.item");
+  assert.equal($selectedItems.length, 0);
+
+  $selectAll.click();
+
+  $selectedItems = $("div.selected div.item");
+  assert.equal($selectedItems.length, 2);
+});
+
+QUnit.test("unselect all button is created and it works", function(assert) {
+  $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+  $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+  $("select").treeMultiselect({ enableSelectAll: true });
+
+  $unselectAll = $(".unselect-all");
+  assert.equal($selectAll.length, 1);
+
+  var $selectedItems = $("div.selected div.item");
+  assert.equal($selectedItems.length, 2);
+
+  $unselectAll.click();
+
+  $selectedItems = $("div.selected div.item");
+  assert.equal($selectedItems.length, 0);
+});

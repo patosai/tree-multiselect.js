@@ -259,7 +259,7 @@ QUnit.test("select all button is created and it works", function(assert) {
   $("select").append("<option value='two' data-section='test'>Two</option>");
   $("select").treeMultiselect({ enableSelectAll: true });
 
-  $selectAll = $(".select-all");
+  var $selectAll = $(".select-all");
   assert.equal($selectAll.length, 1);
 
   var $selectedItems = $("div.selected div.item");
@@ -276,8 +276,8 @@ QUnit.test("unselect all button is created and it works", function(assert) {
   $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
   $("select").treeMultiselect({ enableSelectAll: true });
 
-  $unselectAll = $(".unselect-all");
-  assert.equal($selectAll.length, 1);
+  var $unselectAll = $(".unselect-all");
+  assert.equal($unselectAll.length, 1);
 
   var $selectedItems = $("div.selected div.item");
   assert.equal($selectedItems.length, 2);
@@ -286,4 +286,22 @@ QUnit.test("unselect all button is created and it works", function(assert) {
 
   $selectedItems = $("div.selected div.item");
   assert.equal($selectedItems.length, 0);
+});
+
+QUnit.test("select all text option works", function(assert) {
+  $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+  var selectAllText = "foobar";
+  $("select").treeMultiselect({ enableSelectAll: true, selectAllText: selectAllText });
+
+  var $selectAll = $(".select-all");
+  assert.equal($selectAll.text(), selectAllText);
+});
+
+QUnit.test("unselect all text option works", function(assert) {
+  $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+  var unselectAllText = "foobar";
+  $("select").treeMultiselect({ enableSelectAll: true, unselectAllText: unselectAllText });
+
+  var $unselectAll = $(".unselect-all");
+  assert.equal($unselectAll.text(), unselectAllText);
 });

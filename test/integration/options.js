@@ -254,6 +254,21 @@ QUnit.test("onChange callback is called with correct args when item is removed",
   item.find("input[type=checkbox]").click();
 });
 
+QUnit.test("sortable actually sorts the options", function(assert) {
+  $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+  $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+  $("select").treeMultiselect({ sortable: true });
+
+  assert.deepEqual($("select").val(), ['one', 'two']);
+
+  var $one = $("div.selected div.item[data-value='one']");
+  var $two = $("div.selected div.item[data-value='two']");
+  $one.insertAfter($two);
+  $("div.selected").sortable('option', 'update')();
+
+  assert.deepEqual($("select").val(), ['two', 'one']);
+});
+
 QUnit.test("select all button is created and it works", function(assert) {
   $("select").append("<option value='one' data-section='test'>One</option>");
   $("select").append("<option value='two' data-section='test'>Two</option>");

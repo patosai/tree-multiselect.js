@@ -24,6 +24,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test/lib/jquery-1.11.3.min.js',
+      'test/lib/jquery-ui.min.js',
       'src/jquery.tree-multiselect.js',
       'test/helper.js',
       'test/integration/*.js',

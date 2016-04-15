@@ -1,5 +1,11 @@
+$color-border-light: #D8D8D8;
+$color-border-dark: #676767;
+
+$color-bg-dark: #777;
+$color-bg-light: #EAEAEA;
+
 div.tree-multiselect {
-  border: 2px solid #D8D8D8;
+  border: 2px solid $color-border-light;
   border-radius: 5px;
   display: table;
   height: inherit;
@@ -18,7 +24,7 @@ div.tree-multiselect {
   }
 
   > div.selections {
-    border-right: solid 2px #D8D8D8;
+    border-right: solid 2px $color-border-light;
 
     div.item {
       margin-left: 16px;
@@ -33,7 +39,7 @@ div.tree-multiselect {
     > div.item {
       padding: 2px 5px;
       border-radius: 2px;
-      background: #EAEAEA;
+      background: $color-bg-light;
     }
 
     &.ui-sortable > div.item:hover {
@@ -54,7 +60,7 @@ div.tree-multiselect {
   }
 
   div.title {
-    background: #767676;
+    background: $color-bg-dark;
     color: white;
     padding: 2px;
 
@@ -84,7 +90,7 @@ div.tree-multiselect {
   span.description {
     padding: 0 3px;
     margin-right: 5px;
-    background: #777;
+    background: $color-bg-dark;
     color: white;
     border-radius: 2px;
   }
@@ -102,9 +108,9 @@ div.tree-multiselect {
   }
 
   div.temp-description-popup {
-    background: #FAFAFA;
+    background: $color-bg-light;
     padding: 5px;
-    border: 2px solid #676767;
+    border: 2px solid $color-border-dark;
     border-radius: 3px;
   }
 
@@ -116,11 +122,16 @@ div.tree-multiselect {
   .select-all-container {
     span.select-all,
     span.unselect-all {
-      margin-right: 10px;
+      padding-right: 5px;
+      margin-right: 5px;
 
       &:hover {
         cursor: pointer;
       }
+    }
+
+    span.select-all {
+      border-right: 2px solid $color-border-light;
     }
   }
 }

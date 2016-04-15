@@ -46,6 +46,8 @@
       allowBatchSelection: true,
       collapsible: true,
       enableSelectAll: false,
+      selectAllText: 'Select All',
+      unselectAllText: 'Unselect All',
       freeze: false,
       hideSidePanel: false,
       onChange: null,
@@ -306,8 +308,10 @@
   }
 
   function createSelectAllButtons($selectionContainer, options) {
-    var $selectAll = $("<span class='select-all'>Select All</span>");
-    var $unselectAll = $("<span class='unselect-all'>Unselect All</span>");
+    var $selectAll = $("<span class='select-all'></span>");
+    $selectAll.text(options.selectAllText);
+    var $unselectAll = $("<span class='unselect-all'></span>");
+    $unselectAll.text(options.unselectAllText);
 
     var $selectAllContainer = $("<div class='select-all-container'></div>");
 
@@ -338,7 +342,9 @@
       item.innerHTML = text;
 
       if (options.showSectionOnSelected) {
-        $(item).append("<span class='section-name'>" + sectionName + "</span>");
+        var $sectionSpan = $("<span class='section-name'></span>");
+        $sectionSpan.text(sectionName);
+        $(item).append($sectionSpan);
       }
 
       if (!options.freeze) {

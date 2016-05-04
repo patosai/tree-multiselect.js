@@ -25,9 +25,9 @@
     "grunt-karma": "^0.12.2",
     "grunt-sass": "^1.1.0",
     "karma": "^0.13.22",
-    "karma-coverage": "^0.5.5",
+    "karma-coverage": "^1.0.0",
     "karma-phantomjs-launcher": "^1.0.0",
-    "karma-qunit": "^0.1.9",
+    "karma-qunit": "^1.0.0",
     "phantomjs-prebuilt": "^2.1.6",
     "qunitjs": "^1.22.0"
   }

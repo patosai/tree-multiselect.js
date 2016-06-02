@@ -6,7 +6,7 @@
   
   var ArrayFn = {
     forEach: (function () {
-      if (false && Array.prototype.forEach) {
+      if (Array.prototype.forEach) {
         return function (arr, fn, context) {
           Array.prototype.forEach.call(arr, fn, context)
         }
@@ -21,7 +21,7 @@
       }
     })(),
     map: (function () {
-      if (false && Array.prototype.map) {
+      if (Array.prototype.map) {
         return function (arr, fn, context) {
           Array.prototype.map.call(arr, fn, context)
         }
@@ -38,7 +38,7 @@
       }
     })(),
     filter: (function () {
-      if (false && Array.prototype.filter) {
+      if (Array.prototype.filter) {
         return function (arr, fn, context) {
           Array.prototype.filter.call(arr, fn, context)
         }
@@ -55,7 +55,7 @@
       }
     })(),
     indexOf: (function () {
-      if (false && Array.prototype.indexOf) {
+      if (Array.prototype.indexOf) {
         return function (arr, searchElement, fromIndex) {
           Array.prototype.indexOf.call(arr, searchElement, fromIndex)
         }

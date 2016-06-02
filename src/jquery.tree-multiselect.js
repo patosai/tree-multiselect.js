@@ -1,6 +1,78 @@
 (function($) {
   "use strict";
+  
+  var isIE = /msie/.test(navigator.userAgent.toLowerCase());
+  var ArrayFn = {
+    forEach: (function () {
+      if (false && Array.prototype.forEach) {
+        return function (arr, fn, context) {
+          Array.prototype.forEach.call(arr, fn, context)
+        }
+      } else {
+        return function (arr, fn, context) {
+          for (var k = 0, length = arr.length; k < length; k++) {
+            if (typeof fn === "function" && Object.prototype.hasOwnProperty.call(arr, k)) {
+              fn.call(context || arr, arr[k], k, arr);
+            }
+          }
+        }
+      }
+    })(),
+    map: (function () {
+      if (false && Array.prototype.map) {
+        return function (arr, fn, context) {
+          Array.prototype.map.call(arr, fn, context)
+        }
+      } else {
+        return function (arr, fn, context) {
+          var ret = [];
+          if (typeof fn === "function") {
+            for (var k = 0, length = arr.length; k < length; k++) {
+              ret.push(fn.call(context || arr, arr[k], k, arr));
+            }
+          }
+          return ret;
+        }
+      }
+    })(),
+    filter: (function () {
+      if (false && Array.prototype.filter) {
+        return function (arr, fn, context) {
+          Array.prototype.filter.call(arr, fn, context)
+        }
+      } else {
+        return function (arr, fn, context) {
+          var ret = [];
+          if (typeof fn === "function") {
+            for (var k = 0, length = arr.length; k < length; k++) {
+              fn.call(context || arr[k], arr[k], k, arr) && ret.push(arr[k]);
+            }
+          }
+          return ret;
+        }
+      }
+    })(),
+    indexOf: (function () {
+      if (false && Array.prototype.indexOf) {
+        return function (arr, searchElement, fromIndex) {
+          Array.prototype.indexOf.call(arr, searchElement, fromIndex)
+        }
+      } else {
+        return function (arr, searchElement, fromIndex) {
+          var index = -1;
+          fromIndex = fromIndex * 1 || 0;
 
+          for (var k = 0, length = arr.length; k < length; k++) {
+            if (k >= fromIndex && arr[k] === searchElement) {
+              index = k;
+              break;
+            }
+          }
+          return index;
+        }
+      }
+    })()
+  }
   $.fn.treeMultiselect = function(opts) {
     var options = mergeDefaultOptions(opts);
     this.each(function() {
@@ -209,16 +281,16 @@
     var selectedOptions = $originalSelect.val();
     if (!selectedOptions) return;
 
-    var $selectedOptionDivs = $selectionContainer.find("div.item").filter(function() {
+    var $selectedOptionDivs = $(ArrayFn.filter($selectionContainer.find("div.item"),function() {
       var item = $(this);
-      return selectedOptions.indexOf(item.attr('data-value')) !== -1;
-    });
+      return ArrayFn.indexOf(selectedOptions,item.attr('data-value')) !== -1;
+    }));
     $selectedOptionDivs.find("> input[type=checkbox]").prop('checked', true);
   }
 
   function armTitleCheckboxes($selectionContainer) {
     var $titleCheckboxes = $selectionContainer.find("div.title > input[type=checkbox]");
-    $titleCheckboxes.change(function() {
+    $titleCheckboxes.bind(!isIE?'change':'click change',function() {
       var $titleCheckbox = $(this);
       var $section = $titleCheckbox.closest("div.section");
       var $checkboxesToBeChanged = $section.find("input[type=checkbox]");
@@ -229,7 +301,7 @@
 
   function uncheckParentsOnUnselect($selectionContainer) {
     var $checkboxes = $selectionContainer.find("input[type=checkbox]");
-    $checkboxes.change(function() {
+    $checkboxes.bind(!isIE?'change':'click change',function() {
       var $checkbox = $(this);
       if ($checkbox.is(":checked")) return;
       var $sectionParents = $checkbox.parentsUntil($selectionContainer, "div.section");
@@ -263,7 +335,7 @@
       sections.each(function() {
         var $section = $(this);
         var $items = $section.find("div.item");
-        var numSelected = $items.filter(function() {
+        var numSelected = ArrayFn.filter($items,function() {
           var item = $(this);
           return item.find("> input[type=checkbox]").prop('checked');
         }).length;
@@ -361,11 +433,11 @@
         currentSelections.push($(this).attr('data-value'));
       });
 
-      var selectionsNotYetAdded = selections.filter(function(selection) {
-        return currentSelections.indexOf(selection.value) == -1;
+      var selectionsNotYetAdded = ArrayFn.filter(selections,function(selection) {
+        return ArrayFn.indexOf(currentSelections,selection.value) == -1;
       });
 
-      selectionsNotYetAdded.forEach(function(selection) {
+      ArrayFn.forEach(selectionsNotYetAdded,function(selection) {
         createSelectedDiv(selection);
       });
 
@@ -376,7 +448,7 @@
 
     function removeOldFromSelected(selections) {
       var selectionTexts = [];
-      selections.forEach(function(selection) {
+      ArrayFn.forEach(selections,function(selection) {
         selectionTexts.push(selection.value);
       });
 
@@ -385,7 +457,7 @@
       $selectedContainer.find("div.item").each(function(index, el) {
         var $item = $(el);
         var value = $item.attr('data-value');
-        if (selectionTexts.indexOf(value) == -1) {
+        if (ArrayFn.indexOf(selectionTexts,value) == -1) {
           removedValues.push(value);
           $item.remove();
         }
@@ -395,7 +467,7 @@
       var allSelections = $selectionContainer.find("div.item");
       allSelections.each(function() {
         var $this = $(this);
-        if (removedValues.indexOf($this.attr('data-value')) !== -1) {
+        if (ArrayFn.indexOf(removedValues,$this.attr('data-value')) !== -1) {
           unselectedSelections.push(elToSelectionObject($this));
         }
       });
@@ -411,8 +483,8 @@
       $originalSelect.val(selected).change();
 
       $originalSelect.html($originalSelect.find("option").sort(function(a, b) {
-        var aValue = selected.indexOf($(a).attr('value'));
-        var bValue = selected.indexOf($(b).attr('value'));
+        var aValue = ArrayFn.indexOf(selected,$(a).attr('value'));
+        var bValue = ArrayFn.indexOf(selected,$(b).attr('value'));
 
         if (aValue > bValue) return 1;
         if (aValue < bValue) return -1;
@@ -440,6 +512,7 @@
 
     var initialRun = true;
     function update() {
+      
       var $selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
       var selections = [];
 
@@ -483,8 +556,7 @@
       var value = $(this).parent().attr('data-value');
       var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
       var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
-      $matchingCheckbox.prop('checked', false);
-      $matchingCheckbox.change();
+      $matchingCheckbox.prop('checked', false).change();
     });
   }
 
@@ -522,7 +594,7 @@
 
   function onCheckboxChange($selectionContainer, callback) {
     var checkboxes = $selectionContainer.find("input[type=checkbox]");
-    checkboxes.change(function() {
+    checkboxes.bind(!isIE?'change':'click change',function() {
       callback();
     });
     callback();
@@ -531,4 +603,6 @@
   function textOf(el) {
     return $(el).clone().children().remove().end().text();
   }
+  
 })(jQuery);
+

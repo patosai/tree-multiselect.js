@@ -1,7 +1,9 @@
 (function($) {
   "use strict";
   
-  var isIE = /msie/.test(navigator.userAgent.toLowerCase());
+  var isIE = !!window.ActiveXObject;    
+  var isOldIE = isIE && !!document.documentMode;    
+  
   var ArrayFn = {
     forEach: (function () {
       if (false && Array.prototype.forEach) {
@@ -290,7 +292,7 @@
 
   function armTitleCheckboxes($selectionContainer) {
     var $titleCheckboxes = $selectionContainer.find("div.title > input[type=checkbox]");
-    $titleCheckboxes.bind(!isIE?'change':'click change',function() {
+    $titleCheckboxes.bind(!isOldIE?'change':'click change',function() {
       var $titleCheckbox = $(this);
       var $section = $titleCheckbox.closest("div.section");
       var $checkboxesToBeChanged = $section.find("input[type=checkbox]");
@@ -301,7 +303,7 @@
 
   function uncheckParentsOnUnselect($selectionContainer) {
     var $checkboxes = $selectionContainer.find("input[type=checkbox]");
-    $checkboxes.bind(!isIE?'change':'click change',function() {
+    $checkboxes.bind(!isOldIE?'change':'click change',function() {
       var $checkbox = $(this);
       if ($checkbox.is(":checked")) return;
       var $sectionParents = $checkbox.parentsUntil($selectionContainer, "div.section");
@@ -594,7 +596,7 @@
 
   function onCheckboxChange($selectionContainer, callback) {
     var checkboxes = $selectionContainer.find("input[type=checkbox]");
-    checkboxes.bind(!isIE?'change':'click change',function() {
+    checkboxes.bind(!isOldIE?'change':'click change',function() {
       callback();
     });
     callback();

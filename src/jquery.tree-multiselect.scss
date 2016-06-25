@@ -79,6 +79,7 @@ div.tree-multiselect {
   }
 
   input[type=checkbox] {
+    display: inline;
     margin-right: 5px;
 
     &:hover {

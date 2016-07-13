@@ -1,21 +1,29 @@
 {
-  "name": "jquery.tree-multiselect.js",
+  "name": "tree-multiselect",
   "version": "1.17.1",
   "description": "jQuery multiple select with nested options",
-  "main": "jquery.tree-multiselect.min.js",
+  "browser": "dist/jquery.tree-multiselect.min.js",
+  "keywords": [
+    "tree",
+    "multiselect",
+    "select",
+    "jquery",
+    "options",
+    "checkbox"
+  ],
   "scripts": {
     "test": "grunt test --verbose --force"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/patosai/tree-multiselect.js.git"
+    "url": "git+https://github.com/patosai/tree-multiselect.git"
   },
   "author": "Patrick Tsai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/patosai/tree-multiselect.js/issues"
+    "url": "https://github.com/patosai/tree-multiselect/issues"
   },
-  "homepage": "https://github.com/patosai/tree-multiselect.js#readme",
+  "homepage": "https://github.com/patosai/tree-multiselect#readme",
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-banner": "^0.6.0",
@@ -28,6 +36,7 @@
     "karma-coverage": "^1.0.0",
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-qunit": "^1.1.0",
+    "lodash": "^4.13.1",
     "phantomjs-prebuilt": "^2.1.7",
     "qunitjs": "^1.23.1"
   }

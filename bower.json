@@ -28,7 +28,8 @@
     "bower.json",
     "package.json",
     "Gruntfile.js",
-    "README.md"
+    "README.md",
+    "release.sh"
   ],
   "repository": {
     "type": "git",

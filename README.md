@@ -55,6 +55,8 @@ Option name             | Default        | Description
 ### Installation
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).
 
+You can also use bower - `bower install tree-multiselect`
+
 ### Custom styling
 So, you want to exercise your css-fu. Alright then.
 

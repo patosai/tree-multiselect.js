@@ -4,7 +4,8 @@
 [![devDependency Status](https://david-dm.org/patosai/tree-multiselect/dev-status.svg)](https://david-dm.org/patosai/tree-multiselect#info=devDependencies)
 
 
-**This plugin allows you to replace a `select` element with a sweet treeview element.**
+**This plugin allows you to add a sweet treeview frontend to a `select` element.**
+There seems to be a common misconception that the `select` you call this on is tossed into the void. All this does is make the selection process a little more organized. Your `select` element will still act the same in forms, in JavaScript, etc.
 
 * Requires jQuery v1.8+
 * Does not work on IE8. Pull requests welcome!

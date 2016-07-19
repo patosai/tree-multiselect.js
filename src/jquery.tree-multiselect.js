@@ -1,6 +1,77 @@
 (function($) {
   "use strict";
+  
+  var ArrayFn = {
+    forEach: (function () {
+      if (Array.prototype.forEach) {
+        return function (arr, fn, context) {
+          Array.prototype.forEach.call(arr, fn, context)
+        }
+      } else {
+        return function (arr, fn, context) {
+          for (var k = 0, length = arr.length; k < length; k++) {
+            if (typeof fn === "function" && Object.prototype.hasOwnProperty.call(arr, k)) {
+              fn.call(context || arr, arr[k], k, arr);
+            }
+          }
+        }
+      }
+    })(),
+    map: (function () {
+      if (Array.prototype.map) {
+        return function (arr, fn, context) {
+          Array.prototype.map.call(arr, fn, context)
+        }
+      } else {
+        return function (arr, fn, context) {
+          var ret = [];
+          if (typeof fn === "function") {
+            for (var k = 0, length = arr.length; k < length; k++) {
+              ret.push(fn.call(context || arr, arr[k], k, arr));
+            }
+          }
+          return ret;
+        }
+      }
+    })(),
+    filter: (function () {
+      if (Array.prototype.filter) {
+        return function (arr, fn, context) {
+          Array.prototype.filter.call(arr, fn, context)
+        }
+      } else {
+        return function (arr, fn, context) {
+          var ret = [];
+          if (typeof fn === "function") {
+            for (var k = 0, length = arr.length; k < length; k++) {
+              fn.call(context || arr[k], arr[k], k, arr) && ret.push(arr[k]);
+            }
+          }
+          return ret;
+        }
+      }
+    })(),
+    indexOf: (function () {
+      if (Array.prototype.indexOf) {
+        return function (arr, searchElement, fromIndex) {
+          Array.prototype.indexOf.call(arr, searchElement, fromIndex)
+        }
+      } else {
+        return function (arr, searchElement, fromIndex) {
+          var index = -1;
+          fromIndex = fromIndex * 1 || 0;
 
+          for (var k = 0, length = arr.length; k < length; k++) {
+            if (k >= fromIndex && arr[k] === searchElement) {
+              index = k;
+              break;
+            }
+          }
+          return index;
+        }
+      }
+    })()
+  }
   $.fn.treeMultiselect = function(opts) {
     var options = mergeDefaultOptions(opts);
     this.each(function() {
@@ -11,32 +82,17 @@
       uiBuilder.build($originalSelect, options.hideSidePanel);
 
       var $selectionContainer = $(uiBuilder.selections);
+      var $selectedContainer = $(uiBuilder.selected);
 
       generateSelections($originalSelect, $selectionContainer, options);
 
       addDescriptionHover($selectionContainer, options);
       addCheckboxes($selectionContainer, options);
       checkPreselectedSelections($originalSelect, $selectionContainer, options);
-
-      if (options.allowBatchSelection) {
-        armTitleCheckboxes($selectionContainer, options);
-        uncheckParentsOnUnselect($selectionContainer, options);
-        checkParentsOnAllChildrenSelected($selectionContainer, options);
-        showSemifilledParents($selectionContainer, options);
-      }
-
-      if (options.collapsible) {
-        addCollapsibility($selectionContainer, options);
-      }
-
-      if (options.enableSelectAll) {
-        createSelectAllButtons($selectionContainer, options);
-      }
-
-      var $selectedContainer = $(uiBuilder.selected);
-      updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
-
-      armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
+      updateSelected($selectionContainer, $selectedContainer, $originalSelect, options);
+      
+      bindEvent($selectionContainer, $selectedContainer,$originalSelect,options);
+      
     });
     return this;
   };
@@ -103,7 +159,7 @@
 
     $originalSelect.find("> option").each(function() {
       var $option = $(this);
-      var path = $option.attr('data-section').split(options.sectionDelimiter);
+      var path = ($option.attr('data-section')||'').split(options.sectionDelimiter);
 
       var optionValue = $option.val();
       var optionName = $option.text();
@@ -200,45 +256,69 @@
     }
 
     $checkbox.prependTo($targets);
-    $selectionContainer.find('input[type=checkbox]').click(function(e) {
-      e.stopPropagation();
-    });
   }
 
   function checkPreselectedSelections($originalSelect, $selectionContainer) {
     var selectedOptions = $originalSelect.val();
     if (!selectedOptions) return;
 
-    var $selectedOptionDivs = $selectionContainer.find("div.item").filter(function() {
+    var $selectedOptionDivs = $(ArrayFn.filter($selectionContainer.find("div.item"),function() {
       var item = $(this);
-      return selectedOptions.indexOf(item.attr('data-value')) !== -1;
-    });
+      return ArrayFn.indexOf(selectedOptions,item.attr('data-value')) !== -1;
+    }));
     $selectedOptionDivs.find("> input[type=checkbox]").prop('checked', true);
   }
 
-  function armTitleCheckboxes($selectionContainer) {
-    var $titleCheckboxes = $selectionContainer.find("div.title > input[type=checkbox]");
-    $titleCheckboxes.change(function() {
-      var $titleCheckbox = $(this);
+  function bindEvent($selectionContainer, $selectedContainer,$originalSelect, options){
+      
+    $selectionContainer.on('click','input[type=checkbox]',function(){
+
+      var $checkbox = $(this);
+      var checkboxClass = $checkbox.parent().hasClass('title') ? 'title':'item';
+
+      if(checkboxClass === 'title'){
+        if(options.allowBatchSelection){
+          armTitleCheckboxes($checkbox);
+        }
+      }else if(checkboxClass === 'item'){
+        if(options.allowBatchSelection){
+          checkParentsOnAllChildrenSelected($selectionContainer);
+          showSemifilledOrUncheckParents($selectionContainer);
+        }
+      }
+
+      updateSelected($selectionContainer, $selectedContainer, $originalSelect, options);
+    })
+
+
+    if (options.collapsible) {
+      addCollapsibility($selectionContainer, options);
+    }
+
+    if (options.enableSelectAll) {
+      createSelectAllButtons($selectionContainer, $selectedContainer, $originalSelect, options);
+    }
+
+    //armRemoveSelectedOnClick
+    $selectedContainer.on('click',"span.remove-selected",function() {
+      var value = $(this).parent().attr('data-value');
+      var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
+      var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
+      $matchingCheckbox.prop('checked', false);
+      $(this).parent().remove();
+      checkParentsOnAllChildrenSelected($selectionContainer);
+      showSemifilledOrUncheckParents($selectionContainer);
+    });
+  }
+
+  function armTitleCheckboxes($titleCheckbox) {
       var $section = $titleCheckbox.closest("div.section");
       var $checkboxesToBeChanged = $section.find("input[type=checkbox]");
       var checked = $titleCheckbox.is(':checked');
       $checkboxesToBeChanged.prop('checked', checked);
-    });
-  }
-
-  function uncheckParentsOnUnselect($selectionContainer) {
-    var $checkboxes = $selectionContainer.find("input[type=checkbox]");
-    $checkboxes.change(function() {
-      var $checkbox = $(this);
-      if ($checkbox.is(":checked")) return;
-      var $sectionParents = $checkbox.parentsUntil($selectionContainer, "div.section");
-      $sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
-    });
   }
 
   function checkParentsOnAllChildrenSelected($selectionContainer) {
-    function check() {
       var sections = $selectionContainer.find("div.section");
       sections.each(function() {
         var $section = $(this);
@@ -252,29 +332,25 @@
           sectionCheckbox.prop('checked', true);
         }
       });
-    }
-
-    onCheckboxChange($selectionContainer, check);
   }
 
-  function showSemifilledParents($selectionContainer) {
-    function check() {
-      var sections = $selectionContainer.find("div.section");
-      sections.each(function() {
-        var $section = $(this);
-        var $items = $section.find("div.item");
-        var numSelected = $items.filter(function() {
-          var item = $(this);
-          return item.find("> input[type=checkbox]").prop('checked');
-        }).length;
+  function showSemifilledOrUncheckParents($selectionContainer) {
+    var sections = $selectionContainer.find("div.section");
+    sections.each(function() {
+      var $section = $(this);
+      var $items = $section.find("div.item");
+      var numSelected = ArrayFn.filter($items,function() {
+        var item = $(this);
+        return item.find("> input[type=checkbox]").prop('checked');
+      }).length;
 
-        var $sectionCheckbox = $section.find("> div.title > input[type=checkbox]");
-        var isIndeterminate = (numSelected !== 0 && numSelected !== $items.length);
-        $sectionCheckbox.prop('indeterminate', isIndeterminate);
-      });
-    }
-
-    onCheckboxChange($selectionContainer, check);
+      var $sectionCheckbox = $section.find("> div.title > input[type=checkbox]");
+      var isIndeterminate = (numSelected !== 0 && numSelected !== $items.length);
+      $sectionCheckbox.prop('indeterminate', isIndeterminate);
+      if(numSelected === 0){
+        $sectionCheckbox.prop('checked', false);
+      }
+    });
   }
 
   function addCollapsibility($selectionContainer, options) {
@@ -292,22 +368,23 @@
       $(collapseDiv).text(hideIndicator);
     }
     $titleDivs.prepend(collapseDiv);
-
-    $("span.collapse-section").unbind().click(function(e) {
+    $selectionContainer.on('click','span.collapse-section',function(e){
       e.stopPropagation();
       var $collapseSection = $(this);
       var indicator = $collapseSection.text();
       $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var $title = $collapseSection.parent();
       $title.siblings().toggle();
-    });
+    })
 
-    $titleDivs.click(function() {
-      $(this).find("> span.collapse-section").trigger('click');
-    });
+    $selectionContainer.on('click','div.title',function(e){
+      if(!$(e.target).is('input[type=checkbox]')){
+        $(this).find("> span.collapse-section").trigger('click');
+      }
+    })
   }
 
-  function createSelectAllButtons($selectionContainer, options) {
+  function createSelectAllButtons($selectionContainer, $selectedContainer, $originalSelect, options) {
     var $selectAll = $("<span class='select-all'></span>");
     $selectAll.text(options.selectAllText);
     var $unselectAll = $("<span class='unselect-all'></span>");
@@ -320,18 +397,21 @@
 
     $selectionContainer.prepend($selectAllContainer);
 
-    var $checkboxes = $selectionContainer.find("div.item").find("> input[type=checkbox]");
+    var $checkboxes = $selectionContainer.find("input[type=checkbox]");
 
     $selectAll.unbind().click(function(e) {
-      $checkboxes.prop('checked', true).change();
+      $checkboxes.prop('checked', true);
+      updateSelected($selectionContainer, $selectedContainer, $originalSelect, options);
     });
 
     $unselectAll.unbind().click(function(e) {
-      $checkboxes.prop('checked', false).change();
+      $checkboxes.prop('checked', false);
+      $checkboxes.prop('indeterminate', false);
+      updateSelected($selectionContainer, $selectedContainer, $originalSelect, options);
     });
   }
 
-  function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options) {
+  function updateSelected($selectionContainer, $selectedContainer, $originalSelect, options) {
     function createSelectedDiv(selection) {
       var text = selection.text;
       var value = selection.value;
@@ -361,22 +441,20 @@
         currentSelections.push($(this).attr('data-value'));
       });
 
-      var selectionsNotYetAdded = selections.filter(function(selection) {
-        return currentSelections.indexOf(selection.value) == -1;
+      var selectionsNotYetAdded = ArrayFn.filter(selections,function(selection) {
+        return ArrayFn.indexOf(currentSelections,selection.value) == -1;
       });
 
-      selectionsNotYetAdded.forEach(function(selection) {
+      ArrayFn.forEach(selectionsNotYetAdded,function(selection) {
         createSelectedDiv(selection);
       });
-
-      armRemoveSelectedOnClick($selectionContainer, $selectedContainer);
 
       return selectionsNotYetAdded;
     }
 
     function removeOldFromSelected(selections) {
       var selectionTexts = [];
-      selections.forEach(function(selection) {
+      ArrayFn.forEach(selections,function(selection) {
         selectionTexts.push(selection.value);
       });
 
@@ -385,7 +463,7 @@
       $selectedContainer.find("div.item").each(function(index, el) {
         var $item = $(el);
         var value = $item.attr('data-value');
-        if (selectionTexts.indexOf(value) == -1) {
+        if (ArrayFn.indexOf(selectionTexts,value) == -1) {
           removedValues.push(value);
           $item.remove();
         }
@@ -395,7 +473,7 @@
       var allSelections = $selectionContainer.find("div.item");
       allSelections.each(function() {
         var $this = $(this);
-        if (removedValues.indexOf($this.attr('data-value')) !== -1) {
+        if (ArrayFn.indexOf(removedValues,$this.attr('data-value')) !== -1) {
           unselectedSelections.push(elToSelectionObject($this));
         }
       });
@@ -411,8 +489,8 @@
       $originalSelect.val(selected).change();
 
       $originalSelect.html($originalSelect.find("option").sort(function(a, b) {
-        var aValue = selected.indexOf($(a).attr('value'));
-        var bValue = selected.indexOf($(b).attr('value'));
+        var aValue = ArrayFn.indexOf(selected,$(a).attr('value'));
+        var bValue = ArrayFn.indexOf(selected,$(b).attr('value'));
 
         if (aValue > bValue) return 1;
         if (aValue < bValue) return -1;
@@ -440,6 +518,7 @@
 
     var initialRun = true;
     function update() {
+      
       var $selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
       var selections = [];
 
@@ -475,17 +554,7 @@
       }
     }
 
-    onCheckboxChange($selectionContainer, update);
-  }
-
-  function armRemoveSelectedOnClick($selectionContainer, $selectedContainer) {
-    $selectedContainer.find("span.remove-selected").unbind().click(function() {
-      var value = $(this).parent().attr('data-value');
-      var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
-      var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
-      $matchingCheckbox.prop('checked', false);
-      $matchingCheckbox.change();
-    });
+    update();
   }
 
   // Helpers
@@ -520,15 +589,11 @@
     this.index = index;
   };
 
-  function onCheckboxChange($selectionContainer, callback) {
-    var checkboxes = $selectionContainer.find("input[type=checkbox]");
-    checkboxes.change(function() {
-      callback();
-    });
-    callback();
-  }
+
 
   function textOf(el) {
     return $(el).clone().children().remove().end().text();
   }
+  
 })(jQuery);
+

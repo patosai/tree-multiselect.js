@@ -88,5 +88,12 @@ The plugin adds a `div.tree-multiselect` immediately after the specified `select
   5. The mettle of your code shall tested in the Battles of QUnit. Shall the dragon be slain and the damsel rescued, from the ashes will rise a green trophy, emblazoned on it the shield of `OK`, a legendary paladin enshrined in the kingdom halls.
   6. But that probably won't happen. If not, the Architect will fire up another simulation and you shall patch your hero's weaknesses.
 
+### FAQ
+`Help! The first element is selected when I create the tree. How do I make the first element not selected?`
+You didn't set the `multiple` attribute on your `select`. This is a property of single-option select nodes - the first option is selected.
+
+`How do I dynamically change ___?`
+Not supported... yet.
+
 ### License
 MIT licensed.

@@ -200,9 +200,6 @@
     }
 
     $checkbox.prependTo($targets);
-    $selectionContainer.find('input[type=checkbox]').click(function(e) {
-      e.stopPropagation();
-    });
   }
 
   function checkPreselectedSelections($originalSelect, $selectionContainer) {
@@ -217,8 +214,7 @@
   }
 
   function armTitleCheckboxes($selectionContainer) {
-    var $titleCheckboxes = $selectionContainer.find("div.title > input[type=checkbox]");
-    $titleCheckboxes.change(function() {
+    $selectionContainer.on("change", "div.title > input[type=checkbox]", function() {
       var $titleCheckbox = $(this);
       var $section = $titleCheckbox.closest("div.section");
       var $checkboxesToBeChanged = $section.find("input[type=checkbox]");
@@ -228,8 +224,7 @@
   }
 
   function uncheckParentsOnUnselect($selectionContainer) {
-    var $checkboxes = $selectionContainer.find("input[type=checkbox]");
-    $checkboxes.change(function() {
+    $selectionContainer.on("change", "input[type=checkbox]", function() {
       var $checkbox = $(this);
       if ($checkbox.is(":checked")) return;
       var $sectionParents = $checkbox.parentsUntil($selectionContainer, "div.section");
@@ -281,7 +276,8 @@
     var hideIndicator = "-";
     var expandIndicator = "+";
 
-    var $titleDivs = $selectionContainer.find("div.title");
+    var titleSelector = "div.title";
+    var $titleDivs = $selectionContainer.find(titleSelector);
 
     var collapseDiv = document.createElement('span');
     collapseDiv.className = "collapse-section";
@@ -293,17 +289,12 @@
     }
     $titleDivs.prepend(collapseDiv);
 
-    $("span.collapse-section").unbind().click(function(e) {
-      e.stopPropagation();
-      var $collapseSection = $(this);
+    $selectionContainer.on("click", titleSelector, function() {
+      var $collapseSection = $(this).find("> span.collapse-section");
       var indicator = $collapseSection.text();
       $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
       var $title = $collapseSection.parent();
       $title.siblings().toggle();
-    });
-
-    $titleDivs.click(function() {
-      $(this).find("> span.collapse-section").trigger('click');
     });
   }
 
@@ -322,11 +313,11 @@
 
     var $checkboxes = $selectionContainer.find("div.item").find("> input[type=checkbox]");
 
-    $selectAll.unbind().click(function(e) {
+    $selectionContainer.on("click", "span.select-all", function() {
       $checkboxes.prop('checked', true).change();
     });
 
-    $unselectAll.unbind().click(function(e) {
+    $selectionContainer.on("click", "span.unselect-all", function() {
       $checkboxes.prop('checked', false).change();
     });
   }
@@ -479,7 +470,7 @@
   }
 
   function armRemoveSelectedOnClick($selectionContainer, $selectedContainer) {
-    $selectedContainer.find("span.remove-selected").unbind().click(function() {
+    $selectedContainer.on("click", "span.remove-selected", function() {
       var value = $(this).parent().attr('data-value');
       var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
       var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
@@ -521,8 +512,7 @@
   };
 
   function onCheckboxChange($selectionContainer, callback) {
-    var checkboxes = $selectionContainer.find("input[type=checkbox]");
-    checkboxes.change(function() {
+    $selectionContainer.on("change", "input[type=checkbox]", function() {
       callback();
     });
     callback();

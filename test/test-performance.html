@@ -1,0 +1,39 @@
+<!DOCTYPE html5>
+<html>
+  <head>
+    <title>Tree Multiselect test</title>
+
+    <meta charset="UTF-8">
+
+    <script src="./lib/jquery-1.11.3.min.js"></script>
+    <script src="./lib/jquery-ui.min.js"></script>
+    <script src="../src/jquery.tree-multiselect.js"></script>
+
+    <style>
+      * {
+        font-family: sans-serif;
+      }
+    </style>
+    <link rel="stylesheet" href="../dist/jquery.tree-multiselect.min.css">
+  </head>
+
+  <body>
+    <select id="test-select" multiple="multiple">
+      <option value="blueberry" data-section="Smoothies">Blueberry</option>
+      <option value="strawberry" data-section="Smoothies">Strawberries</option>
+      <option value="peach" data-section="Smoothies">Peach</option>
+      <option value="milk tea" data-section="Smoothies/Bubble Tea">Milk Tea</option>
+      <option value="green apple" data-section="Smoothies/Bubble Tea">Green Apple</option>
+      <option value="passion fruit" data-section="Smoothies/Bubble Tea" data-description="The greatest flavor" selected="selected">Passion Fruit</option>
+    </select>
+
+    <script type="text/javascript">
+      var $select = $('#test-select');
+      for (var ii = 0; ii < 10000; ++ii) {
+        var $option = $('<option value="fruit' + ii +'" data-section="Smoothies/' + ii + '" data-description="The greatest flavor" selected="selected">Passion Fruit</option>');
+        $select.append($option);
+      }
+      $select.treeMultiselect({ enableSelectAll: true, sortable: true });
+    </script>
+  </body>
+</html>

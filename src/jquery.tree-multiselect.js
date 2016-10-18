@@ -311,15 +311,19 @@
 
     $selectionContainer.prepend($selectAllContainer);
 
-    var $checkboxes = $selectionContainer.find("div.item").find("> input[type=checkbox]");
-
     $selectionContainer.on("click", "span.select-all", function() {
-      $checkboxes.prop('checked', true).change();
+      handleCheckboxes(true);
     });
 
     $selectionContainer.on("click", "span.unselect-all", function() {
-      $checkboxes.prop('checked', false).change();
+      handleCheckboxes(false);
     });
+
+    function handleCheckboxes(checked) {
+      var $checkboxes = $selectionContainer.find("input[type=checkbox]");
+      $checkboxes.prop('checked', checked);
+      $checkboxes.first().change();
+    }
   }
 
   function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options) {

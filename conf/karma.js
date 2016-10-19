@@ -1,6 +1,7 @@
 // Karma configuration
 
-var config = require('./config');
+var isparta = require('isparta');
+var browserifyIstanbul = require('browserify-istanbul');
 
 module.exports = function(config) {
   config.set({
@@ -11,23 +12,22 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['qunit'],
+    frameworks: ['browserify', 'qunit'],
 
 
     plugins: [
-      'karma-qunit',
+      'karma-browserify',
+      'karma-coverage',
       'karma-phantomjs-launcher',
-      'karma-coverage'
+      'karma-qunit',
     ],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'test/lib/jquery-1.11.3.min.js',
-      'test/lib/jquery-ui.min.js',
-      'src/jquery.tree-multiselect.js',
-      'test/helper.js',
-      'test/integration/*.js',
+      'test/vendor/jquery-1.11.3.min.js',
+      'test/vendor/jquery-ui.min.js',
+      'test/**/*.test.js',
     ],
 
 
@@ -39,7 +39,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'src/jquery.tree-multiselect.js': ['coverage']
+      // browserify handles istanbul coverage
+      'test/**/*.test.js': ['browserify'],
     },
 
 
@@ -50,7 +51,7 @@ module.exports = function(config) {
 
 
     // web server port
-    port: config.port,
+    port: 9876,
 
 
     // enable / disable colors in the output (reporters and logs)
@@ -80,14 +81,35 @@ module.exports = function(config) {
     concurrency: Infinity,
 
 
+    browserify: {
+      debug: true,
+
+      transform: [
+        // this will transform your ES6 and/or JSX
+        ['babelify', {"presets": ["es2015"]}],
+
+        // (I think) returns files readable by the reporters
+        browserifyIstanbul({
+          instrumenter: isparta,
+          ignore: ['**/node_modules/**']
+        })
+      ],
+
+      // paths that we can `require()` from
+      paths: [
+        'src',
+        'node_modules',
+      ]
+    },
+
+
     // Configure coverage reporter
     coverageReporter: {
       dir: 'coverage/',
       reporters: [
         { type: 'text-summary' },
-        { type: 'lcovonly' }
+        { type: 'lcovonly' },
       ]
-    },
-
+    }
   });
 }

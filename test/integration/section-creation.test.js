@@ -1,3 +1,5 @@
+var Util = require('utility');
+
 QUnit.module("Section Creation", {
   beforeEach: function(assert) {
     var select = document.createElement("select");
@@ -29,7 +31,7 @@ QUnit.test("creates a section with title and items", function(assert) {
 
   var title = $("div.selections > div.section > div.title");
   assert.equal(title.length, 1);
-  assert.equal(textOf(title), "section");
+  assert.equal(Util.textOf(title), "section");
 
   var collapse = title.find("span.collapse-section");
   assert.equal(collapse.length, 1);
@@ -58,7 +60,7 @@ QUnit.test("can generate nested sections", function(assert) {
   assert.equal($("div.section > div.section").length, 2);
 
   var outerSection = $("div.section").first();
-  assert.equal(textOf(outerSection.find("> div.title")), "alphabet");
+  assert.equal(Util.textOf(outerSection.find("> div.title")), "alphabet");
 
   var outerItem = outerSection.find("> div.item");
   assert.equal(outerItem.length, 1);
@@ -67,8 +69,8 @@ QUnit.test("can generate nested sections", function(assert) {
   var innerSections = $("div.section").slice(1);
   var firstInnerSection = innerSections.first();
   var lastInnerSection = innerSections.last();
-  assert.equal(textOf(firstInnerSection.find("> div.title")), "capitals");
-  assert.equal(textOf(lastInnerSection.find("> div.title")), "lowercase");
+  assert.equal(Util.textOf(firstInnerSection.find("> div.title")), "capitals");
+  assert.equal(Util.textOf(lastInnerSection.find("> div.title")), "lowercase");
 
   var capitalsItems = firstInnerSection.find("> div.item");
   assert.equal(capitalsItems.length, 2);
@@ -110,7 +112,7 @@ QUnit.test("respects the data-index attribute", function(assert) {
   var order = ["Two", "One", "Three"];
 
   selected.each(function(i, item) {
-    assert.equal(textOf(item), order[i]);
+    assert.equal(Util.textOf(item), order[i]);
   });
 });
 
@@ -125,7 +127,7 @@ QUnit.test("data-index works on nested elements", function(assert) {
   var order = ["Two", "One", "Three"];
 
   selected.each(function(i, item) {
-    assert.equal(textOf(item), order[i]);
+    assert.equal(Util.textOf(item), order[i]);
   });
 });
 
@@ -144,7 +146,7 @@ QUnit.test("section on selected items is displayed correctly", function(assert) 
 
   var sectionSpan = $("div.selected div.item span.section-name");
   assert.equal(sectionSpan.length, 1);
-  assert.equal(textOf(sectionSpan), "foo/bar/baz");
+  assert.equal(Util.textOf(sectionSpan), "foo/bar/baz");
 });
 
 QUnit.test("handles undefined data-section input", function(assert) {
@@ -154,7 +156,7 @@ QUnit.test("handles undefined data-section input", function(assert) {
   assert.equal($("div.selections div.item").length, 1);
 
   var parentSection = $("div.selections div.section");
-  assert.equal(textOf(parentSection.find("> div.title")), "");
+  assert.equal(Util.textOf(parentSection.find("> div.title")), "");
 });
 
 QUnit.test("blows up if no data-section is provided at all", function(assert) {
@@ -171,6 +173,6 @@ QUnit.test("can handle multi-digit data-index", function(assert) {
   $("select").treeMultiselect();
 
   var items = $("div.selected div.item");
-  assert.equal(textOf(items.first()), 'Two');
-  assert.equal(textOf(items.last()), 'One');
+  assert.equal(Util.textOf(items.first()), 'Two');
+  assert.equal(Util.textOf(items.last()), 'One');
 });

@@ -1,5 +1,3 @@
-var config = require('./conf/config.js');
-
 module.exports = function(grunt) {
   grunt.initConfig({
 

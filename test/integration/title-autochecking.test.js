@@ -1,3 +1,5 @@
+var Util = require('utility');
+
 QUnit.module("Title Autochecking", {
   beforeEach: function(assert) {
     var select = document.createElement("select");
@@ -49,7 +51,7 @@ QUnit.test("top level parent checking with only one child section completely che
   assert.ok(!(topLevel.find("> div.title > input[type=checkbox]").is(":checked")));
 
   var barSection = $("div.section").filter(function() {
-    return textOf($(this).find("> div.title")) == 'bar';
+    return Util.textOf($(this).find("> div.title")) == 'bar';
   });
   assert.equal(barSection.length, 1);
   assert.ok(!(barSection.find("> div.title > input[type=checkbox]").is(":checked")));
@@ -81,7 +83,7 @@ QUnit.test("nested titles should all be checked if a title is batch selected", f
   assert.equal($("input[type=checkbox]:checked").length, 0);
 
   var middleSection = $("div.section").filter(function() {
-    return textOf($(this).find("> div.title")) == 'middle';
+    return Util.textOf($(this).find("> div.title")) == 'middle';
   });
 
   middleSection.find("> div.title > input[type=checkbox]").prop('checked', true).trigger('change');

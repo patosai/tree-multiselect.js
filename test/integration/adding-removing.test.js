@@ -1,3 +1,5 @@
+var Util = require('utility');
+
 QUnit.module("Adding and Removing", {
   beforeEach: function(assert) {
     var select = document.createElement("select");
@@ -20,8 +22,8 @@ QUnit.test("can add an item", function(assert) {
   var selectedItem = $("div.selected div.item");
   assert.equal($("div.selected div.item").length, 1);
 
-  assert.equal(textOf(selectedItem), 'One');
-  assert.equal(textOf(selectedItem.find("> span.section-name")), 'section');
+  assert.equal(Util.textOf(selectedItem), 'One');
+  assert.equal(Util.textOf(selectedItem.find("> span.section-name")), 'section');
 });
 
 QUnit.test("can add an item with the same text", function(assert) {
@@ -38,10 +40,10 @@ QUnit.test("can add an item with the same text", function(assert) {
   var selectedItem = $("div.selected div.item");
   assert.equal($("div.selected div.item").length, 2);
 
-  assert.equal(textOf(selectedItem.first()), 'One');
-  assert.equal(textOf(selectedItem.last()), 'One');
-  assert.equal(textOf(selectedItem.first().find("> span.section-name")), 'section');
-  assert.equal(textOf(selectedItem.last().find("> span.section-name")), 'section1');
+  assert.equal(Util.textOf(selectedItem.first()), 'One');
+  assert.equal(Util.textOf(selectedItem.last()), 'One');
+  assert.equal(Util.textOf(selectedItem.first().find("> span.section-name")), 'section');
+  assert.equal(Util.textOf(selectedItem.last().find("> span.section-name")), 'section1');
 
   var correct_val = ['one', 'one_more'];
   var select_val = $("select").val();
@@ -75,7 +77,7 @@ QUnit.test("removing an item does not remove any others", function(assert) {
   assert.equal($("div.selected div.item").length, 5);
 
   var thirdItem = $("div.selected div.item").filter(function() {
-    return textOf($(this)) == 'Three';
+    return Util.textOf($(this)) == 'Three';
   });
 
   thirdItem.find("span.remove-selected").trigger('click');
@@ -83,7 +85,7 @@ QUnit.test("removing an item does not remove any others", function(assert) {
   assert.equal($("div.selected div.item").length, 4);
 
   var itemWithLabelThree = $("div.selected div.item").filter(function() {
-    return textOf($(this)) == 'Three';
+    return Util.textOf($(this)) == 'Three';
   });
   assert.equal(itemWithLabelThree.length, 0);
 });

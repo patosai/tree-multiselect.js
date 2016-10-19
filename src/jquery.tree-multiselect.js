@@ -7,8 +7,7 @@
       var $originalSelect = $(this);
       $originalSelect.attr('multiple', '').css('display', 'none');
 
-      var uiBuilder = new UiBuilder();
-      uiBuilder.build($originalSelect, options.hideSidePanel);
+      var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
 
       var $selectionContainer = $(uiBuilder.selections);
 
@@ -38,6 +37,7 @@
 
       armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
     });
+
     return this;
   };
 
@@ -484,11 +484,10 @@
   }
 
   // Helpers
-  var UiBuilder = function() {};
-  UiBuilder.prototype.build = function(el, hideSidePanel) {
+  var UiBuilder = function($el, hideSidePanel) {
     var tree = document.createElement('div');
     tree.className = "tree-multiselect";
-    $(el).after(tree);
+    $el.after(tree);
 
     var selections = document.createElement('div');
     selections.className = "selections";

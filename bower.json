@@ -22,6 +22,7 @@
     "**/.*",
     "conf",
     "coverage",
+    "dist",
     "node_modules",
     "bower_components",
     "test",
@@ -29,7 +30,8 @@
     "package.json",
     "Gruntfile.js",
     "README.md",
-    "release.sh"
+    "release.sh",
+    "yark.lock"
   ],
   "repository": {
     "type": "git",

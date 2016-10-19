@@ -1,3 +1,5 @@
+var Util = require('utility');
+
 QUnit.module("Options", {
   beforeEach: function(assert) {
     var select = document.createElement("select");
@@ -88,8 +90,8 @@ QUnit.test("can set a different section delimiter", function(assert) {
   var innerSections = $("div.selections div.section > div.section");
   assert.equal(innerSections.length, 2, "should be two inner sections");
 
-  assert.equal(textOf(innerSections.first().find("div.title")), "inner");
-  assert.equal(textOf(innerSections.last().find("div.title")), "inner2");
+  assert.equal(Util.textOf(innerSections.first().find("div.title")), "inner");
+  assert.equal(Util.textOf(innerSections.last().find("div.title")), "inner2");
 });
 
 QUnit.test("can disable batch select", function(assert) {
@@ -223,7 +225,7 @@ QUnit.test("onChange callback is called with correct args when item is added", f
   $("select").treeMultiselect(options);
 
   var item = $("div.selections div.item").filter(function() {
-    return textOf($(this)) == 'Two';
+    return Util.textOf($(this)) == 'Two';
   });
   item.find("input[type=checkbox]").click();
 });
@@ -249,7 +251,7 @@ QUnit.test("onChange callback is called with correct args when item is removed",
   $("select").treeMultiselect(options);
 
   var item = $("div.selections div.item").filter(function() {
-    return textOf($(this)) == 'One';
+    return Util.textOf($(this)) == 'One';
   });
   item.find("input[type=checkbox]").click();
 });

@@ -1,3 +1,5 @@
+var Util = require('utility');
+
 QUnit.module("Visual Features", {
   beforeEach: function(assert) {
     var select = document.createElement("select");
@@ -17,7 +19,7 @@ QUnit.test("data-description popup should show when hovered, and be removed when
   $($descriptions[0]).mouseenter();
   var tempPopup = $("div.temp-description-popup");
   assert.equal(tempPopup.length, 1);
-  assert.equal(textOf(tempPopup), 'One');
+  assert.equal(Util.textOf(tempPopup), 'One');
 
   $($descriptions[0]).mouseleave();
   tempPopup = $("div.temp-description-popup");
@@ -40,13 +42,13 @@ QUnit.test("each item has its own description popup", function(assert) {
   tempPopup = $("div.temp-description-popup");
   assert.equal(tempPopup.length, 2);
 
-  assert.equal(textOf(tempPopup[0]), 'One');
-  assert.equal(textOf(tempPopup[1]), 'Two');
+  assert.equal(Util.textOf(tempPopup[0]), 'One');
+  assert.equal(Util.textOf(tempPopup[1]), 'Two');
 
   $($descriptions[0]).mouseleave();
   tempPopup = $("div.temp-description-popup");
   assert.equal(tempPopup.length, 1);
-  assert.equal(textOf(tempPopup[0]), 'Two');
+  assert.equal(Util.textOf(tempPopup[0]), 'Two');
 
   $($descriptions[1]).mouseleave();
   tempPopup = $("div.temp-description-popup");

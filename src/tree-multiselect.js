@@ -1,4 +1,4 @@
-(function($) {
+(($) => {
   "use strict";
-  $.fn.treeMultiselect = require('main');
+  $.fn.treeMultiselect = require('./main');
 })(jQuery);

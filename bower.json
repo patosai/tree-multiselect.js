@@ -21,11 +21,11 @@
   "ignore": [
     "**/.*",
     "conf",
-    "coverage",
     "dist",
     "node_modules",
     "bower_components",
     "test",
+    "tmp",
     "bower.json",
     "package.json",
     "Gruntfile.js",

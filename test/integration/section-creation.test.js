@@ -1,3 +1,5 @@
+require('tree-multiselect');
+
 var Util = require('utility');
 
 QUnit.module("Section Creation", {
@@ -159,12 +161,13 @@ QUnit.test("handles undefined data-section input", function(assert) {
   assert.equal(Util.textOf(parentSection.find("> div.title")), "");
 });
 
-QUnit.test("blows up if no data-section is provided at all", function(assert) {
+QUnit.test("can live without data-section", function(assert) {
   $("select").append("<option value='one' selected='selected'>One</option>");
+  $("select").treeMultiselect();
 
-  assert.throws(function() {
-    $("select").treeMultiselect();
-  });
+  var item = $("div.selections div.item");
+  assert.equal(item.length, 1, "should be one item");
+  assert.equal(item.first().attr('data-section'), undefined);
 });
 
 QUnit.test("can handle multi-digit data-index", function(assert) {

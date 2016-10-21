@@ -1,3 +1,5 @@
+require('tree-multiselect');
+
 var Util = require('utility');
 
 QUnit.module("Title Autochecking", {

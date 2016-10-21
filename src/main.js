@@ -1,6 +1,6 @@
 var Option = require('./option');
-var Util = require('./utility');
 var UiBuilder = require('./ui-builder');
+var Util = require('./utility');
 
 var treeMultiselect = function(opts) {
   var options = mergeDefaultOptions(opts);
@@ -63,48 +63,24 @@ function mergeDefaultOptions(options) {
 
 function generateSelections($originalSelect, $selectionContainer, options) {
   // nested objects and arrays
-  var data = {};
+  // [ [options directly under this section], {nested sections}]
+  var data = [[], {}];
 
   function insertOption(path, option) {
-    var currentPos = data;
-    for (var i = 0; i < path.length; ++i) {
-      var pathPart = path[i];
-
-      if (!currentPos[pathPart]) {
-        currentPos[pathPart] = [];
+    var currentPosition = data;
+    for (var ii = 0; ii < path.length; ++ii) {
+      if (!currentPosition[1][path[ii]]) {
+        currentPosition[1][path[ii]] = [[], {}];
       }
-      currentPos = currentPos[pathPart];
-
-      if (i == path.length - 1) {
-        currentPos.push(option);
-        break;
-      }
-
-      pathPart = path[i + 1];
-      var existingObj = null;
-      for (var j = 0; j < currentPos.length; ++j) {
-        var arrayItem = currentPos[j];
-        if ((arrayItem.constructor != Option) &&
-            $.isPlainObject(arrayItem) &&
-            arrayItem[pathPart] &&
-            (typeof arrayItem[pathPart] !== 'undefined')) {
-          existingObj = arrayItem;
-          break;
-        }
-      }
-
-      if (existingObj) {
-        currentPos = existingObj;
-      } else {
-        var newLength = currentPos.push({});
-        currentPos = currentPos[newLength - 1];
-      }
+      currentPosition = currentPosition[1][path[ii]];
     }
+    currentPosition[0].push(option);
   }
 
   $originalSelect.find("> option").each(function() {
     var $option = $(this);
-    var path = $option.attr('data-section').split(options.sectionDelimiter);
+    var section = $option.attr('data-section');
+    var path = (section && section.length > 0) ? section.split(options.sectionDelimiter) : [];
 
     var optionValue = $option.val();
     var optionName = $option.text();
@@ -119,16 +95,9 @@ function generateSelections($originalSelect, $selectionContainer, options) {
 
 function fillSelections($selectionContainer, data) {
   function createSection($sectionContainer, title) {
-    var section = document.createElement('div');
-    section.className = "section";
-
-    var sectionTitle = document.createElement('div');
-    sectionTitle.className = "title";
-    sectionTitle.innerHTML = title;
-
-    $(section).append(sectionTitle);
-    $sectionContainer.append(section);
-    return section;
+    var $section = $("<div class='section'><div class='title'>" + title + "</div></div>");
+    $sectionContainer.append($section);
+    return $section;
   }
 
   function createSelection($itemContainer, option) {
@@ -137,29 +106,23 @@ function fillSelections($selectionContainer, data) {
     var description = option.description;
     var index = option.index;
 
-    var selection = document.createElement('div');
-    selection.className = "item";
-    $(selection).text(text || value).attr({
+    var $selection = $("<div class='item'>" + (text || value) + "</div>");
+    $selection.attr({
       'data-value': value,
       'data-description': description,
       'data-index': index
     });
-    $itemContainer.append(selection);
-    return selection;
+    $itemContainer.append($selection);
+    return $selection;
   }
 
-  if (data.constructor == Option) {
-    createSelection($selectionContainer, data);
-  } else if ($.isArray(data)) {
-    for (var i = 0; i < data.length; ++i) {
-      fillSelections($selectionContainer, data[i]);
-    }
-  } else {
-    for (var key in data) {
-      if (!data.hasOwnProperty(key)) continue;
-      var $section = $(createSection($selectionContainer, key));
-      fillSelections($section, data[key]);
-    }
+  for (var ii = 0; ii < data[0].length; ++ii) {
+    createSelection($selectionContainer, data[0][ii]);
+  }
+  var keys = Object.keys(data[1]);
+  for (var jj = 0; jj < keys.length; ++jj) {
+    var $section = createSection($selectionContainer, keys[jj]);
+    fillSelections($section, data[1][keys[jj]]);
   }
 }
 

@@ -78,7 +78,21 @@ function generateSelections($originalSelect, $selectionContainer, options) {
   // [ [options directly under this section], {nested sections}]
   var data = [[], {}];
 
-  function insertOption(path, option) {
+  $originalSelect.find("> option").each(function() {
+    var option = this;
+    var attributes = option.attributes;
+    var sectionItem = attributes.getNamedItem("data-section");
+    var section = sectionItem ? sectionItem.value : null;
+    var path = (section && section.length > 0) ? section.split(options.sectionDelimiter) : [];
+
+    var optionValue = option.value;
+    var optionName = option.text;
+    var optionDescriptionItem = attributes.getNamedItem("data-description");
+    var optionDescription = optionDescriptionItem ? optionDescriptionItem.value : null;
+    var optionIndexItem = attributes.getNamedItem("data-index");
+    var optionIndex = optionIndexItem ? optionIndexItem.value : null;
+    var optionObj = new Option(optionValue, optionName, optionDescription, optionIndex);
+
     var currentPosition = data;
     for (var ii = 0; ii < path.length; ++ii) {
       if (!currentPosition[1][path[ii]]) {
@@ -86,20 +100,7 @@ function generateSelections($originalSelect, $selectionContainer, options) {
       }
       currentPosition = currentPosition[1][path[ii]];
     }
-    currentPosition[0].push(option);
-  }
-
-  $originalSelect.find("> option").each(function() {
-    var $option = $(this);
-    var section = $option.attr('data-section');
-    var path = (section && section.length > 0) ? section.split(options.sectionDelimiter) : [];
-
-    var optionValue = $option.val();
-    var optionName = $option.text();
-    var optionDescription = $option.attr('data-description');
-    var optionIndex = $option.attr('data-index');
-    var option = new Option(optionValue, optionName, optionDescription, optionIndex);
-    insertOption(path, option);
+    currentPosition[0].push(optionObj);
   });
 
 

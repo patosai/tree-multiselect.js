@@ -161,13 +161,16 @@ QUnit.test("handles undefined data-section input", function(assert) {
   assert.equal(Util.textOf(parentSection.find("> div.title")), "");
 });
 
-QUnit.test("can live without data-section", function(assert) {
+QUnit.test("can render without data-section", function(assert) {
   $("select").append("<option value='one' selected='selected'>One</option>");
   $("select").treeMultiselect();
 
   var item = $("div.selections div.item");
-  assert.equal(item.length, 1, "should be one item");
+  assert.equal(item.length, 1);
   assert.equal(item.first().attr('data-section'), undefined);
+
+  var sections = $("div.section");
+  assert.equal(sections.length, 0);
 });
 
 QUnit.test("can handle multi-digit data-index", function(assert) {

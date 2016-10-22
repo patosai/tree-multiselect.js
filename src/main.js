@@ -4,13 +4,13 @@ var Util = require('./utility');
 
 var treeMultiselect = function(opts) {
   var options = mergeDefaultOptions(opts);
-  this.each(function() {
+  this.each(() => {
     var $originalSelect = $(this);
     $originalSelect.attr('multiple', '').css('display', 'none');
 
     var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
 
-    var $selectionContainer = $(uiBuilder.selections);
+    var $selectionContainer = uiBuilder.$selections;
 
     generateSelections($originalSelect, $selectionContainer, options);
 
@@ -33,9 +33,8 @@ var treeMultiselect = function(opts) {
       createSelectAllButtons($selectionContainer, options);
     }
 
-    var $selectedContainer = $(uiBuilder.selected);
+    var $selectedContainer = uiBuilder.$selected;
     updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
-
     armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
   });
 

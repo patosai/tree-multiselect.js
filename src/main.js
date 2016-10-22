@@ -125,7 +125,7 @@ function generateHtmlFromData(data, options) {
     }
     var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
 
-    str += `<div class='item' data-value='${option.value}'${descriptionStr}${indexStr}>${(option.text || option.value)}${optionCheckboxStr}${descriptionPopupStr}</div>`;
+    str += `<div class='item' data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${(option.text || option.value)}</div>`;
   }
 
   var keys = Object.keys(data[1]);

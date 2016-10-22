@@ -12,11 +12,15 @@ var treeMultiselect = function(opts) {
 
     var $selectionContainer = uiBuilder.$selections;
 
+  var time = new Date().getTime();
     generateSelections($originalSelect, $selectionContainer, options);
+  console.log("GENERATED SELECTIONS IN ", new Date().getTime() - time);
 
+  time = new Date().getTime();
     addDescriptionHover($selectionContainer, options);
     addCheckboxes($selectionContainer, options);
     checkPreselectedSelections($originalSelect, $selectionContainer, options);
+  console.log("added stuff IN ", new Date().getTime() - time);
 
     if (options.allowBatchSelection) {
       armTitleCheckboxes($selectionContainer, options);
@@ -24,6 +28,7 @@ var treeMultiselect = function(opts) {
       checkParentsOnAllChildrenSelected($selectionContainer, options);
       showSemifilledParents($selectionContainer, options);
     }
+  console.log("BATCH SELECTION DONE IN ", new Date().getTime() - time);
 
     if (options.collapsible) {
       addCollapsibility($selectionContainer, options);
@@ -89,40 +94,33 @@ function generateSelections($originalSelect, $selectionContainer, options) {
     insertOption(path, option);
   });
 
-  fillSelections($selectionContainer, data);
+
+  $selectionContainer.append(generateHtmlFromData(data));
 }
 
-function fillSelections($selectionContainer, data) {
-  function createSection($sectionContainer, title) {
-    var $section = $("<div class='section'><div class='title'>" + title + "</div></div>");
-    $sectionContainer.append($section);
-    return $section;
-  }
-
-  function createSelection($itemContainer, option) {
-    var text = option.text;
-    var value = option.value;
-    var description = option.description;
-    var index = option.index;
-
-    var $selection = $("<div class='item'>" + (text || value) + "</div>");
-    $selection.attr({
-      'data-value': value,
-      'data-description': description,
-      'data-index': index
-    });
-    $itemContainer.append($selection);
-    return $selection;
-  }
-
+function generateHtmlFromData(data) {
+  var str = "";
+  var option = null;
   for (var ii = 0; ii < data[0].length; ++ii) {
-    createSelection($selectionContainer, data[0][ii]);
+    option = data[0][ii];
+    str += `<div class='item' data-value=${option.value}`;
+    if (option.description) {
+      str += ` data-description='${option.description}'`;
+    }
+    if (option.index) {
+      str += ` data-index='${option.index}'`;
+    }
+    str += `>${option.text || option.value}</div>`;
   }
+
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
-    var $section = createSection($selectionContainer, keys[jj]);
-    fillSelections($section, data[1][keys[jj]]);
+    str += `<div class='section'><div class='title'>${keys[jj]}</div>`;
+    str += generateHtmlFromData(data[1][keys[jj]]);
+    str += "</div>";
   }
+  console.log(str);
+  return str;
 }
 
 function addDescriptionHover($selectionContainer) {
@@ -130,7 +128,7 @@ function addDescriptionHover($selectionContainer) {
   var targets = $selectionContainer.find("div.item[data-description!=''][data-description]");
   $description.prependTo(targets);
 
-  $("div.item > span.description").unbind().mouseenter(function() {
+  $selectionContainer.on("mouseenter", "div.item > span.description", function() {
     var $item = $(this).parent();
     var description = $item.attr('data-description');
 
@@ -141,7 +139,8 @@ function addDescriptionHover($selectionContainer) {
     descriptionDiv.style.position = 'absolute';
 
     $item.append(descriptionDiv);
-  }).mouseleave(function() {
+  });
+  $selectionContainer.on("mouseleave", "div.item > span.description", function() {
     var $item = $(this).parent();
     $item.find("div.temp-description-popup").remove();
   });
@@ -360,24 +359,6 @@ function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $ori
     return unselectedSelections;
   }
 
-  function updateOriginalSelect() {
-    var selected = [];
-    $selectedContainer.find("div.item").each(function() {
-      selected.push($(this).attr('data-value'));
-    });
-
-    $originalSelect.val(selected).change();
-
-    $originalSelect.html($originalSelect.find("option").sort(function(a, b) {
-      var aValue = selected.indexOf($(a).attr('value'));
-      var bValue = selected.indexOf($(b).attr('value'));
-
-      if (aValue > bValue) return 1;
-      if (aValue < bValue) return -1;
-      return 0;
-    }));
-  }
-
   function elToSelectionObject($el) {
     var text = Util.textOf($el);
     var value = $el.attr('data-value');
@@ -394,6 +375,24 @@ function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $ori
       initialIndex: initialIndex,
       sectionName: sectionName
     };
+  }
+
+  function updateOriginalSelect() {
+    var selected = [];
+    $selectedContainer.find("div.item").each(function() {
+      selected.push($(this).attr('data-value'));
+    });
+
+    $originalSelect.val(selected).change();
+
+    $originalSelect.html($originalSelect.find("option").sort(function(a, b) {
+      var aValue = selected.indexOf($(a).attr('value'));
+      var bValue = selected.indexOf($(b).attr('value'));
+
+      if (aValue > bValue) return 1;
+      if (aValue < bValue) return -1;
+      return 0;
+    }));
   }
 
   var initialRun = true;

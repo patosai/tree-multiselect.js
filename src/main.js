@@ -8,20 +8,22 @@ var treeMultiselect = function(opts) {
     var $originalSelect = $(this);
     $originalSelect.attr('multiple', '').css('display', 'none');
 
+  var time = new Date().getTime();
     var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
+  console.log("BUILT UI IN ", new Date().getTime() - time);
 
     var $selectionContainer = uiBuilder.$selections;
 
-  var time = new Date().getTime();
+  time = new Date().getTime();
     generateSelections($originalSelect, $selectionContainer, options);
   console.log("GENERATED SELECTIONS IN ", new Date().getTime() - time);
 
   time = new Date().getTime();
-    addDescriptionHover($selectionContainer, options);
-    addCheckboxes($selectionContainer, options);
+    popupDescriptionHover($selectionContainer, options);
     checkPreselectedSelections($originalSelect, $selectionContainer, options);
   console.log("added stuff IN ", new Date().getTime() - time);
 
+  time = new Date().getTime();
     if (options.allowBatchSelection) {
       armTitleCheckboxes($selectionContainer, options);
       uncheckParentsOnUnselect($selectionContainer, options);
@@ -30,17 +32,23 @@ var treeMultiselect = function(opts) {
     }
   console.log("BATCH SELECTION DONE IN ", new Date().getTime() - time);
 
+  time = new Date().getTime();
     if (options.collapsible) {
       addCollapsibility($selectionContainer, options);
     }
+  console.log("COLLAPSIBILITY IN ", new Date().getTime() - time);
 
+  time = new Date().getTime();
     if (options.enableSelectAll) {
       createSelectAllButtons($selectionContainer, options);
     }
+  console.log("SELECT ALL IN ", new Date().getTime() - time);
 
+  time = new Date().getTime();
     var $selectedContainer = uiBuilder.$selected;
     updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
     armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
+  console.log("END DONE IN ", new Date().getTime() - time);
   });
 
   return this;
@@ -95,39 +103,47 @@ function generateSelections($originalSelect, $selectionContainer, options) {
   });
 
 
-  $selectionContainer.append(generateHtmlFromData(data));
+  $selectionContainer.append(generateHtmlFromData(data, options));
 }
 
-function generateHtmlFromData(data) {
+function generateHtmlFromData(data, options) {
   var str = "";
   var option = null;
   for (var ii = 0; ii < data[0].length; ++ii) {
     option = data[0][ii];
-    str += `<div class='item' data-value=${option.value}`;
-    if (option.description) {
-      str += ` data-description='${option.description}'`;
+
+    var descriptionStr = option.description ? ` data-description='${option.description}'` : "";
+    var indexStr = option.index ? ` data-index='${option.index}'` : "";
+    var optionCheckboxStr = "";
+    if (!options.onlyBatchSelection) {
+      optionCheckboxStr += "<input type='checkbox'";
+      if (options.freeze) {
+        optionCheckboxStr += " disabled";
+      }
+      optionCheckboxStr += "/>";
     }
-    if (option.index) {
-      str += ` data-index='${option.index}'`;
-    }
-    str += `>${option.text || option.value}</div>`;
+    var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
+
+    str += `<div class='item' data-value='${option.value}'${descriptionStr}${indexStr}>${(option.text || option.value)}${optionCheckboxStr}${descriptionPopupStr}</div>`;
   }
 
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
-    str += `<div class='section'><div class='title'>${keys[jj]}</div>`;
-    str += generateHtmlFromData(data[1][keys[jj]]);
-    str += "</div>";
+    var sectionCheckboxStr = "";
+    if (options.onlyBatchSelection || options.allowBatchSelection) {
+      sectionCheckboxStr += "<input type='checkbox'";
+      if (options.freeze) {
+        sectionCheckboxStr += " disabled";
+      }
+      sectionCheckboxStr += "/>";
+    }
+
+    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generateHtmlFromData(data[1][keys[jj]], options)}</div>`;
   }
-  console.log(str);
   return str;
 }
 
-function addDescriptionHover($selectionContainer) {
-  var $description = $("<span class='description'>?</span>");
-  var targets = $selectionContainer.find("div.item[data-description!=''][data-description]");
-  $description.prependTo(targets);
-
+function popupDescriptionHover($selectionContainer) {
   $selectionContainer.on("mouseenter", "div.item > span.description", function() {
     var $item = $(this).parent();
     var description = $item.attr('data-description');
@@ -144,24 +160,6 @@ function addDescriptionHover($selectionContainer) {
     var $item = $(this).parent();
     $item.find("div.temp-description-popup").remove();
   });
-}
-
-function addCheckboxes($selectionContainer, options) {
-  var $checkbox = $('<input />', { type: 'checkbox' });
-  if (options.freeze) {
-    $checkbox.attr('disabled', 'disabled');
-  }
-
-  var $targets = null;
-  if (options.onlyBatchSelection) {
-    $targets = $selectionContainer.find("div.title");
-  } else if (options.allowBatchSelection) {
-    $targets = $selectionContainer.find("div.title, div.item");
-  } else {
-    $targets = $selectionContainer.find("div.item");
-  }
-
-  $checkbox.prependTo($targets);
 }
 
 function checkPreselectedSelections($originalSelect, $selectionContainer) {

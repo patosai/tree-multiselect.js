@@ -90,7 +90,8 @@ QUnit.test("nested titles should all be checked if a title is batch selected", f
 
   middleSection.find("> div.title > input[type=checkbox]").prop('checked', true).trigger('change');
 
-  assert.equal($("input[type=checkbox]:checked").length, 4);
+  assert.equal($("input[type=checkbox]").length, 4);
+  assert.equal($("input[type=checkbox]:checked").length, 3);
 });
 
 QUnit.test("title checkbox is indeterminate when some but not all options are selected", function(assert) {

@@ -8,7 +8,7 @@ function Tree($originalSelect, $selectionContainer, $selectedContainer, options)
   this.options = options;
 
   this.selectOptions = [];
-  this.selectedVals = [];
+  this.selectedKeys = [];
 }
 
 Tree.prototype.initialize = function() {
@@ -56,8 +56,8 @@ Tree.prototype.generateSelections = function() {
     var optionDescriptionItem = attributes.getNamedItem("data-description");
     var optionDescription = optionDescriptionItem ? optionDescriptionItem.value : null;
     var optionIndexItem = attributes.getNamedItem("data-index");
-    var optionIndex = optionIndexItem ? optionIndexItem.value : null;
-    var optionObj = new Option(optionValue, optionName, optionDescription, optionIndex);
+    var optionIndex = optionIndexItem ? parseInt(optionIndexItem.value) : null;
+    var optionObj = new Option(optionValue, optionName, optionDescription, optionIndex, section);
 
     var currentPosition = data;
     for (var ii = 0; ii < path.length; ++ii) {
@@ -81,10 +81,10 @@ Tree.prototype.generateHtmlFromData = function(data, startingIndex) {
     var option = data[0][ii];
 
     var descriptionStr = option.description ? ` data-description='${option.description}'` : "";
-    var indexStr = option.index ? ` data-index='${option.index}'` : "";
+    var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : "";
     var optionCheckboxStr = "";
     if (!this.options.onlyBatchSelection) {
-      optionCheckboxStr += "<input type='checkbox'";
+      optionCheckboxStr += "<input class='option' type='checkbox'";
       if (this.options.freeze) {
         optionCheckboxStr += " disabled";
       }
@@ -101,7 +101,7 @@ Tree.prototype.generateHtmlFromData = function(data, startingIndex) {
   for (var jj = 0; jj < keys.length; ++jj) {
     var sectionCheckboxStr = "";
     if (this.options.onlyBatchSelection || this.options.allowBatchSelection) {
-      sectionCheckboxStr += "<input type='checkbox'";
+      sectionCheckboxStr += "<input class='section' type='checkbox'";
       if (this.options.freeze) {
         sectionCheckboxStr += " disabled";
       }
@@ -412,7 +412,103 @@ Tree.prototype.updateSelectedAndOnChange = function() {
     }
   }
 
-  Util.onCheckboxChange($selectionContainer, update);
+  //Util.onCheckboxChange($selectionContainer, update);
+
+  var self = this;
+  $selectionContainer.on("change", "input.option[type=checkbox]", function(event) {
+    var checkbox = this;
+    var selection = checkbox.parentNode;
+    var key = selection.attributes.getNamedItem("data-key").value;
+    if (key) {
+      key = parseInt(key);
+      Util.assert(!isNaN(key));
+    } else {
+      return;
+    }
+
+    if (checkbox.checked) {
+      self.selectedKeys.push(key);
+    } else {
+      self.selectedKeys.splice(self.selectedKeys.indexOf(key), 1);
+    }
+
+    if (self.options.onChange) {
+      self.options.onChange([], [], []);
+    }
+
+    self.render();
+  });
+
+  if (options.sortable && !options.freeze) {
+    var startIndex = null;
+    var endIndex = null;
+    $selectedContainer.sortable({
+      start: function(event, ui) {
+        startIndex = ui.item.index();
+      },
+
+      update: function(event, ui) {
+        endIndex = ui.item.index();
+        if (startIndex < endIndex) {
+          var tmp = self.selectedKeys[startIndex];
+          for (var ii = startIndex; ii < endIndex; ++ii) {
+            self.selectedKeys[ii] = self.selectedKeys[ii + 1];
+          }
+          self.selectedKeys[endIndex] = tmp;
+        } else if (startIndex > endIndex) {
+          var tmp = self.selectedKeys[startIndex];
+          for (var ii = startIndex; ii > endIndex; --ii) {
+            self.selectedKeys[ii] = self.selectedKeys[ii - 1];
+          }
+          self.selectedKeys[endIndex] = tmp;
+        }
+        self.render();
+      }
+    });
+  }
+};
+
+Tree.prototype.render = function() {
+  // set original select values
+  var vals = [];
+  for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
+    vals.push(this.selectOptions[this.selectedKeys[ii]].value);
+  }
+  this.$originalSelect.val(vals).change();
+
+  // TODO is there a better way to sort the values other than by HTML?
+  this.$originalSelect.html(this.$originalSelect.find("option").sort(function(a, b) {
+    var aValue = vals.indexOf(a.value);
+    var bValue = vals.indexOf(b.value);
+    return aValue - bValue;
+  }));
+
+  // fix selected container markings
+  this.$selectedContainer.find("div.item").remove();
+  // create divs
+  for (var jj = 0; jj < this.selectedKeys.length; ++jj) {
+    var option = this.selectOptions[this.selectedKeys[jj]];
+
+    var text = option.text;
+    var value = option.value;
+    var section = option.section;
+
+    var item = document.createElement('div');
+    item.className = "item";
+    item.innerHTML = text;
+
+    if (this.options.showSectionOnSelected) {
+      var $sectionSpan = $("<span class='section-name'></span>");
+      $sectionSpan.text(section);
+      $(item).append($sectionSpan);
+    }
+
+    if (!this.options.freeze) {
+      $(item).prepend("<span class='remove-selected'>×</span>");
+    }
+
+    $(item).attr('data-value', value).appendTo(this.$selectedContainer);
+  }
 };
 
 module.exports = Tree;

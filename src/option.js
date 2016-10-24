@@ -1,7 +1,8 @@
-module.exports = function(value, text, description, index) {
+module.exports = function(value, text, description, initialIndex, section) {
   this.value = value;
   this.text = text;
   this.description = description;
-  this.index = index;
+  this.initialIndex = initialIndex;
+  this.section = section;
 };
 

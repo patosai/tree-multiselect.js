@@ -6,12 +6,16 @@ function Tree($originalSelect, $selectionContainer, $selectedContainer, options)
   this.$selectionContainer = $selectionContainer;
   this.$selectedContainer = $selectedContainer;
   this.options = options;
+
+  this.selectOptions = [];
+  this.selectedVals = [];
 }
 
 Tree.prototype.initialize = function() {
   var data = this.generateSelections();
-  var html = this.generateHtmlFromData(data);
-  this.$selectionContainer.append(html);
+  var generatedHtmlData = this.generateHtmlFromData(data);
+  Util.assert(this.selectOptions.length == generatedHtmlData[0]);
+  this.$selectionContainer.append(generatedHtmlData[1]);
 
   this.popupDescriptionHover();
 
@@ -68,11 +72,13 @@ Tree.prototype.generateSelections = function() {
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function(data) {
+Tree.prototype.generateHtmlFromData = function(data, startingIndex) {
+  // returns array, 0th el is number of options, 1st el is HTML string
+  startingIndex  = startingIndex || 0;
+  var keyIndex = startingIndex;
   var str = "";
-  var option = null;
   for (var ii = 0; ii < data[0].length; ++ii) {
-    option = data[0][ii];
+    var option = data[0][ii];
 
     var descriptionStr = option.description ? ` data-description='${option.description}'` : "";
     var indexStr = option.index ? ` data-index='${option.index}'` : "";
@@ -86,7 +92,9 @@ Tree.prototype.generateHtmlFromData = function(data) {
     }
     var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
 
-    str += `<div class='item' data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${(option.text || option.value)}</div>`;
+    str += `<div class='item' data-key='${keyIndex}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${(option.text || option.value)}</div>`;
+    this.selectOptions.push(option);
+    ++keyIndex;
   }
 
   var keys = Object.keys(data[1]);
@@ -100,9 +108,11 @@ Tree.prototype.generateHtmlFromData = function(data) {
       sectionCheckboxStr += "/>";
     }
 
-    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${this.generateHtmlFromData(data[1][keys[jj]])}</div>`;
+    var generatedData = this.generateHtmlFromData(data[1][keys[jj]], keyIndex);
+    keyIndex += generatedData[0];
+    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData[1]}</div>`;
   }
-  return str;
+  return [keyIndex - startingIndex, str];
 };
 
 Tree.prototype.popupDescriptionHover = function() {

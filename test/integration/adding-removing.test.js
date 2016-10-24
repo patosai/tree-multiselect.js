@@ -125,3 +125,25 @@ QUnit.test("change event also fires for plain Javascript callbacks", function(as
 
   $("div.item input[type=checkbox]").click();
 });
+
+QUnit.test("data-key attribute is added", function(assert) {
+  $("select").append("<option value='1' data-section='foo'>1</option>");
+  $("select").append("<option value='2' data-section='foo'>2</option>");
+  $("select").append("<option value='3' data-section='bar'>3</option>");
+  $("select").treeMultiselect();
+
+  var $firstEl = $("div.selections div.item").filter(function() {
+    return Util.textOf(this) == '1';
+  });
+  assert.equal(parseInt($firstEl.attr('data-key')), 0);
+
+  var $secondEl = $("div.selections div.item").filter(function() {
+    return Util.textOf(this) == '2';
+  });
+  assert.equal(parseInt($secondEl.attr('data-key')), 1);
+
+  var $thirdEl = $("div.selections div.item").filter(function() {
+    return Util.textOf(this) == '3';
+  });
+  assert.equal(parseInt($thirdEl.attr('data-key')), 2);
+});

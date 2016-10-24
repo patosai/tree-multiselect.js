@@ -19,7 +19,16 @@ Tree.prototype.initialize = function() {
     this.handleSectionCheckboxMarkings();
   }
 
+  if (this.options.collapsible) {
+    this.addCollapsibility();
+  }
+
+  if (this.options.enableSelectAll) {
+    this.createSelectAllButtons();
+  }
+
   this.checkPreselectedSelections();
+  this.armRemoveSelectedOnClick();
 };
 
 Tree.prototype.generateSelections = function() {
@@ -174,6 +183,73 @@ Tree.prototype.handleSectionCheckboxesOnOptionClick = function($section) {
   }
 
   return returnVal;
+};
+
+Tree.prototype.addCollapsibility = function() {
+  var hideIndicator = "-";
+  var expandIndicator = "+";
+
+  var titleSelector = "div.title";
+  var $titleDivs = this.$selectionContainer.find(titleSelector);
+
+  var collapseDiv = document.createElement('span');
+  collapseDiv.className = "collapse-section";
+  if (this.options.startCollapsed) {
+    $(collapseDiv).text(expandIndicator);
+    $titleDivs.siblings().toggle();
+  } else {
+    $(collapseDiv).text(hideIndicator);
+  }
+  $titleDivs.prepend(collapseDiv);
+
+  this.$selectionContainer.on("click", titleSelector, function(event) {
+    if (event.target.nodeName == "INPUT") {
+      return;
+    }
+
+    var $collapseSection = $(this).find("> span.collapse-section");
+    var indicator = $collapseSection.text();
+    $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
+    var $title = $collapseSection.parent();
+    $title.siblings().toggle();
+  });
+};
+
+Tree.prototype.createSelectAllButtons = function() {
+  var $selectAll = $("<span class='select-all'></span>");
+  $selectAll.text(this.options.selectAllText);
+  var $unselectAll = $("<span class='unselect-all'></span>");
+  $unselectAll.text(this.options.unselectAllText);
+
+  var $selectAllContainer = $("<div class='select-all-container'></div>");
+
+  $selectAllContainer.prepend($unselectAll);
+  $selectAllContainer.prepend($selectAll);
+
+  var self = this;
+
+  this.$selectionContainer.prepend($selectAllContainer);
+
+  this.$selectionContainer.on("click", "span.select-all", function() {
+    var $checkboxes = self.$selectionContainer.find("input[type=checkbox]");
+    $checkboxes.prop('checked', true).change();
+  });
+
+  this.$selectionContainer.on("click", "span.unselect-all", function() {
+    var $checkboxes = self.$selectionContainer.find("input[type=checkbox]");
+    $checkboxes.prop('checked', false).change();
+  });
+};
+
+Tree.prototype.armRemoveSelectedOnClick = function() {
+  var self = this;
+  this.$selectedContainer.on("click", "span.remove-selected", function() {
+    var parentNode = this.parentNode;
+    var value = parentNode.attributes.getNamedItem('data-value').value;
+    var $matchingSelection = self.$selectionContainer.find("div.item[data-value='" + value + "']");
+    var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
+    $matchingCheckbox.prop('checked', false).change();
+  });
 };
 
 module.exports = Tree;

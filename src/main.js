@@ -16,17 +16,9 @@ var treeMultiselect = function(opts) {
 
     var $selectionContainer = uiBuilder.$selectionContainer;
 
-    if (options.collapsible) {
-      addCollapsibility($selectionContainer, options);
-    }
-
-    if (options.enableSelectAll) {
-      createSelectAllButtons($selectionContainer, options);
-    }
-
     var $selectedContainer = uiBuilder.$selectedContainer;
     updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
-    armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
+    //armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
   });
 
   return this;
@@ -49,63 +41,6 @@ function mergeDefaultOptions(options) {
     startCollapsed: false
   };
   return $.extend({}, defaults, options);
-}
-
-function addCollapsibility($selectionContainer, options) {
-  var hideIndicator = "-";
-  var expandIndicator = "+";
-
-  var titleSelector = "div.title";
-  var $titleDivs = $selectionContainer.find(titleSelector);
-
-  var collapseDiv = document.createElement('span');
-  collapseDiv.className = "collapse-section";
-  if (options.startCollapsed) {
-    $(collapseDiv).text(expandIndicator);
-    $titleDivs.siblings().toggle();
-  } else {
-    $(collapseDiv).text(hideIndicator);
-  }
-  $titleDivs.prepend(collapseDiv);
-
-  $selectionContainer.on("click", titleSelector, function(event) {
-    if (event.target.nodeName == "INPUT") {
-      return;
-    }
-    var $collapseSection = $(this).find("> span.collapse-section");
-    var indicator = $collapseSection.text();
-    $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
-    var $title = $collapseSection.parent();
-    $title.siblings().toggle();
-  });
-}
-
-function createSelectAllButtons($selectionContainer, options) {
-  var $selectAll = $("<span class='select-all'></span>");
-  $selectAll.text(options.selectAllText);
-  var $unselectAll = $("<span class='unselect-all'></span>");
-  $unselectAll.text(options.unselectAllText);
-
-  var $selectAllContainer = $("<div class='select-all-container'></div>");
-
-  $selectAllContainer.prepend($unselectAll);
-  $selectAllContainer.prepend($selectAll);
-
-  $selectionContainer.prepend($selectAllContainer);
-
-  $selectionContainer.on("click", "span.select-all", function() {
-    handleCheckboxes(true);
-  });
-
-  $selectionContainer.on("click", "span.unselect-all", function() {
-    handleCheckboxes(false);
-  });
-
-  function handleCheckboxes(checked) {
-    var $checkboxes = $selectionContainer.find("input[type=checkbox]");
-    $checkboxes.prop('checked', checked);
-    $checkboxes.first().change();
-  }
 }
 
 function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options) {
@@ -145,8 +80,6 @@ function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $ori
     selectionsNotYetAdded.forEach(function(selection) {
       createSelectedDiv(selection);
     });
-
-    armRemoveSelectedOnClick($selectionContainer, $selectedContainer);
 
     return selectionsNotYetAdded;
   }
@@ -253,17 +186,6 @@ function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $ori
   }
 
   Util.onCheckboxChange($selectionContainer, update);
-}
-
-function armRemoveSelectedOnClick($selectionContainer, $selectedContainer) {
-  $selectedContainer.on("click", "span.remove-selected", function() {
-    var parentNode = this.parentNode;
-    var value = parentNode.attributes.getNamedItem('data-value').value;
-    var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
-    var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
-    $matchingCheckbox.prop('checked', false);
-    $matchingCheckbox.change();
-  });
 }
 
 module.exports = treeMultiselect;

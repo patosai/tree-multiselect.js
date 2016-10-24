@@ -15,6 +15,6 @@ module.exports = function($el, hideSidePanel) {
   $el.after($tree);
 
   this.$tree = $tree;
-  this.$selections = $selections;
-  this.$selected = $selected;
+  this.$selectionContainer = $selections;
+  this.$selectedContainer = $selected;
 };

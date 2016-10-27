@@ -78,7 +78,26 @@ QUnit.test("titles should unselect when a child is unselected", function(assert)
 });
 
 QUnit.test("nested titles should all be checked if a title is batch selected", function(assert) {
-  console.log("BEGIN TEST");
+  $("select").append("<option value='one' data-section='top/middle/inner'>One</option>");
+  $("select").treeMultiselect();
+
+  assert.equal($("div.title > input[type=checkbox]").length, 3);
+  assert.equal($("div.item > input[type=checkbox]").length, 1);
+  assert.equal($("input[type=checkbox]").length, 4);
+  assert.equal($("input[type=checkbox]:checked").length, 0);
+
+  var middleSection = $("div.section").filter(function() {
+    return Util.textOf($(this).find("> div.title")) == 'middle';
+  });
+
+  middleSection.find("> div.title > input[type=checkbox]").click();
+
+  assert.equal($("div.title > input[type=checkbox]:checked").length, 3);
+  assert.equal($("div.item > input[type=checkbox]:checked").length, 1);
+  assert.equal($("input[type=checkbox]:checked").length, 4);
+});
+
+QUnit.test("only relevant titles should all be checked if a title is batch selected", function(assert) {
   $("select").append("<option value='one' data-section='top/middle/inner'>One</option>");
   $("select").append("<option value='two' data-section='top'>Two</option>");
   $("select").treeMultiselect();
@@ -97,7 +116,6 @@ QUnit.test("nested titles should all be checked if a title is batch selected", f
   assert.equal($("div.title > input[type=checkbox]:checked").length, 2);
   assert.equal($("div.item > input[type=checkbox]:checked").length, 1);
   assert.equal($("input[type=checkbox]:checked").length, 3);
-  console.log("END TEST");
 });
 
 QUnit.test("title checkbox is indeterminate when some but not all options are selected", function(assert) {

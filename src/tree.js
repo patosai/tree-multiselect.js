@@ -368,15 +368,25 @@ Tree.prototype.render = function(noCallbacks) {
 
   // now fix original select
   var vals = [];
+  // valHash hashes a value to an index
+  var valHash = {};
   for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
-    vals.push(this.selectOptions[this.selectedKeys[ii]].value);
+    var value = this.selectOptions[this.selectedKeys[ii]].value;
+    vals.push(value);
+    valHash[value] = ii;
+    console.log(value, ' ', ii);
   }
   // TODO is there a better way to sort the values other than by HTML?
-  this.$originalSelect.html(this.$originalSelect.find("option").sort(function(a, b) {
-    var aValue = vals.indexOf(a.value);
-    var bValue = vals.indexOf(b.value);
+  var options = this.$originalSelect.find("option").toArray();
+  options.sort(function(a, b) {
+    var aValue = valHash[a.value] || 0;
+    var bValue = valHash[b.value] || 0;
     return aValue - bValue;
-  }));
+  })
+  
+  this.$originalSelect.html(options);
+  console.log("sorting original select took ", new Date().getTime() - time);
+  time = new Date().getTime();
   this.$originalSelect.val(vals).change();
 
   if (!noCallbacks && this.options.onChange) {
@@ -397,7 +407,6 @@ Tree.prototype.render = function(noCallbacks) {
 
   this.keysToRemove = [];
   this.keysToAdd = [];
-  console.log("rendering took ", new Date().getTime() - time);
 };
 
 module.exports = Tree;

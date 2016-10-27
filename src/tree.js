@@ -317,6 +317,10 @@ Tree.prototype.updateSelectedAndOnChange = function() {
 };
 
 Tree.prototype.render = function(noCallbacks) {
+  // fix arrays first
+  this.keysToAdd = Util.arraySubtract(this.keysToAdd, this.selectedKeys);
+  this.keysToRemove = Util.arrayIntersect(this.keysToRemove, this.selectedKeys);
+
   // remove items first
   var self = this;
   var $selectionItems = this.$selectionContainer.find("div.item");

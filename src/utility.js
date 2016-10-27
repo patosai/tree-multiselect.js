@@ -61,6 +61,20 @@ function arrayMoveEl(arr, oldPos, newPos) {
   arr.splice(newPos, 0, el);
 }
 
+function arrayIntersect(arr, arrExcluded) {
+  var newArr = [];
+  var hash = {};
+  for (var ii = 0; ii < arrExcluded.length; ++ii) {
+    hash[arrExcluded[ii]] = true;
+  }
+  for (var jj = 0; jj < arr.length; ++jj) {
+    if (hash[arr[jj]]) {
+      newArr.push(arr[jj]);
+    }
+  }
+  return newArr;
+}
+
 module.exports = {
   assert: assert,
 
@@ -74,5 +88,7 @@ module.exports = {
 
   arrayRemoveFalseyExceptZero: arrayRemoveFalseyExceptZero,
 
-  arrayMoveEl: arrayMoveEl
+  arrayMoveEl: arrayMoveEl,
+
+  arrayIntersect: arrayIntersect
 };

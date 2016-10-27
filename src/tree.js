@@ -308,6 +308,8 @@ Tree.prototype.updateSelectedAndOnChange = function() {
 };
 
 Tree.prototype.render = function(noCallbacks) {
+  console.log("rendering");
+  var time = new Date().getTime();
   // fix arrays first
   this.keysToAdd = Util.arraySubtract(this.keysToAdd, this.selectedKeys);
   this.keysToRemove = Util.arrayIntersect(this.keysToRemove, this.selectedKeys);
@@ -330,7 +332,11 @@ Tree.prototype.render = function(noCallbacks) {
 
   this.selectedKeys = Util.arraySubtract(this.selectedKeys, this.keysToRemove);
 
+  console.log("removing took ", new Date().getTime() - time);
+  time = new Date().getTime();
+
   // now add items
+  var domStr = "";
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
     var key = this.keysToAdd[jj];
     var option = this.selectOptions[key];
@@ -340,20 +346,11 @@ Tree.prototype.render = function(noCallbacks) {
     var value = option.value;
     var section = option.section;
 
-    var $item = $(`<div class='item' data-key='${option.id}' data-value='${value}'>${text}</div>`);
-
-    if (this.options.showSectionOnSelected) {
-      var $sectionSpan = $("<span class='section-name'></span>");
-      $sectionSpan.text(section);
-      $item.append($sectionSpan);
-    }
-
-    if (!this.options.freeze) {
-      $item.prepend("<span class='remove-selected'>×</span>");
-    }
-
-    $item.appendTo(this.$selectedContainer);
+    var freezeStr = this.options.freeze ? '' : "<span class='remove-selected'>×</span>";
+    var sectionNameStr = this.options.showSectionOnSelected ? `<span class='section-name'>${section}</span>` : '';
+    domStr += `<div class='item' data-key='${option.id}' data-value='${value}'>${freezeStr}${sectionNameStr}${text}</div>`;
   }
+  this.$selectedContainer.append(domStr);
 
   // check the checkboxes
   $selectionItems.filter(function() {
@@ -365,6 +362,9 @@ Tree.prototype.render = function(noCallbacks) {
 
   // redraw section checkboxes
   this.redrawSectionCheckboxes();
+
+  console.log("adding took ", new Date().getTime() - time);
+  time = new Date().getTime();
 
   // now fix original select
   var vals = [];
@@ -392,8 +392,12 @@ Tree.prototype.render = function(noCallbacks) {
     this.options.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }
 
+  console.log("fixing original select took ", new Date().getTime() - time);
+  time = new Date().getTime();
+
   this.keysToRemove = [];
   this.keysToAdd = [];
+  console.log("rendering took ", new Date().getTime() - time);
 };
 
 module.exports = Tree;

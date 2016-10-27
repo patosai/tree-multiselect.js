@@ -91,39 +91,39 @@ Tree.prototype.generateHtmlFromData = function(data) {
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
 
-    var optionLabelCheckboxId = `tree-${option.id}`;
+    var optionLabelCheckboxId = `treemultiselect-${option.id}`;
     var descriptionStr = option.description ? ` data-description='${option.description}'` : "";
     var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : "";
     var optionCheckboxStr = "";
     var optionLabelStr = "";
     if (!this.options.onlyBatchSelection) {
-      optionCheckboxStr += `<input class='option' type='checkbox' id='${optionLabelCheckboxId}'`;
+      optionCheckboxStr.concat(`<input class='option' type='checkbox' id='${optionLabelCheckboxId}'`);
       if (this.options.freeze) {
-        optionCheckboxStr += " disabled";
+        optionCheckboxStr.concat(" disabled");
       }
-      optionCheckboxStr += "/>";
-      optionLabelStr += `<label for='${optionLabelCheckboxId}'>${option.text || option.value}</label>`;
+      optionCheckboxStr.concat("/>");
+      optionLabelStr.concat(`<label for='${optionLabelCheckboxId}'>${option.text || option.value}</label>`);
     } else {
-      optionLabelStr += `${option.text || option.value}`;
+      optionLabelStr.concat(`${option.text || option.value}`);
     }
     var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
 
-    str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${optionLabelStr}</div>`;
+    str.concat(`<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${optionLabelStr}</div>`);
   }
 
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
     var sectionCheckboxStr = "";
     if (this.options.onlyBatchSelection || this.options.allowBatchSelection) {
-      sectionCheckboxStr += "<input class='section' type='checkbox'";
+      sectionCheckboxStr.concat("<input class='section' type='checkbox'");
       if (this.options.freeze) {
-        sectionCheckboxStr += " disabled";
+        sectionCheckboxStr.concat(" disabled");
       }
-      sectionCheckboxStr += "/>";
+      sectionCheckboxStr.concat("/>");
     }
 
     var generatedData = this.generateHtmlFromData(data[1][keys[jj]]);
-    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData}</div>`;
+    str.concat(`<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData}</div>`);
   }
   return str;
 };
@@ -344,7 +344,7 @@ Tree.prototype.render = function(noCallbacks) {
 
     var freezeStr = this.options.freeze ? '' : "<span class='remove-selected'>×</span>";
     var sectionNameStr = this.options.showSectionOnSelected ? `<span class='section-name'>${option.section}</span>` : '';
-    domStr += `<div class='item' data-key='${option.id}' data-value='${option.value}'>${freezeStr}${sectionNameStr}${option.text}</div>`;
+    domStr.concat(`<div class='item' data-key='${option.id}' data-value='${option.value}'>${freezeStr}${sectionNameStr}${option.text}</div>`);
   }
   this.$selectedContainer.append(domStr);
 

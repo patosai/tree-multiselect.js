@@ -9,19 +9,21 @@ module.exports = function(config) {
 
     basePath: '../',
 
-    frameworks: ['browserify', 'qunit'],
+    frameworks: ['browserify', 'mocha', 'chai'],
 
     plugins: [
       'karma-browserify',
+      'karma-chai',
       'karma-coverage',
-      'karma-phantomjs-launcher',
-      'karma-qunit'
+      'karma-mocha',
+      'karma-mocha-reporter',
+      'karma-phantomjs-launcher'
     ],
 
     files: [
       'test/vendor/jquery-1.11.3.min.js',
       'test/vendor/jquery-ui.min.js',
-      'test/**/*.test.js'
+      'test/integration/adding-removing.test.js'
     ],
 
     exclude: [],
@@ -32,7 +34,7 @@ module.exports = function(config) {
       'test/**/*.test.js': ['browserify']
     },
 
-    reporters: ['progress', 'coverage'],
+    reporters: ['mocha', 'coverage'],
 
     port: 9876,
 
@@ -64,6 +66,16 @@ module.exports = function(config) {
         'src',
         'node_modules'
       ]
+    },
+
+    client: {
+      mocha: {
+        fullTrace: true
+      }
+    },
+
+    mochaReporter: {
+      showDiff: true
     },
 
     coverageReporter: {

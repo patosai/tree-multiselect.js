@@ -301,15 +301,6 @@ Tree.prototype.updateSelectedAndOnChange = function() {
           return;
         }
         Util.arrayMoveEl(self.selectedKeys, startIndex, endIndex);
-        // TODO move this into render()
-        // how do we detect this in render()?
-        var $items = self.$selectedContainer.find("div.item");
-        var item = $items[startIndex];
-        if (endIndex === 0) {
-          self.$selectedContainer.prepend(item);
-        } else {
-          $(item).insertAfter($items[endIndex - 1]);
-        }
         self.render();
       }
     });

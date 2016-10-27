@@ -91,19 +91,24 @@ Tree.prototype.generateHtmlFromData = function(data) {
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
 
+    var optionLabelCheckboxId = `tree-${option.id}`;
     var descriptionStr = option.description ? ` data-description='${option.description}'` : "";
     var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : "";
     var optionCheckboxStr = "";
+    var optionLabelStr = "";
     if (!this.options.onlyBatchSelection) {
-      optionCheckboxStr += "<input class='option' type='checkbox'";
+      optionCheckboxStr += `<input class='option' type='checkbox' id='${optionLabelCheckboxId}'`;
       if (this.options.freeze) {
         optionCheckboxStr += " disabled";
       }
       optionCheckboxStr += "/>";
+      optionLabelStr += `<label for='${optionLabelCheckboxId}'>${option.text || option.value}</label>`;
+    } else {
+      optionLabelStr += `${option.text || option.value}`;
     }
     var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
 
-    str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${(option.text || option.value)}</div>`;
+    str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${optionLabelStr}</div>`;
   }
 
   var keys = Object.keys(data[1]);
@@ -370,7 +375,7 @@ Tree.prototype.render = function(noCallbacks) {
     var bValue = valHash[b.value] || 0;
     return aValue - bValue;
   });
-  
+
   this.$originalSelect.html(options);
   this.$originalSelect.val(vals).change();
 

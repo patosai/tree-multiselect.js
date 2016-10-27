@@ -308,8 +308,6 @@ Tree.prototype.updateSelectedAndOnChange = function() {
 };
 
 Tree.prototype.render = function(noCallbacks) {
-  console.log("rendering");
-  var time = new Date().getTime();
   // fix arrays first
   this.keysToAdd = Util.arraySubtract(this.keysToAdd, this.selectedKeys);
   this.keysToRemove = Util.arrayIntersect(this.keysToRemove, this.selectedKeys);
@@ -332,9 +330,6 @@ Tree.prototype.render = function(noCallbacks) {
 
   this.selectedKeys = Util.arraySubtract(this.selectedKeys, this.keysToRemove);
 
-  console.log("removing took ", new Date().getTime() - time);
-  time = new Date().getTime();
-
   // now add items
   var domStr = "";
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
@@ -342,13 +337,9 @@ Tree.prototype.render = function(noCallbacks) {
     var option = this.selectOptions[key];
     this.selectedKeys.push(key);
 
-    var text = option.text;
-    var value = option.value;
-    var section = option.section;
-
     var freezeStr = this.options.freeze ? '' : "<span class='remove-selected'>×</span>";
-    var sectionNameStr = this.options.showSectionOnSelected ? `<span class='section-name'>${section}</span>` : '';
-    domStr += `<div class='item' data-key='${option.id}' data-value='${value}'>${freezeStr}${sectionNameStr}${text}</div>`;
+    var sectionNameStr = this.options.showSectionOnSelected ? `<span class='section-name'>${option.section}</span>` : '';
+    domStr += `<div class='item' data-key='${option.id}' data-value='${option.value}'>${freezeStr}${sectionNameStr}${option.text}</div>`;
   }
   this.$selectedContainer.append(domStr);
 
@@ -363,9 +354,6 @@ Tree.prototype.render = function(noCallbacks) {
   // redraw section checkboxes
   this.redrawSectionCheckboxes();
 
-  console.log("adding took ", new Date().getTime() - time);
-  time = new Date().getTime();
-
   // now fix original select
   var vals = [];
   // valHash hashes a value to an index
@@ -374,7 +362,6 @@ Tree.prototype.render = function(noCallbacks) {
     var value = this.selectOptions[this.selectedKeys[ii]].value;
     vals.push(value);
     valHash[value] = ii;
-    console.log(value, ' ', ii);
   }
   // TODO is there a better way to sort the values other than by HTML?
   var options = this.$originalSelect.find("option").toArray();
@@ -382,11 +369,9 @@ Tree.prototype.render = function(noCallbacks) {
     var aValue = valHash[a.value] || 0;
     var bValue = valHash[b.value] || 0;
     return aValue - bValue;
-  })
+  });
   
   this.$originalSelect.html(options);
-  console.log("sorting original select took ", new Date().getTime() - time);
-  time = new Date().getTime();
   this.$originalSelect.val(vals).change();
 
   if (!noCallbacks && this.options.onChange) {
@@ -401,9 +386,6 @@ Tree.prototype.render = function(noCallbacks) {
     });
     this.options.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }
-
-  console.log("fixing original select took ", new Date().getTime() - time);
-  time = new Date().getTime();
 
   this.keysToRemove = [];
   this.keysToAdd = [];

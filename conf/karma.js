@@ -15,13 +15,13 @@ module.exports = function(config) {
       'karma-browserify',
       'karma-coverage',
       'karma-phantomjs-launcher',
-      'karma-qunit',
+      'karma-qunit'
     ],
 
     files: [
       'test/vendor/jquery-1.11.3.min.js',
       'test/vendor/jquery-ui.min.js',
-      'test/**/*.test.js',
+      'test/**/*.test.js'
     ],
 
     exclude: [],
@@ -29,7 +29,7 @@ module.exports = function(config) {
     preprocessors: {
       // browserify handles istanbul coverage
       'src/tree-multiselect.js': ['browserify'],
-      'test/**/*.test.js': ['browserify'],
+      'test/**/*.test.js': ['browserify']
     },
 
     reporters: ['progress', 'coverage'],
@@ -62,7 +62,7 @@ module.exports = function(config) {
 
       paths: [
         'src',
-        'node_modules',
+        'node_modules'
       ]
     },
 
@@ -70,7 +70,7 @@ module.exports = function(config) {
       dir: path.join(TEMP_DIR, 'coverage/'),
       reporters: [
         { type: 'text-summary' },
-        { type: 'lcovonly' },
+        { type: 'lcovonly' }
       ]
     }
   });

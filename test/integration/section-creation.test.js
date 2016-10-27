@@ -84,23 +84,17 @@ QUnit.test("can generate nested sections", function(assert) {
   assert.equal(lowercaseItems.first().text(), "xyz");
 });
 
-QUnit.test("selects options that were selected in original select", function(assert) {
+QUnit.test("does not select options that don't have selected tag", function(assert) {
   $("select").append("<option value='one' data-section='foo'>one</option>");
-  $("select").append("<option value='two' data-section='foo'>two</option>");
 
   $("select").val(["one"]);
 
   $("select").treeMultiselect();
 
   var itemOne = $("div.item").filter(function() {
-    return $(this).clone().children().remove().end().text() == 'one';
+    return Util.textOf(this) === 'one';
   });
-  assert.ok(itemOne.find("> input[type=checkbox]").prop('checked'));
-
-  var itemTwo = $("div.item").filter(function() {
-    return $(this).clone().children().remove().end().text() == 'two';
-  });
-  assert.ok(!itemTwo.find("> input[type=checkbox]").prop('checked'));
+  assert.notOk(itemOne.find("> input[type=checkbox]").prop('checked'));
 });
 
 QUnit.test("respects the data-index attribute", function(assert) {

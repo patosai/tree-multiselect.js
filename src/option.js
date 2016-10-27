@@ -1,4 +1,5 @@
-module.exports = function(value, text, description, initialIndex, section) {
+module.exports = function(id, value, text, description, initialIndex, section) {
+  this.id = id;
   this.value = value;
   this.text = text;
   this.description = description;

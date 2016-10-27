@@ -148,24 +148,24 @@ QUnit.test("can freeze selections", function(assert) {
 
 QUnit.test("freeze does not affect other treeMultiselects", function(assert) {
   $("select").append("<option value='one' data-section='test'>One</option>");
-  var options = {
-    freeze: true
-  };
-  $("select").treeMultiselect(options);
+  $("select").treeMultiselect();
 
   $("div#qunit-fixture").append("<select id='frozen'></select>");
   $("select#frozen").append("<option value='two' data-section='test' selected='selected'>Two</option>");
-  $("select#frozen").treeMultiselect();
+  var options = {
+    freeze: true
+  };
+  $("select#frozen").treeMultiselect(options);
 
-  var frozenOption = $("div.selections div.item:contains(One)");
+  var frozenOption = $("div.selections div.item:contains(Two)");
   assert.equal(frozenOption.length, 1);
-  assert.ok(!!frozenOption.find("input[type=checkbox]").attr('disabled'));
+  assert.ok(frozenOption.find("input[type=checkbox]")[0].hasAttribute('disabled'));
 
-  var unfrozenOption = $("div.selections div.item:contains(Two)");
+  var unfrozenOption = $("div.selections div.item:contains(One)");
   assert.equal(unfrozenOption.length, 1);
   unfrozenOption.find("input[type=checkbox]").prop('checked', 'true').trigger('change');
 
-  var unfrozenSelection = $("div.selected div.item:contains(Two)");
+  var unfrozenSelection = $("div.selected div.item:contains(One)");
   assert.equal(unfrozenSelection.length, 1);
   assert.equal(unfrozenSelection.find("span.remove-selected").length, 1);
 });
@@ -215,21 +215,22 @@ QUnit.test("onChange callback is called with correct args when item is added", f
                   assert.equal(selection.text, 'Two');
                   assert.equal(selection.value, 'two');
                   assert.equal(selection.initialIndex, undefined);
-                  assert.equal(selection.sectionName, 'test');
+                  assert.equal(selection.section, 'test');
                 }
                 assert.equal(all[0].text, 'One');
                 assert.equal(all[0].value, 'one');
                 assert.equal(all[0].initialIndex, undefined);
-                assert.equal(all[0].sectionName, 'test');
+                assert.equal(all[0].section, 'test');
                 done();
               }
   };
   $("select").treeMultiselect(options);
 
-  var item = $("div.selections div.item").filter(function() {
+  var $item = $("div.selections div.item").filter(function() {
     return Util.textOf($(this)) == 'Two';
   });
-  item.find("input[type=checkbox]").click();
+  var $checkbox = $item.find("input[type=checkbox]");
+  $checkbox.click();
 });
 
 QUnit.test("onChange callback is called with correct args when item is removed", function(assert) {
@@ -246,16 +247,17 @@ QUnit.test("onChange callback is called with correct args when item is removed",
                 assert.equal(removedSelection.text, 'One');
                 assert.equal(removedSelection.value, 'one');
                 assert.equal(removedSelection.initialIndex, undefined);
-                assert.equal(removedSelection.sectionName, 'test');
+                assert.equal(removedSelection.section, 'test');
                 done();
               }
   };
   $("select").treeMultiselect(options);
 
-  var item = $("div.selections div.item").filter(function() {
+  var $item = $("div.selections div.item").filter(function() {
     return Util.textOf($(this)) == 'One';
   });
-  item.find("input[type=checkbox]").click();
+  var $checkbox = $item.find("input[type=checkbox]");
+  $checkbox.click();
 });
 
 QUnit.test("sortable actually sorts the options", function(assert) {
@@ -267,8 +269,13 @@ QUnit.test("sortable actually sorts the options", function(assert) {
 
   var $one = $("div.selected div.item[data-value='one']");
   var $two = $("div.selected div.item[data-value='two']");
+  $("div.selected").sortable('option', 'start')(null, {
+    item: $one
+  });
   $one.insertAfter($two);
-  $("div.selected").sortable('option', 'update')();
+  $("div.selected").sortable('option', 'stop')(null, {
+    item: $one
+  });
 
   assert.deepEqual($("select").val(), ['two', 'one']);
 });

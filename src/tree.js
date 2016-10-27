@@ -9,13 +9,14 @@ function Tree($originalSelect, $selectionContainer, $selectedContainer, options)
 
   this.selectOptions = [];
   this.selectedKeys = [];
+  this.keysToAdd = [];
+  this.keysToRemove = [];
 }
 
 Tree.prototype.initialize = function() {
   var data = this.generateSelections();
   var generatedHtmlData = this.generateHtmlFromData(data);
-  Util.assert(this.selectOptions.length == generatedHtmlData[0]);
-  this.$selectionContainer.append(generatedHtmlData[1]);
+  this.$selectionContainer.append(generatedHtmlData);
 
   this.popupDescriptionHover();
 
@@ -34,7 +35,7 @@ Tree.prototype.initialize = function() {
   this.armRemoveSelectedOnClick();
   this.updateSelectedAndOnChange();
 
-  this.checkPreselectedSelections();
+  this.render(true);
 };
 
 Tree.prototype.generateSelections = function() {
@@ -44,6 +45,9 @@ Tree.prototype.generateSelections = function() {
 
   var sectionDelimiter = this.options.sectionDelimiter;
 
+  var self = this;
+  var id = 0;
+  var keysToAddAtEnd = [];
   this.$originalSelect.find("> option").each(function() {
     var option = this;
     var attributes = option.attributes;
@@ -57,7 +61,13 @@ Tree.prototype.generateSelections = function() {
     var optionDescription = optionDescriptionItem ? optionDescriptionItem.value : null;
     var optionIndexItem = attributes.getNamedItem("data-index");
     var optionIndex = optionIndexItem ? parseInt(optionIndexItem.value) : null;
-    var optionObj = new Option(optionValue, optionName, optionDescription, optionIndex, section);
+    var optionObj = new Option(id, optionValue, optionName, optionDescription, optionIndex, section);
+    if (optionIndex) {
+      self.keysToAdd[optionIndex] = id;
+    } else if (option.hasAttribute('selected')) {
+      keysToAddAtEnd.push(id);
+    }
+    self.selectOptions[id] = optionObj;
 
     var currentPosition = data;
     for (var ii = 0; ii < path.length; ++ii) {
@@ -67,15 +77,16 @@ Tree.prototype.generateSelections = function() {
       currentPosition = currentPosition[1][path[ii]];
     }
     currentPosition[0].push(optionObj);
+
+    ++id;
   });
+  this.keysToAdd = Util.arrayUniq(Util.arrayRemoveFalseyExceptZero(this.keysToAdd).concat(keysToAddAtEnd));
 
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function(data, startingIndex) {
+Tree.prototype.generateHtmlFromData = function(data) {
   // returns array, 0th el is number of options, 1st el is HTML string
-  startingIndex  = startingIndex || 0;
-  var keyIndex = startingIndex;
   var str = "";
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
@@ -92,9 +103,7 @@ Tree.prototype.generateHtmlFromData = function(data, startingIndex) {
     }
     var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
 
-    str += `<div class='item' data-key='${keyIndex}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${(option.text || option.value)}</div>`;
-    this.selectOptions.push(option);
-    ++keyIndex;
+    str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${(option.text || option.value)}</div>`;
   }
 
   var keys = Object.keys(data[1]);
@@ -108,11 +117,10 @@ Tree.prototype.generateHtmlFromData = function(data, startingIndex) {
       sectionCheckboxStr += "/>";
     }
 
-    var generatedData = this.generateHtmlFromData(data[1][keys[jj]], keyIndex);
-    keyIndex += generatedData[0];
-    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData[1]}</div>`;
+    var generatedData = this.generateHtmlFromData(data[1][keys[jj]]);
+    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData}</div>`;
   }
-  return [keyIndex - startingIndex, str];
+  return str;
 };
 
 Tree.prototype.popupDescriptionHover = function() {
@@ -135,33 +143,28 @@ Tree.prototype.popupDescriptionHover = function() {
   });
 };
 
-Tree.prototype.checkPreselectedSelections = function() {
-  var selectedOptions = this.$originalSelect.val();
-  if (!selectedOptions) return;
-
-  var $selectedOptionDivs = this.$selectionContainer.find("div.item").filter(function() {
-    var item = $(this);
-    return selectedOptions.indexOf(item.attr('data-value')) !== -1;
-  });
-  $selectedOptionDivs.find("> input[type=checkbox]").prop('checked', true).change();
-};
-
 Tree.prototype.handleSectionCheckboxMarkings = function() {
   var self = this;
-  this.$selectionContainer.on("change", "input[type=checkbox]", function() {
-    var $checkboxParent = $(this).parent("div.title");
-    if ($checkboxParent.length) {
-      var $section = $checkboxParent.closest("div.section");
-      $section.find("input[type=checkbox]").prop('checked', this.checked);
+  this.$selectionContainer.on("change", "input.section[type=checkbox]", function() {
+    var $section = $(this).closest("div.section");
+    var $items = $section.find("div.item");
+    var keys = [];
+    $items.each((idx, el) => {
+      keys.push(Util.getKey(el));
+    });
+    if (this.checked) {
+      self.keysToAdd = Util.arrayUniq(self.keysToAdd.concat(keys));
     } else {
-      self.handleSectionCheckboxesOnOptionClick(self.$selectionContainer);
+      self.keysToRemove = Util.arrayUniq(self.keysToRemove.concat(keys));
     }
+    self.render();
   });
 };
 
-Tree.prototype.handleSectionCheckboxesOnOptionClick = function($section) {
+Tree.prototype.redrawSectionCheckboxes = function($section) {
+  $section = $section || this.$selectionContainer;
+
   // returns array; 0th el is all children are true, 1st el is all children are false
-  var self = this;
   var returnVal = [true, true];
   var $childCheckboxes = $section.find("> div.item > input[type=checkbox]");
   $childCheckboxes.each(function() {
@@ -172,9 +175,10 @@ Tree.prototype.handleSectionCheckboxesOnOptionClick = function($section) {
     }
   });
 
+  var self = this;
   var $childSections = $section.find("> div.section");
   $childSections.each(function() {
-    var result = self.handleSectionCheckboxesOnOptionClick($(this));
+    var result = self.redrawSectionCheckboxes($(this));
     returnVal[0] = returnVal[0] && result[0];
     returnVal[1] = returnVal[1] && result[1];
   });
@@ -238,18 +242,20 @@ Tree.prototype.createSelectAllButtons = function() {
   $selectAllContainer.prepend($unselectAll);
   $selectAllContainer.prepend($selectAll);
 
-  var self = this;
-
   this.$selectionContainer.prepend($selectAllContainer);
 
+  var self = this;
   this.$selectionContainer.on("click", "span.select-all", function() {
-    var $checkboxes = self.$selectionContainer.find("input[type=checkbox]");
-    $checkboxes.prop('checked', true).change();
+    for (var ii = 0; ii < self.selectOptions.length; ++ii) {
+      self.keysToAdd.push(ii);
+    }
+    self.keysToAdd = Util.arrayUniq(self.keysToAdd);
+    self.render();
   });
 
   this.$selectionContainer.on("click", "span.unselect-all", function() {
-    var $checkboxes = self.$selectionContainer.find("input[type=checkbox]");
-    $checkboxes.prop('checked', false).change();
+    self.keysToRemove = Util.arrayUniq(self.keysToRemove.concat(self.selectedKeys));
+    self.render();
   });
 };
 
@@ -257,210 +263,52 @@ Tree.prototype.armRemoveSelectedOnClick = function() {
   var self = this;
   this.$selectedContainer.on("click", "span.remove-selected", function() {
     var parentNode = this.parentNode;
-    var value = parentNode.attributes.getNamedItem('data-value').value;
-    var $matchingSelection = self.$selectionContainer.find("div.item[data-value='" + value + "']");
-    var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
-    $matchingCheckbox.prop('checked', false).change();
+    var key = Util.getKey(parentNode);
+    self.keysToRemove.push(key);
+    self.render();
   });
 };
 
 
 Tree.prototype.updateSelectedAndOnChange = function() {
-  var $selectionContainer = this.$selectionContainer;
-  var $selectedContainer = this.$selectedContainer;
-  var $originalSelect = this.$originalSelect;
-  var options = this.options;
-
-  function createSelectedDiv(selection) {
-    var text = selection.text;
-    var value = selection.value;
-    var sectionName = selection.sectionName;
-
-    var item = document.createElement('div');
-    item.className = "item";
-    item.innerHTML = text;
-
-    if (options.showSectionOnSelected) {
-      var $sectionSpan = $("<span class='section-name'></span>");
-      $sectionSpan.text(sectionName);
-      $(item).append($sectionSpan);
-    }
-
-    if (!options.freeze) {
-      $(item).prepend("<span class='remove-selected'>×</span>");
-    }
-
-    $(item).attr('data-value', value)
-      .appendTo($selectedContainer);
-  }
-
-  function addNewFromSelected(selections) {
-    var currentSelections = [];
-    $selectedContainer.find("div.item").each(function() {
-      currentSelections.push($(this).attr('data-value'));
-    });
-
-    var selectionsNotYetAdded = selections.filter(function(selection) {
-      return currentSelections.indexOf(selection.value) == -1;
-    });
-
-    selectionsNotYetAdded.forEach(function(selection) {
-      createSelectedDiv(selection);
-    });
-
-    return selectionsNotYetAdded;
-  }
-
-  function removeOldFromSelected(selections) {
-    var selectionTexts = [];
-    selections.forEach(function(selection) {
-      selectionTexts.push(selection.value);
-    });
-
-    var removedValues = [];
-
-    $selectedContainer.find("div.item").each(function(index, el) {
-      var $item = $(el);
-      var value = $item.attr('data-value');
-      if (selectionTexts.indexOf(value) == -1) {
-        removedValues.push(value);
-        $item.remove();
-      }
-    });
-
-    var unselectedSelections = [];
-    var allSelections = $selectionContainer.find("div.item");
-    allSelections.each(function() {
-      var $this = $(this);
-      if (removedValues.indexOf($this.attr('data-value')) !== -1) {
-        unselectedSelections.push(elToSelectionObject($this));
-      }
-    });
-    return unselectedSelections;
-  }
-
-  function elToSelectionObject($el) {
-    var text = Util.textOf($el);
-    var value = $el.attr('data-value');
-    var initialIndex = $el.attr('data-index');
-    $el.attr('data-index', undefined);
-
-    var sectionName = $.map($el.parentsUntil($selectionContainer, "div.section").get().reverse(), function(parentSection) {
-      return Util.textOf($(parentSection).find("> div.title"));
-    }).join(options.sectionDelimiter);
-
-    return {
-      text: text,
-      value: value,
-      initialIndex: initialIndex,
-      sectionName: sectionName
-    };
-  }
-
-  function updateOriginalSelect() {
-    var selected = [];
-    $selectedContainer.find("div.item").each(function() {
-      selected.push($(this).attr('data-value'));
-    });
-
-    $originalSelect.val(selected).change();
-
-    $originalSelect.html($originalSelect.find("option").sort(function(a, b) {
-      var aValue = selected.indexOf($(a).attr('value'));
-      var bValue = selected.indexOf($(b).attr('value'));
-
-      if (aValue > bValue) return 1;
-      if (aValue < bValue) return -1;
-      return 0;
-    }));
-  }
-
-  var initialRun = true;
-  function update() {
-    var $selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
-    var selections = [];
-
-    $selectedBoxes.each(function() {
-      var $el = $(this);
-      selections.push(elToSelectionObject($el));
-    });
-
-    selections.sort(function(a, b) {
-      var aIndex = parseInt(a.initialIndex);
-      var bIndex = parseInt(b.initialIndex);
-      if (aIndex > bIndex) return 1;
-      if (aIndex < bIndex) return -1;
-      return 0;
-    });
-
-    var newlyAddedSelections = addNewFromSelected(selections);
-    var newlyRemovedSelections = removeOldFromSelected(selections);
-    updateOriginalSelect();
-
-    if (initialRun) {
-      initialRun = false;
-    } else if (options.onChange) {
-      options.onChange(selections, newlyAddedSelections, newlyRemovedSelections);
-    }
-
-    if (options.sortable && !options.freeze) {
-      $selectedContainer.sortable({
-        update: function(event, ui) {
-          updateOriginalSelect();
-        }
-      });
-    }
-  }
-
-  //Util.onCheckboxChange($selectionContainer, update);
-
   var self = this;
-  $selectionContainer.on("change", "input.option[type=checkbox]", function(event) {
+  this.$selectionContainer.on("change", "input.option[type=checkbox]", function(event) {
     var checkbox = this;
     var selection = checkbox.parentNode;
-    var key = selection.attributes.getNamedItem("data-key").value;
-    if (key) {
-      key = parseInt(key);
-      Util.assert(!isNaN(key));
-    } else {
-      return;
-    }
+    var key = Util.getKey(selection);
+    Util.assert(key || key === 0);
 
     if (checkbox.checked) {
-      self.selectedKeys.push(key);
+      self.keysToAdd.push(key);
     } else {
-      self.selectedKeys.splice(self.selectedKeys.indexOf(key), 1);
-    }
-
-    if (self.options.onChange) {
-      self.options.onChange([], [], []);
+      self.keysToRemove.push(key);
     }
 
     self.render();
   });
 
-  if (options.sortable && !options.freeze) {
+  if (this.options.sortable && !this.options.freeze) {
     var startIndex = null;
     var endIndex = null;
-    $selectedContainer.sortable({
+    this.$selectedContainer.sortable({
       start: function(event, ui) {
         startIndex = ui.item.index();
       },
 
-      update: function(event, ui) {
+      stop: function(event, ui) {
         endIndex = ui.item.index();
-        if (startIndex < endIndex) {
-          var tmp = self.selectedKeys[startIndex];
-          for (var ii = startIndex; ii < endIndex; ++ii) {
-            self.selectedKeys[ii] = self.selectedKeys[ii + 1];
-          }
-          self.selectedKeys[endIndex] = tmp;
-        } else if (startIndex > endIndex) {
-          var tmp = self.selectedKeys[startIndex];
-          for (var ii = startIndex; ii > endIndex; --ii) {
-            self.selectedKeys[ii] = self.selectedKeys[ii - 1];
-          }
-          self.selectedKeys[endIndex] = tmp;
+        if (startIndex === endIndex) {
+          return;
+        }
+        Util.arrayMoveEl(self.selectedKeys, startIndex, endIndex);
+        // TODO move this into render()
+        // how do we detect this in render()?
+        var $items = self.$selectedContainer.find("div.item");
+        var item = $items[startIndex];
+        if (endIndex === 0) {
+          self.$selectedContainer.prepend(item);
+        } else {
+          $(item).insertAfter($items[endIndex - 1]);
         }
         self.render();
       }
@@ -468,47 +316,89 @@ Tree.prototype.updateSelectedAndOnChange = function() {
   }
 };
 
-Tree.prototype.render = function() {
-  // set original select values
+Tree.prototype.render = function(noCallbacks) {
+  // remove items first
+  var self = this;
+  var $selectionItems = this.$selectionContainer.find("div.item");
+
+  // remove the selected divs
+  this.$selectedContainer.find("div.item").filter(function() {
+    var key = Util.getKey(this);
+    return self.keysToRemove.indexOf(key) !== -1;
+  }).remove();
+
+  // uncheck these checkboxes
+  $selectionItems.filter(function() {
+    var key = Util.getKey(this);
+    return self.keysToRemove.indexOf(key) !== -1;
+  }).find("> input[type=checkbox]").prop('checked', false);
+
+  this.selectedKeys = Util.arraySubtract(this.selectedKeys, this.keysToRemove);
+
+  // now add items
+  for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
+    var key = this.keysToAdd[jj];
+    var option = this.selectOptions[key];
+    this.selectedKeys.push(key);
+
+    var text = option.text;
+    var value = option.value;
+    var section = option.section;
+
+    var $item = $(`<div class='item' data-key='${option.id}' data-value='${value}'>${text}</div>`);
+
+    if (this.options.showSectionOnSelected) {
+      var $sectionSpan = $("<span class='section-name'></span>");
+      $sectionSpan.text(section);
+      $item.append($sectionSpan);
+    }
+
+    if (!this.options.freeze) {
+      $item.prepend("<span class='remove-selected'>×</span>");
+    }
+
+    $item.appendTo(this.$selectedContainer);
+  }
+
+  // check the checkboxes
+  $selectionItems.filter(function() {
+    var key = Util.getKey(this);
+    return self.keysToAdd.indexOf(key) !== -1;
+  }).find("> input[type=checkbox]").prop('checked', true);
+
+  this.selectedKeys = Util.arrayUniq(this.selectedKeys.concat(this.keysToAdd));
+
+  // redraw section checkboxes
+  this.redrawSectionCheckboxes();
+
+  // now fix original select
   var vals = [];
   for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
     vals.push(this.selectOptions[this.selectedKeys[ii]].value);
   }
-  this.$originalSelect.val(vals).change();
-
   // TODO is there a better way to sort the values other than by HTML?
   this.$originalSelect.html(this.$originalSelect.find("option").sort(function(a, b) {
     var aValue = vals.indexOf(a.value);
     var bValue = vals.indexOf(b.value);
     return aValue - bValue;
   }));
+  this.$originalSelect.val(vals).change();
 
-  // fix selected container markings
-  this.$selectedContainer.find("div.item").remove();
-  // create divs
-  for (var jj = 0; jj < this.selectedKeys.length; ++jj) {
-    var option = this.selectOptions[this.selectedKeys[jj]];
-
-    var text = option.text;
-    var value = option.value;
-    var section = option.section;
-
-    var item = document.createElement('div');
-    item.className = "item";
-    item.innerHTML = text;
-
-    if (this.options.showSectionOnSelected) {
-      var $sectionSpan = $("<span class='section-name'></span>");
-      $sectionSpan.text(section);
-      $(item).append($sectionSpan);
-    }
-
-    if (!this.options.freeze) {
-      $(item).prepend("<span class='remove-selected'>×</span>");
-    }
-
-    $(item).attr('data-value', value).appendTo(this.$selectedContainer);
+  if (!noCallbacks && this.options.onChange) {
+    var optionsSelected = this.selectedKeys.map((key) => {
+      return this.selectOptions[key];
+    });
+    var optionsAdded = this.keysToAdd.map((key) => {
+      return this.selectOptions[key];
+    });
+    var optionsRemoved = this.keysToRemove.map((key) => {
+      return this.selectOptions[key];
+    });
+    this.options.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }
+
+  this.keysToRemove = [];
+  this.keysToAdd = [];
 };
 
 module.exports = Tree;

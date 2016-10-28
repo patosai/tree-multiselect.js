@@ -4,11 +4,6 @@ function assert(bool, message) {
   }
 }
 
-function textOf(el) {
-  assert(el);
-  return $(el).clone().children().remove().end().text();
-}
-
 function getKey(el) {
   assert(el);
   var item = el.attributes.getNamedItem("data-key");
@@ -77,8 +72,6 @@ function arrayIntersect(arr, arrExcluded) {
 
 module.exports = {
   assert: assert,
-
-  textOf: textOf,
 
   getKey: getKey,
 

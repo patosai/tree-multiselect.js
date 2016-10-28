@@ -91,228 +91,232 @@ describe('Options', () => {
     $("select").append("<option value='one' data-section='test'>One</option>");
     $("select").append("<option value='two' data-section='test'>Two</option>");
     $("select").append("<option value='three' data-section='test'>Three</option>");
-
     $("select").append("<option value='four' data-section='test/inner'>Four</option>");
     $("select").append("<option value='five' data-section='test/inner2'>Five</option>");
     $("select").append("<option value='Six' data-section='test/inner2'>Six</option>");
     $("select").treeMultiselect(options);
 
-    assert.equal("input.section[type=checkbox]".length, 0);
+    assert.equal($("input.section[type=checkbox]").length, 0);
+  });
+
+  it('can disable section display for selected items', () => {
+    $("select").append("<option value='one' data-section='test' data-description='foobar' selected='selected'>One</option>");
+    var options = {
+      showSectionOnSelected: false
+    };
+    $("select").treeMultiselect(options);
+
+    var $selectedItem = Common.getSelections();
+    assert.equal($selectedItem.length, 1);
+    assert.equal($selectedItem.find("span.section-name").length, 0);
+  });
+
+  it('can freeze selections', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    var options = {
+      freeze: true
+    };
+    $("select").treeMultiselect(options);
+
+    var $checkboxes = Common.getSelections().children("input[type=checkbox]");
+    assert.equal($checkboxes.length, 2);
+    $checkboxes.each(function() {
+      var $checkbox = $(this);
+      assert($checkbox.attr('disabled'));
+    });
+
+    var removeSpans = $("div.selected span.remove-selected");
+    assert.equal(removeSpans.length, 0);
+  });
+
+  it('applies only to one tree and not another', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    $("select").treeMultiselect();
+
+    $("div#qunit-fixture").append("<select id='frozen'></select>");
+    $("select#frozen").append("<option value='two' data-section='anothertest' selected='selected'>Two</option>");
+    var options = {
+      freeze: true
+    };
+    $("select#frozen").treeMultiselect(options);
+
+    var $frozenOption = Common.getSelectionsWithText("Two");
+    assert.equal($frozenOption.length, 1);
+    assert($frozenOption.find("input[type=checkbox]").attr('disabled'));
+
+    var $unfrozenOption = Common.getSelectionsWithText("One");
+    assert.equal($unfrozenOption.length, 1);
+    var $checkbox = $unfrozenOption.find("input[type=checkbox]");
+    assert.notOk($checkbox.attr('disabled'));
+    $checkbox.click();
+
+    var $unfrozenSelection = Common.getSelectedWithText("One");
+    assert.equal($unfrozenSelection.length, 1);
+    assert.equal($("select").val(), ['one']);
+    assert.equal($("select#frozen").val(), ['two']);
+  });
+
+  it('hides side panel', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    var options = {
+      hideSidePanel: true
+    };
+    $("select").treeMultiselect(options);
+
+    assert.equal($("div.selected").length, 0);
+  });
+
+  it('onlyBatchSelection gives checkboxes to only sections', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    var options = {
+      onlyBatchSelection: true
+    };
+    $("select").treeMultiselect(options);
+
+    assert.equal($("input.section[type=checkbox]").length, 1);
+    assert.equal($("input.option[type=checkbox]").length, 0);
+  });
+
+  it('calls onChange with correct arguments when item is removed', (done) => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test'>Two</option>");
+    var options = {
+      onChange: function(all, added, removed) {
+                  assert.equal(all.length, 2);
+                  assert.equal(added.length, 1);
+                  assert.equal(removed.length, 0);
+                  var expectedSecondSelections = [all[1], added[0]];
+                  for (var i = 0; i < expectedSecondSelections.length; ++i) {
+                    var selection = expectedSecondSelections[i];
+                    assert.equal(selection.text, 'Two');
+                    assert.equal(selection.value, 'two');
+                    assert.equal(selection.initialIndex, undefined);
+                    assert.equal(selection.section, 'test');
+                  }
+                  assert.equal(all[0].text, 'One');
+                  assert.equal(all[0].value, 'one');
+                  assert.equal(all[0].initialIndex, undefined);
+                  assert.equal(all[0].section, 'test');
+                  done();
+                }
+    };
+    $("select").treeMultiselect(options);
+
+    var $item = Common.getSelectionsWithText("Two");
+    assert.equal($item.length, 1);
+    $item.find("input[type=checkbox]").click();
+  });
+
+  it('fixes original select value when sorted', () => {
+    $("select").append("<option value='one' data-section='test' selected>One</option>");
+    $("select").append("<option value='two' data-section='test' selected>Two</option>");
+    $("select").treeMultiselect({ sortable: true });
+
+    assert.deepEqual($("select").val(), ['one', 'two']);
+
+    var $selections = Common.getSelections();
+    assert.equal($selections.length, 2);
+    var $one = $selections.first();
+    var $two = $selections.last();
+
+    assert($("div.selected").sortable('option', 'start'));
+    $("div.selected").sortable('option', 'start')(null, {
+      item: $one
+    });
+    $one.insertAfter($two);
+    assert($("div.selected").sortable('option', 'stop'));
+    $("div.selected").sortable('option', 'stop')(null, {
+      item: $one
+    });
+
+    assert.deepEqual($("select").val(), ['two', 'one']);
+  });
+
+  it('puts selected items in right order when sorted', () => {
+    $("select").append("<option value='one' data-section='test' selected>One</option>");
+    $("select").append("<option value='two' data-section='test' selected>Two</option>");
+    $("select").treeMultiselect({ sortable: true });
+
+    var $selections = Common.getSelections();
+    assert.equal($selections.length, 2);
+    var $one = $selections.first();
+    var $two = $selections.last();
+
+    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
+
+    assert($("div.selected").sortable('option', 'start'));
+    $("div.selected").sortable('option', 'start')(null, {
+      item: $one
+    });
+    $one.insertAfter($two);
+    assert($("div.selected").sortable('option', 'stop'));
+    $("div.selected").sortable('option', 'stop')(null, {
+      item: $one
+    });
+
+    $selections = Common.getSelections();
+    assert.equal($selections.length, 2);
+    var $two = $selections.first();
+    var $one = $selections.last();
+    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
+  });
+
+  it('select all button works', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    $("select").append("<option value='two' data-section='test'>Two</option>");
+    $("select").treeMultiselect({ enableSelectAll: true });
+
+    var $selectAll = $(".select-all");
+    assert.equal($selectAll.length, 1);
+
+    var $selectedItems = Common.getSelected();
+    assert.equal($selectedItems.length, 0);
+    assert.deepEqual($("select").val(), null);
+
+    $selectAll.click();
+
+    $selectedItems = Common.getSelected();
+    assert.equal($selectedItems.length, 2);
+    assert.deepEqual($("select").val(), ['one', 'two']);
+  });
+
+  it('unselect button works', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    $("select").treeMultiselect({ enableSelectAll: true });
+
+    var $unselectAll = $(".unselect-all");
+    assert.equal($unselectAll.length, 1);
+
+    var $selectedItems = Common.getSelected();
+    assert.equal($selectedItems.length, 2);
+    assert.deepEqual($("select").val(), ['one', 'two']);
+
+    $unselectAll.click();
+
+    $selectedItems = Common.getSelected();
+    assert.equal($selectedItems.length, 0);
+    assert.deepEqual($("select").val(), null);
+  });
+
+  it('select all text option', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    var selectAllText = "foobar";
+    $("select").treeMultiselect({ enableSelectAll: true, selectAllText: selectAllText });
+
+    var $selectAll = $(".select-all");
+    assert.equal($selectAll.text(), selectAllText);
+  });
+
+  it('unselect all text option', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    var unselectAllText = "foobar";
+    $("select").treeMultiselect({ enableSelectAll: true, unselectAllText: unselectAllText });
+
+    var $unselectAll = $(".unselect-all");
+    assert.equal($unselectAll.text(), unselectAllText);
   });
 });
-//QUnit.test("can disable section display on selected items", function(assert) {
-  //$("select").append("<option value='one' data-section='test' data-description='foobar' selected='selected'>One</option>");
-  //var options = {
-    //showSectionOnSelected: false
-  //};
-  //$("select").treeMultiselect(options);
-
-  //var selectedItem = $("div.selected div.item");
-  //assert.equal(selectedItem.length, 1);
-  //assert.equal(selectedItem.find("span.section-name").length, 0);
-//});
-
-//QUnit.test("can freeze selections", function(assert) {
-  //$("select").append("<option value='one' data-section='test'>One</option>");
-  //$("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
-  //var options = {
-    //freeze: true
-  //};
-  //$("select").treeMultiselect(options);
-
-  //var checkboxes = $("div.selections div.item > input[type=checkbox]");
-  //assert.equal(checkboxes.length, 2);
-  //checkboxes.each(function() {
-    //var checkbox = $(this);
-    //assert.ok(checkbox.attr('disabled'));
-  //});
-
-  //var removeSpans = $("div.selected span.remove-selected");
-  //assert.equal(removeSpans.length, 0);
-//});
-
-//QUnit.test("freeze does not affect other treeMultiselects", function(assert) {
-  //$("select").append("<option value='one' data-section='test'>One</option>");
-  //$("select").treeMultiselect();
-
-  //$("div#qunit-fixture").append("<select id='frozen'></select>");
-  //$("select#frozen").append("<option value='two' data-section='test' selected='selected'>Two</option>");
-  //var options = {
-    //freeze: true
-  //};
-  //$("select#frozen").treeMultiselect(options);
-
-  //var frozenOption = $("div.selections div.item:contains(Two)");
-  //assert.equal(frozenOption.length, 1);
-  //assert.ok(frozenOption.find("input[type=checkbox]")[0].hasAttribute('disabled'));
-
-  //var unfrozenOption = $("div.selections div.item:contains(One)");
-  //assert.equal(unfrozenOption.length, 1);
-  //unfrozenOption.find("input[type=checkbox]").prop('checked', 'true').trigger('change');
-
-  //var unfrozenSelection = $("div.selected div.item:contains(One)");
-  //assert.equal(unfrozenSelection.length, 1);
-  //assert.equal(unfrozenSelection.find("span.remove-selected").length, 1);
-//});
-
-//QUnit.test("Selected panel is not removed by default", function(assert) {
-  //$("select").append("<option value='one' data-section='test'>One</option>");
-  //$("select").treeMultiselect();
-
-  //assert.equal($("div.selected").length, 1);
-//});
-
-//QUnit.test("hideSidePanel removes the selected panel", function(assert) {
-  //$("select").append("<option value='one' data-section='test'>One</option>");
-  //var options = {
-    //hideSidePanel: true
-  //};
-  //$("select").treeMultiselect(options);
-
-  //assert.equal($("div.selected").length, 0);
-//});
-
-//QUnit.test("onlyBatchSelection adds checkboxes to only sections", function(assert) {
-  //$("select").append("<option value='one' data-section='test'>One</option>");
-  //var options = {
-    //onlyBatchSelection: true
-  //};
-  //$("select").treeMultiselect(options);
-  //assert.equal($("div.title").length, 1);
-  //assert.equal($("div.item").length, 1);
-
-  //assert.equal($("div.title > input[type=checkbox]").length, 1);
-  //assert.equal($("div.item > input[type=checkbox]").length, 0);
-//});
-
-//QUnit.test("onChange callback is called with correct args when item is added", function(assert) {
-  //var done = assert.async();
-  //$("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-  //$("select").append("<option value='two' data-section='test'>Two</option>");
-  //var options = {
-    //onChange: function(all, added, removed) {
-                //assert.equal(all.length, 2);
-                //assert.equal(added.length, 1);
-                //assert.equal(removed.length, 0);
-                //var expectedSecondSelections = [all[1], added[0]];
-                //for (var i = 0; i < expectedSecondSelections.length; ++i) {
-                  //var selection = expectedSecondSelections[i];
-                  //assert.equal(selection.text, 'Two');
-                  //assert.equal(selection.value, 'two');
-                  //assert.equal(selection.initialIndex, undefined);
-                  //assert.equal(selection.section, 'test');
-                //}
-                //assert.equal(all[0].text, 'One');
-                //assert.equal(all[0].value, 'one');
-                //assert.equal(all[0].initialIndex, undefined);
-                //assert.equal(all[0].section, 'test');
-                //done();
-              //}
-  //};
-  //$("select").treeMultiselect(options);
-
-  //var $item = $("div.selections div.item").filter(function() {
-    //return Util.textOf($(this)) == 'Two';
-  //});
-  //var $checkbox = $item.find("input[type=checkbox]");
-  //$checkbox.click();
-//});
-
-//QUnit.test("onChange callback is called with correct args when item is removed", function(assert) {
-  //var done = assert.async();
-  //$("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-  //$("select").append("<option value='two' data-section='test'>Two</option>");
-  //var options = {
-    //onChange: function(all, added, removed) {
-                //assert.equal(all.length, 0);
-                //assert.equal(added.length, 0);
-                //assert.equal(removed.length, 1);
-
-                //var removedSelection = removed[0];
-                //assert.equal(removedSelection.text, 'One');
-                //assert.equal(removedSelection.value, 'one');
-                //assert.equal(removedSelection.initialIndex, undefined);
-                //assert.equal(removedSelection.section, 'test');
-                //done();
-              //}
-  //};
-  //$("select").treeMultiselect(options);
-
-  //var $item = $("div.selections div.item").filter(function() {
-    //return Util.textOf($(this)) == 'One';
-  //});
-  //var $checkbox = $item.find("input[type=checkbox]");
-  //$checkbox.click();
-//});
-
-//QUnit.test("sortable actually sorts the options", function(assert) {
-  //$("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-  //$("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
-  //$("select").treeMultiselect({ sortable: true });
-
-  //assert.deepEqual($("select").val(), ['one', 'two']);
-
-  //var $one = $("div.selected div.item[data-value='one']");
-  //var $two = $("div.selected div.item[data-value='two']");
-  //$("div.selected").sortable('option', 'start')(null, {
-    //item: $one
-  //});
-  //$one.insertAfter($two);
-  //$("div.selected").sortable('option', 'stop')(null, {
-    //item: $one
-  //});
-
-  //assert.deepEqual($("select").val(), ['two', 'one']);
-//});
-
-//QUnit.test("select all button is created and it works", function(assert) {
-  //$("select").append("<option value='one' data-section='test'>One</option>");
-  //$("select").append("<option value='two' data-section='test'>Two</option>");
-  //$("select").treeMultiselect({ enableSelectAll: true });
-
-  //var $selectAll = $(".select-all");
-  //assert.equal($selectAll.length, 1);
-
-  //var $selectedItems = $("div.selected div.item");
-  //assert.equal($selectedItems.length, 0);
-
-  //$selectAll.click();
-
-  //$selectedItems = $("div.selected div.item");
-  //assert.equal($selectedItems.length, 2);
-//});
-
-//QUnit.test("unselect all button is created and it works", function(assert) {
-  //$("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-  //$("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
-  //$("select").treeMultiselect({ enableSelectAll: true });
-
-  //var $unselectAll = $(".unselect-all");
-  //assert.equal($unselectAll.length, 1);
-
-  //var $selectedItems = $("div.selected div.item");
-  //assert.equal($selectedItems.length, 2);
-
-  //$unselectAll.click();
-
-  //$selectedItems = $("div.selected div.item");
-  //assert.equal($selectedItems.length, 0);
-//});
-
-//QUnit.test("select all text option works", function(assert) {
-  //$("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-  //var selectAllText = "foobar";
-  //$("select").treeMultiselect({ enableSelectAll: true, selectAllText: selectAllText });
-
-  //var $selectAll = $(".select-all");
-  //assert.equal($selectAll.text(), selectAllText);
-//});
-
-//QUnit.test("unselect all text option works", function(assert) {
-  //$("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-  //var unselectAllText = "foobar";
-  //$("select").treeMultiselect({ enableSelectAll: true, unselectAllText: unselectAllText });
-
-  //var $unselectAll = $(".unselect-all");
-  //assert.equal($unselectAll.text(), unselectAllText);
-//});

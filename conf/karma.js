@@ -26,7 +26,8 @@ module.exports = function(config) {
       'src/tree-multiselect.js',
       'test/integration/initial-load.test.js',
       'test/integration/adding-removing.test.js',
-      'test/integration/options.test.js'
+      'test/integration/options.test.js',
+      'test/integration/section-checkboxes.test.js'
     ],
 
     exclude: [],

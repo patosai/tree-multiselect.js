@@ -1,10 +1,21 @@
+var browserify = require("browserify");
+var fs = require("fs");
+
 module.exports = function(grunt) {
   grunt.initConfig({
 
     pkg: grunt.file.readJSON('package.json'),
 
     browserify: {
-      'dist/jquery.tree-multiselect.js': ['src/tree-multiselect.js']
+      dist: {
+        options: {
+          transform: ['babelify']
+        },
+
+        files: {
+          'dist/jquery.tree-multiselect.js': ['src/tree-multiselect.js']
+        }
+      }
     },
 
     // Upload LCOV data to coveralls.io
@@ -32,18 +43,7 @@ module.exports = function(grunt) {
         configFile: 'conf/karma.js',
       },
 
-      local: {
-      },
-
-      // requires browserify to be run
-      release: {
-        files: [
-          'test/vendor/jquery-1.11.3.min.js',
-          'test/vendor/jquery-ui.min.js',
-          'dist/jquery.tree-multiselect.js',
-          'test/integration/*.test.js',
-        ],
-      },
+      local: {},
 
       continuous: {
         autoWatch: true,
@@ -54,12 +54,26 @@ module.exports = function(grunt) {
     // SASS compiler
     sass: {
       options: {
-        sourceMap: false,
-        outputStyle: 'compressed'
+        sourceMap: false
       },
-      dist: {
+
+      build: {
+        options: {
+          outputStyle: 'compressed'
+        },
+
         files: {
           'dist/jquery.tree-multiselect.min.css': 'src/style.scss'
+        }
+      },
+
+      min: {
+        options: {
+          outputStyle: 'nested'
+        },
+
+        files: {
+          'dist/jquery.tree-multiselect.css': 'src/style.scss'
         }
       }
     },
@@ -81,7 +95,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           position: 'top',
-          banner: "// jQuery Tree Multiselect v<%= pkg.version %> | (c) Patrick Tsai et al. | MIT Licensed",
+          banner: "/* jQuery Tree Multiselect v<%= pkg.version %> | (c) Patrick Tsai | MIT Licensed */",
           linebreak: true
         },
         files: {
@@ -92,8 +106,7 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-banner');
-  // TODO yarn add --dev grunt-browserify
-  //grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-coveralls');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-karma');
@@ -103,8 +116,11 @@ module.exports = function(grunt) {
   grunt.registerTask('test-local', ['karma:local', 'jshint']);
   grunt.registerTask('test-travis', ['test-local', 'coveralls']);
   grunt.registerTask('test-watch', ['karma:continuous']);
-  grunt.registerTask('build-dist', ['browserify', 'karma:release']);
-  grunt.registerTask('release', ['test-local', 'build-dist', 'sass', 'uglify', 'usebanner']);
+
+  grunt.registerTask('build', ['browserify']);
+
+  grunt.registerTask('release', ['test-local', 'build', 'uglify', 'sass:build', 'sass:min', 'usebanner']);
+  grunt.registerTask('watch', ['test-watch']);
 
   grunt.registerTask('default', 'test-local');
 };

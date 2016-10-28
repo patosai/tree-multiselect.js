@@ -1,43 +1,22 @@
+/* jQuery Tree Multiselect v1.18.0 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
 var Option = require('./option');
+var Tree = require('./tree');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
-var treeMultiselect = function(opts) {
+var treeMultiselect = function treeMultiselect(opts) {
+  var _this = this;
+
   var options = mergeDefaultOptions(opts);
-  this.each(function() {
-    var $originalSelect = $(this);
+  this.each(function () {
+    var $originalSelect = $(_this);
     $originalSelect.attr('multiple', '').css('display', 'none');
 
-    var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
-
-    var $selectionContainer = $(uiBuilder.selections);
-
-    generateSelections($originalSelect, $selectionContainer, options);
-
-    addDescriptionHover($selectionContainer, options);
-    addCheckboxes($selectionContainer, options);
-    checkPreselectedSelections($originalSelect, $selectionContainer, options);
-
-    if (options.allowBatchSelection) {
-      armTitleCheckboxes($selectionContainer, options);
-      uncheckParentsOnUnselect($selectionContainer, options);
-      checkParentsOnAllChildrenSelected($selectionContainer, options);
-      showSemifilledParents($selectionContainer, options);
-    }
-
-    if (options.collapsible) {
-      addCollapsibility($selectionContainer, options);
-    }
-
-    if (options.enableSelectAll) {
-      createSelectAllButtons($selectionContainer, options);
-    }
-
-    var $selectedContainer = $(uiBuilder.selected);
-    updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
-
-    armRemoveSelectedOnClick($selectionContainer, $selectedContainer, options);
+    var tree = new Tree($originalSelect, options);
+    tree.initialize();
   });
 
   return this;
@@ -62,12 +41,105 @@ function mergeDefaultOptions(options) {
   return $.extend({}, defaults, options);
 }
 
-function generateSelections($originalSelect, $selectionContainer, options) {
+module.exports = treeMultiselect;
+
+},{"./option":2,"./tree":4,"./ui-builder":5,"./utility":6}],2:[function(require,module,exports){
+"use strict";
+
+module.exports = function (id, value, text, description, initialIndex, section) {
+  this.id = id;
+  this.value = value;
+  this.text = text;
+  this.description = description;
+  this.initialIndex = initialIndex;
+  this.section = section;
+};
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+(function ($) {
+  "use strict";
+
+  $.fn.treeMultiselect = require('./main');
+})(jQuery);
+
+},{"./main":1}],4:[function(require,module,exports){
+'use strict';
+
+var Option = require('./option');
+var UiBuilder = require('./ui-builder');
+var Util = require('./utility');
+
+function Tree($originalSelect, options) {
+  this.$originalSelect = $originalSelect;
+
+  var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
+  this.$selectionContainer = uiBuilder.$selectionContainer;
+  this.$selectedContainer = uiBuilder.$selectedContainer;
+
+  this.options = options;
+
+  this.selectOptions = [];
+  this.selectedKeys = [];
+  this.keysToAdd = [];
+  this.keysToRemove = [];
+}
+
+Tree.prototype.initialize = function () {
+  var data = this.generateSelections();
+  var generatedHtmlData = this.generateHtmlFromData(data);
+  this.$selectionContainer.append(generatedHtmlData);
+
+  this.popupDescriptionHover();
+
+  if (this.options.allowBatchSelection) {
+    this.handleSectionCheckboxMarkings();
+  }
+
+  if (this.options.collapsible) {
+    this.addCollapsibility();
+  }
+
+  if (this.options.enableSelectAll) {
+    this.createSelectAllButtons();
+  }
+
+  this.armRemoveSelectedOnClick();
+  this.updateSelectedAndOnChange();
+
+  this.render(true);
+};
+
+Tree.prototype.generateSelections = function () {
   // nested objects and arrays
   // [ [options directly under this section], {nested sections}]
   var data = [[], {}];
 
-  function insertOption(path, option) {
+  var sectionDelimiter = this.options.sectionDelimiter;
+
+  var self = this;
+  var id = 0;
+  var keysToAddAtEnd = [];
+  this.$originalSelect.find("> option").each(function () {
+    var option = this;
+    option.setAttribute('data-key', id);
+
+    var section = option.getAttribute('data-section');
+    var path = section && section.length > 0 ? section.split(sectionDelimiter) : [];
+
+    var optionValue = option.value;
+    var optionName = option.text;
+    var optionDescription = option.getAttribute('data-description');
+    var optionIndex = parseInt(option.getAttribute('data-index'));
+    var optionObj = new Option(id, optionValue, optionName, optionDescription, optionIndex, section);
+    if (optionIndex) {
+      self.keysToAdd[optionIndex] = id;
+    } else if (option.hasAttribute('selected')) {
+      keysToAddAtEnd.push(id);
+    }
+    self.selectOptions[id] = optionObj;
+
     var currentPosition = data;
     for (var ii = 0; ii < path.length; ++ii) {
       if (!currentPosition[1][path[ii]]) {
@@ -75,64 +147,60 @@ function generateSelections($originalSelect, $selectionContainer, options) {
       }
       currentPosition = currentPosition[1][path[ii]];
     }
-    currentPosition[0].push(option);
-  }
+    currentPosition[0].push(optionObj);
 
-  $originalSelect.find("> option").each(function() {
-    var $option = $(this);
-    var section = $option.attr('data-section');
-    var path = (section && section.length > 0) ? section.split(options.sectionDelimiter) : [];
-
-    var optionValue = $option.val();
-    var optionName = $option.text();
-    var optionDescription = $option.attr('data-description');
-    var optionIndex = $option.attr('data-index');
-    var option = new Option(optionValue, optionName, optionDescription, optionIndex);
-    insertOption(path, option);
+    ++id;
   });
+  this.keysToAdd = Util.arrayUniq(Util.arrayRemoveFalseyExceptZero(this.keysToAdd).concat(keysToAddAtEnd));
 
-  fillSelections($selectionContainer, data);
-}
+  return data;
+};
 
-function fillSelections($selectionContainer, data) {
-  function createSection($sectionContainer, title) {
-    var $section = $("<div class='section'><div class='title'>" + title + "</div></div>");
-    $sectionContainer.append($section);
-    return $section;
-  }
-
-  function createSelection($itemContainer, option) {
-    var text = option.text;
-    var value = option.value;
-    var description = option.description;
-    var index = option.index;
-
-    var $selection = $("<div class='item'>" + (text || value) + "</div>");
-    $selection.attr({
-      'data-value': value,
-      'data-description': description,
-      'data-index': index
-    });
-    $itemContainer.append($selection);
-    return $selection;
-  }
-
+Tree.prototype.generateHtmlFromData = function (data) {
+  // returns array, 0th el is number of options, 1st el is HTML string
+  var str = "";
   for (var ii = 0; ii < data[0].length; ++ii) {
-    createSelection($selectionContainer, data[0][ii]);
+    var option = data[0][ii];
+
+    var optionLabelCheckboxId = 'treemultiselect-' + option.id;
+    var descriptionStr = option.description ? ' data-description=\'' + option.description + '\'' : "";
+    var indexStr = option.initialIndex ? ' data-index=\'' + option.initialIndex + '\'' : "";
+    var optionCheckboxStr = "";
+    var optionLabelStr = "";
+    if (!this.options.onlyBatchSelection) {
+      optionCheckboxStr += '<input class=\'option\' type=\'checkbox\' id=\'' + optionLabelCheckboxId + '\'';
+      if (this.options.freeze) {
+        optionCheckboxStr += " disabled";
+      }
+      optionCheckboxStr += "/>";
+      optionLabelStr += '<label for=\'' + optionLabelCheckboxId + '\'>' + (option.text || option.value) + '</label>';
+    } else {
+      optionLabelStr += '' + (option.text || option.value);
+    }
+    var descriptionPopupStr = option.description ? "<span class='description'>?</span>" : "";
+
+    str += '<div class=\'item\' data-key=\'' + option.id + '\'data-value=\'' + option.value + '\'' + descriptionStr + indexStr + '>' + optionCheckboxStr + descriptionPopupStr + optionLabelStr + '</div>';
   }
+
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
-    var $section = createSection($selectionContainer, keys[jj]);
-    fillSelections($section, data[1][keys[jj]]);
+    var sectionCheckboxStr = "";
+    if (this.options.onlyBatchSelection || this.options.allowBatchSelection) {
+      sectionCheckboxStr += "<input class='section' type='checkbox'";
+      if (this.options.freeze) {
+        sectionCheckboxStr += " disabled";
+      }
+      sectionCheckboxStr += "/>";
+    }
+
+    var generatedData = this.generateHtmlFromData(data[1][keys[jj]]);
+    str += '<div class=\'section\'><div class=\'title\'>' + sectionCheckboxStr + keys[jj] + '</div>' + generatedData + '</div>';
   }
-}
+  return str;
+};
 
-function addDescriptionHover($selectionContainer) {
-  var $description = $("<span class='description'>?</span>");
-  var targets = $selectionContainer.find("div.item[data-description!=''][data-description]");
-  $description.prependTo(targets);
-
-  $("div.item > span.description").unbind().mouseenter(function() {
+Tree.prototype.popupDescriptionHover = function () {
+  this.$selectionContainer.on("mouseenter", "div.item > span.description", function () {
     var $item = $(this).parent();
     var description = $item.attr('data-description');
 
@@ -143,110 +211,82 @@ function addDescriptionHover($selectionContainer) {
     descriptionDiv.style.position = 'absolute';
 
     $item.append(descriptionDiv);
-  }).mouseleave(function() {
+  });
+
+  this.$selectionContainer.on("mouseleave", "div.item > span.description", function () {
     var $item = $(this).parent();
     $item.find("div.temp-description-popup").remove();
   });
-}
+};
 
-function addCheckboxes($selectionContainer, options) {
-  var $checkbox = $('<input />', { type: 'checkbox' });
-  if (options.freeze) {
-    $checkbox.attr('disabled', 'disabled');
-  }
-
-  var $targets = null;
-  if (options.onlyBatchSelection) {
-    $targets = $selectionContainer.find("div.title");
-  } else if (options.allowBatchSelection) {
-    $targets = $selectionContainer.find("div.title, div.item");
-  } else {
-    $targets = $selectionContainer.find("div.item");
-  }
-
-  $checkbox.prependTo($targets);
-}
-
-function checkPreselectedSelections($originalSelect, $selectionContainer) {
-  var selectedOptions = $originalSelect.val();
-  if (!selectedOptions) return;
-
-  var $selectedOptionDivs = $selectionContainer.find("div.item").filter(function() {
-    var item = $(this);
-    return selectedOptions.indexOf(item.attr('data-value')) !== -1;
-  });
-  $selectedOptionDivs.find("> input[type=checkbox]").prop('checked', true);
-}
-
-function armTitleCheckboxes($selectionContainer) {
-  $selectionContainer.on("change", "div.title > input[type=checkbox]", function() {
-    var $titleCheckbox = $(this);
-    var $section = $titleCheckbox.closest("div.section");
-    var $checkboxesToBeChanged = $section.find("input[type=checkbox]");
-    var checked = $titleCheckbox.is(':checked');
-    $checkboxesToBeChanged.prop('checked', checked);
-  });
-}
-
-function uncheckParentsOnUnselect($selectionContainer) {
-  $selectionContainer.on("change", "input[type=checkbox]", function() {
-    var $checkbox = $(this);
-    if ($checkbox.is(":checked")) return;
-    var $sectionParents = $checkbox.parentsUntil($selectionContainer, "div.section");
-    $sectionParents.find("> div.title > input[type=checkbox]").prop('checked', false);
-  });
-}
-
-function checkParentsOnAllChildrenSelected($selectionContainer) {
-  function check() {
-    var sections = $selectionContainer.find("div.section");
-    sections.each(function() {
-      var $section = $(this);
-      var $sectionItems = $section.find("div.item");
-      var $unselectedItems = $sectionItems.filter(function() {
-        var $checkbox = $(this).find("> input[type=checkbox]");
-        return !($checkbox.is(":checked"));
-      });
-      if ($unselectedItems.length === 0) {
-        var sectionCheckbox = $(this).find("> div.title > input[type=checkbox]");
-        sectionCheckbox.prop('checked', true);
-      }
+Tree.prototype.handleSectionCheckboxMarkings = function () {
+  var self = this;
+  this.$selectionContainer.on("change", "input.section[type=checkbox]", function () {
+    var $section = $(this).closest("div.section");
+    var $items = $section.find("div.item");
+    var keys = [];
+    $items.each(function (idx, el) {
+      keys.push(Util.getKey(el));
     });
+    if (this.checked) {
+      self.keysToAdd = Util.arrayUniq(self.keysToAdd.concat(keys));
+    } else {
+      self.keysToRemove = Util.arrayUniq(self.keysToRemove.concat(keys));
+    }
+    self.render();
+  });
+};
+
+Tree.prototype.redrawSectionCheckboxes = function ($section) {
+  $section = $section || this.$selectionContainer;
+
+  // returns array; 0th el is all children are true, 1st el is all children are false
+  var returnVal = [true, true];
+  var $childCheckboxes = $section.find("> div.item > input[type=checkbox]");
+  $childCheckboxes.each(function () {
+    if (this.checked) {
+      returnVal[1] = false;
+    } else {
+      returnVal[0] = false;
+    }
+  });
+
+  var self = this;
+  var $childSections = $section.find("> div.section");
+  $childSections.each(function () {
+    var result = self.redrawSectionCheckboxes($(this));
+    returnVal[0] = returnVal[0] && result[0];
+    returnVal[1] = returnVal[1] && result[1];
+  });
+
+  var sectionCheckbox = $section.find("> div.title > input[type=checkbox]");
+  if (sectionCheckbox.length) {
+    sectionCheckbox = sectionCheckbox[0];
+    if (returnVal[0]) {
+      sectionCheckbox.checked = true;
+      sectionCheckbox.indeterminate = false;
+    } else if (returnVal[1]) {
+      sectionCheckbox.checked = false;
+      sectionCheckbox.indeterminate = false;
+    } else {
+      sectionCheckbox.checked = false;
+      sectionCheckbox.indeterminate = true;
+    }
   }
 
-  Util.onCheckboxChange($selectionContainer, check);
-}
+  return returnVal;
+};
 
-function showSemifilledParents($selectionContainer) {
-  function check() {
-    var sections = $selectionContainer.find("div.section");
-    sections.each(function() {
-      var $section = $(this);
-      var $items = $section.find("div.item");
-      var numSelected = $items.filter(function() {
-        var item = $(this);
-        return item.find("> input[type=checkbox]").prop('checked');
-      }).length;
-
-      var $sectionCheckbox = $section.find("> div.title > input[type=checkbox]");
-      var isIndeterminate = (numSelected !== 0 && numSelected !== $items.length);
-      $sectionCheckbox.prop('indeterminate', isIndeterminate);
-    });
-  }
-
-  Util.onCheckboxChange($selectionContainer, check);
-}
-
-function addCollapsibility($selectionContainer, options) {
+Tree.prototype.addCollapsibility = function () {
   var hideIndicator = "-";
   var expandIndicator = "+";
 
   var titleSelector = "div.title";
-  var $titleDivs = $selectionContainer.find(titleSelector);
+  var $titleDivs = this.$selectionContainer.find(titleSelector);
 
   var collapseDiv = document.createElement('span');
   collapseDiv.className = "collapse-section";
-  if (options.startCollapsed) {
+  if (this.options.startCollapsed) {
     $(collapseDiv).text(expandIndicator);
     $titleDivs.siblings().toggle();
   } else {
@@ -254,253 +294,304 @@ function addCollapsibility($selectionContainer, options) {
   }
   $titleDivs.prepend(collapseDiv);
 
-  $selectionContainer.on("click", titleSelector, function() {
+  this.$selectionContainer.on("click", titleSelector, function (event) {
+    if (event.target.nodeName == "INPUT") {
+      return;
+    }
+
     var $collapseSection = $(this).find("> span.collapse-section");
     var indicator = $collapseSection.text();
-    $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
+    $collapseSection.text(indicator == hideIndicator ? expandIndicator : hideIndicator);
     var $title = $collapseSection.parent();
     $title.siblings().toggle();
   });
-}
+};
 
-function createSelectAllButtons($selectionContainer, options) {
+Tree.prototype.createSelectAllButtons = function () {
   var $selectAll = $("<span class='select-all'></span>");
-  $selectAll.text(options.selectAllText);
+  $selectAll.text(this.options.selectAllText);
   var $unselectAll = $("<span class='unselect-all'></span>");
-  $unselectAll.text(options.unselectAllText);
+  $unselectAll.text(this.options.unselectAllText);
 
   var $selectAllContainer = $("<div class='select-all-container'></div>");
 
   $selectAllContainer.prepend($unselectAll);
   $selectAllContainer.prepend($selectAll);
 
-  $selectionContainer.prepend($selectAllContainer);
+  this.$selectionContainer.prepend($selectAllContainer);
 
-  $selectionContainer.on("click", "span.select-all", function() {
-    handleCheckboxes(true);
+  var self = this;
+  this.$selectionContainer.on("click", "span.select-all", function () {
+    for (var ii = 0; ii < self.selectOptions.length; ++ii) {
+      self.keysToAdd.push(ii);
+    }
+    self.keysToAdd = Util.arrayUniq(self.keysToAdd);
+    self.render();
   });
 
-  $selectionContainer.on("click", "span.unselect-all", function() {
-    handleCheckboxes(false);
+  this.$selectionContainer.on("click", "span.unselect-all", function () {
+    self.keysToRemove = Util.arrayUniq(self.keysToRemove.concat(self.selectedKeys));
+    self.render();
+  });
+};
+
+Tree.prototype.armRemoveSelectedOnClick = function () {
+  var self = this;
+  this.$selectedContainer.on("click", "span.remove-selected", function () {
+    var parentNode = this.parentNode;
+    var key = Util.getKey(parentNode);
+    self.keysToRemove.push(key);
+    self.render();
+  });
+};
+
+Tree.prototype.updateSelectedAndOnChange = function () {
+  var self = this;
+  this.$selectionContainer.on("change", "input.option[type=checkbox]", function (event) {
+    var checkbox = this;
+    var selection = checkbox.parentNode;
+    var key = Util.getKey(selection);
+    Util.assert(key || key === 0);
+
+    if (checkbox.checked) {
+      self.keysToAdd.push(key);
+    } else {
+      self.keysToRemove.push(key);
+    }
+
+    self.render();
   });
 
-  function handleCheckboxes(checked) {
-    var $checkboxes = $selectionContainer.find("input[type=checkbox]");
-    $checkboxes.prop('checked', checked);
-    $checkboxes.first().change();
-  }
-}
+  if (this.options.sortable && !this.options.freeze) {
+    var startIndex = null;
+    var endIndex = null;
+    this.$selectedContainer.sortable({
+      start: function start(event, ui) {
+        startIndex = ui.item.index();
+      },
 
-function updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options) {
-  function createSelectedDiv(selection) {
-    var text = selection.text;
-    var value = selection.value;
-    var sectionName = selection.sectionName;
-
-    var item = document.createElement('div');
-    item.className = "item";
-    item.innerHTML = text;
-
-    if (options.showSectionOnSelected) {
-      var $sectionSpan = $("<span class='section-name'></span>");
-      $sectionSpan.text(sectionName);
-      $(item).append($sectionSpan);
-    }
-
-    if (!options.freeze) {
-      $(item).prepend("<span class='remove-selected'>×</span>");
-    }
-
-    $(item).attr('data-value', value)
-      .appendTo($selectedContainer);
-  }
-
-  function addNewFromSelected(selections) {
-    var currentSelections = [];
-    $selectedContainer.find("div.item").each(function() {
-      currentSelections.push($(this).attr('data-value'));
-    });
-
-    var selectionsNotYetAdded = selections.filter(function(selection) {
-      return currentSelections.indexOf(selection.value) == -1;
-    });
-
-    selectionsNotYetAdded.forEach(function(selection) {
-      createSelectedDiv(selection);
-    });
-
-    armRemoveSelectedOnClick($selectionContainer, $selectedContainer);
-
-    return selectionsNotYetAdded;
-  }
-
-  function removeOldFromSelected(selections) {
-    var selectionTexts = [];
-    selections.forEach(function(selection) {
-      selectionTexts.push(selection.value);
-    });
-
-    var removedValues = [];
-
-    $selectedContainer.find("div.item").each(function(index, el) {
-      var $item = $(el);
-      var value = $item.attr('data-value');
-      if (selectionTexts.indexOf(value) == -1) {
-        removedValues.push(value);
-        $item.remove();
-      }
-    });
-
-    var unselectedSelections = [];
-    var allSelections = $selectionContainer.find("div.item");
-    allSelections.each(function() {
-      var $this = $(this);
-      if (removedValues.indexOf($this.attr('data-value')) !== -1) {
-        unselectedSelections.push(elToSelectionObject($this));
-      }
-    });
-    return unselectedSelections;
-  }
-
-  function updateOriginalSelect() {
-    var selected = [];
-    $selectedContainer.find("div.item").each(function() {
-      selected.push($(this).attr('data-value'));
-    });
-
-    $originalSelect.val(selected).change();
-
-    $originalSelect.html($originalSelect.find("option").sort(function(a, b) {
-      var aValue = selected.indexOf($(a).attr('value'));
-      var bValue = selected.indexOf($(b).attr('value'));
-
-      if (aValue > bValue) return 1;
-      if (aValue < bValue) return -1;
-      return 0;
-    }));
-  }
-
-  function elToSelectionObject($el) {
-    var text = Util.textOf($el);
-    var value = $el.attr('data-value');
-    var initialIndex = $el.attr('data-index');
-    $el.attr('data-index', undefined);
-
-    var sectionName = $.map($el.parentsUntil($selectionContainer, "div.section").get().reverse(), function(parentSection) {
-      return Util.textOf($(parentSection).find("> div.title"));
-    }).join(options.sectionDelimiter);
-
-    return {
-      text: text,
-      value: value,
-      initialIndex: initialIndex,
-      sectionName: sectionName
-    };
-  }
-
-  var initialRun = true;
-  function update() {
-    var $selectedBoxes = $selectionContainer.find("div.item").has("> input[type=checkbox]:checked");
-    var selections = [];
-
-    $selectedBoxes.each(function() {
-      var $el = $(this);
-      selections.push(elToSelectionObject($el));
-    });
-
-    selections.sort(function(a, b) {
-      var aIndex = parseInt(a.initialIndex);
-      var bIndex = parseInt(b.initialIndex);
-      if (aIndex > bIndex) return 1;
-      if (aIndex < bIndex) return -1;
-      return 0;
-    });
-
-    var newlyAddedSelections = addNewFromSelected(selections);
-    var newlyRemovedSelections = removeOldFromSelected(selections);
-    updateOriginalSelect();
-
-    if (initialRun) {
-      initialRun = false;
-    } else if (options.onChange) {
-      options.onChange(selections, newlyAddedSelections, newlyRemovedSelections);
-    }
-
-    if (options.sortable && !options.freeze) {
-      $selectedContainer.sortable({
-        update: function(event, ui) {
-          updateOriginalSelect();
+      stop: function stop(event, ui) {
+        endIndex = ui.item.index();
+        if (startIndex === endIndex) {
+          return;
         }
-      });
+        Util.arrayMoveEl(self.selectedKeys, startIndex, endIndex);
+        self.render();
+      }
+    });
+  }
+};
+
+Tree.prototype.render = function (noCallbacks) {
+  var _this = this;
+
+  // fix arrays first
+  this.keysToAdd = Util.arraySubtract(this.keysToAdd, this.selectedKeys);
+  this.keysToRemove = Util.arrayIntersect(this.keysToRemove, this.selectedKeys);
+
+  // remove items first
+  var self = this;
+  var $selectionItems = this.$selectionContainer.find("div.item");
+
+  // remove the selected divs
+  this.$selectedContainer.find("div.item").filter(function () {
+    var key = Util.getKey(this);
+    return self.keysToRemove.indexOf(key) !== -1;
+  }).remove();
+
+  // uncheck these checkboxes
+  $selectionItems.filter(function () {
+    var key = Util.getKey(this);
+    return self.keysToRemove.indexOf(key) !== -1;
+  }).find("> input[type=checkbox]").prop('checked', false);
+
+  this.selectedKeys = Util.arraySubtract(this.selectedKeys, this.keysToRemove);
+
+  // now add items
+  var domStr = "";
+  for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
+    var key = this.keysToAdd[jj];
+    var option = this.selectOptions[key];
+    this.selectedKeys.push(key);
+
+    var freezeStr = this.options.freeze ? '' : "<span class='remove-selected'>×</span>";
+    var sectionNameStr = this.options.showSectionOnSelected ? '<span class=\'section-name\'>' + option.section + '</span>' : '';
+    domStr += '<div class=\'item\' data-key=\'' + option.id + '\' data-value=\'' + option.value + '\'>' + freezeStr + sectionNameStr + option.text + '</div>';
+  }
+  this.$selectedContainer.append(domStr);
+
+  // check the checkboxes
+  $selectionItems.filter(function () {
+    var key = Util.getKey(this);
+    return self.keysToAdd.indexOf(key) !== -1;
+  }).find("> input[type=checkbox]").prop('checked', true);
+
+  this.selectedKeys = Util.arrayUniq(this.selectedKeys.concat(this.keysToAdd));
+
+  // redraw section checkboxes
+  this.redrawSectionCheckboxes();
+
+  // now fix original select
+  var originalValsHash = {};
+  // valHash hashes a value to an index
+  var valHash = {};
+  for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
+    var value = this.selectOptions[this.selectedKeys[ii]].value;
+    originalValsHash[this.selectedKeys[ii]] = true;
+    valHash[value] = ii;
+  }
+  // TODO is there a better way to sort the values other than by HTML?
+  var options = this.$originalSelect.find("option").toArray();
+  options.sort(function (a, b) {
+    var aValue = valHash[a.value] || 0;
+    var bValue = valHash[b.value] || 0;
+    return aValue - bValue;
+  });
+
+  this.$originalSelect.html(options);
+  this.$originalSelect.find("option").each(function (idx, el) {
+    if (originalValsHash[Util.getKey(el)]) {
+      this.selected = true;
+    } else {
+      this.selected = false;
+    }
+  });
+  // NOTE: the following does not work since jQuery duplicates option values with the same value
+  //this.$originalSelect.val(vals).change();
+  this.$originalSelect.change();
+
+  if (!noCallbacks && this.options.onChange) {
+    var optionsSelected = this.selectedKeys.map(function (key) {
+      return _this.selectOptions[key];
+    });
+    var optionsAdded = this.keysToAdd.map(function (key) {
+      return _this.selectOptions[key];
+    });
+    var optionsRemoved = this.keysToRemove.map(function (key) {
+      return _this.selectOptions[key];
+    });
+    this.options.onChange(optionsSelected, optionsAdded, optionsRemoved);
+  }
+
+  this.keysToRemove = [];
+  this.keysToAdd = [];
+};
+
+module.exports = Tree;
+
+},{"./option":2,"./ui-builder":5,"./utility":6}],5:[function(require,module,exports){
+"use strict";
+
+module.exports = function ($el, hideSidePanel) {
+  var $tree = $("<div class='tree-multiselect'></div>");
+
+  var $selections = $("<div class='selections'></div>");
+  if (hideSidePanel) {
+    $selections.addClass("no-border");
+  }
+  $tree.append($selections);
+
+  var $selected = $("<div class='selected'></div>");
+  if (!hideSidePanel) {
+    $tree.append($selected);
+  }
+
+  $el.after($tree);
+
+  this.$tree = $tree;
+  this.$selectionContainer = $selections;
+  this.$selectedContainer = $selected;
+};
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+function assert(bool, message) {
+  if (!bool) {
+    throw new Error(message || "Assertion failed");
+  }
+}
+
+function getKey(el) {
+  assert(el);
+  var item = el.attributes.getNamedItem("data-key");
+  if (item) {
+    return parseInt(item.value);
+  } else {
+    return null;
+  }
+}
+
+function arraySubtract(arr1, arr2) {
+  var hash = {};
+  var returnArr = [];
+  for (var ii = 0; ii < arr2.length; ++ii) {
+    hash[arr2[ii]] = true;
+  }
+  for (var jj = 0; jj < arr1.length; ++jj) {
+    if (!hash[arr1[jj]]) {
+      returnArr.push(arr1[jj]);
     }
   }
-
-  Util.onCheckboxChange($selectionContainer, update);
+  return returnArr;
 }
 
-function armRemoveSelectedOnClick($selectionContainer, $selectedContainer) {
-  $selectedContainer.on("click", "span.remove-selected", function() {
-    var value = $(this).parent().attr('data-value');
-    var $matchingSelection = $selectionContainer.find("div.item[data-value='" + value + "']");
-    var $matchingCheckbox = $matchingSelection.find("> input[type=checkbox]");
-    $matchingCheckbox.prop('checked', false);
-    $matchingCheckbox.change();
-  });
+function arrayUniq(arr) {
+  var hash = {};
+  var newArr = [];
+  for (var ii = 0; ii < arr.length; ++ii) {
+    if (!hash[arr[ii]]) {
+      hash[arr[ii]] = true;
+      newArr.push(arr[ii]);
+    }
+  }
+  return newArr;
 }
 
-module.exports = treeMultiselect;
-
-},{"./option":2,"./ui-builder":4,"./utility":5}],2:[function(require,module,exports){
-module.exports = function(value, text, description, index) {
-  this.value = value;
-  this.text = text;
-  this.description = description;
-  this.index = index;
-};
-
-
-},{}],3:[function(require,module,exports){
-(($) => {
-  "use strict";
-  $.fn.treeMultiselect = require('./main');
-})(jQuery);
-
-},{"./main":1}],4:[function(require,module,exports){
-module.exports = function($el, hideSidePanel) {
-  var tree = document.createElement('div');
-  tree.className = "tree-multiselect";
-  $el.after(tree);
-
-  var selections = document.createElement('div');
-  selections.className = "selections";
-  if (hideSidePanel) {
-    selections.className += " no-border";
+function arrayRemoveFalseyExceptZero(arr) {
+  var newArr = [];
+  for (var ii = 0; ii < arr.length; ++ii) {
+    if (arr[ii] || arr[ii] === 0) {
+      newArr.push(arr[ii]);
+    }
   }
-  $(tree).append(selections);
+  return newArr;
+}
 
-  var selected = document.createElement('div');
-  selected.className = "selected";
-  if (!hideSidePanel) {
-    $(tree).append(selected);
+function arrayMoveEl(arr, oldPos, newPos) {
+  var el = arr[oldPos];
+  arr.splice(oldPos, 1);
+  arr.splice(newPos, 0, el);
+}
+
+function arrayIntersect(arr, arrExcluded) {
+  var newArr = [];
+  var hash = {};
+  for (var ii = 0; ii < arrExcluded.length; ++ii) {
+    hash[arrExcluded[ii]] = true;
   }
+  for (var jj = 0; jj < arr.length; ++jj) {
+    if (hash[arr[jj]]) {
+      newArr.push(arr[jj]);
+    }
+  }
+  return newArr;
+}
 
-  this.tree = tree;
-  this.selections = selections;
-  this.selected = selected;
-};
-
-},{}],5:[function(require,module,exports){
 module.exports = {
-  onCheckboxChange($selectionContainer, callback) {
-    $selectionContainer.on("change", "input[type=checkbox]", function() {
-      callback();
-    });
-    callback();
-  },
+  assert: assert,
 
-  textOf(el) {
-    return $(el).clone().children().remove().end().text();
-  }
+  getKey: getKey,
+
+  arraySubtract: arraySubtract,
+
+  arrayUniq: arrayUniq,
+
+  arrayRemoveFalseyExceptZero: arrayRemoveFalseyExceptZero,
+
+  arrayMoveEl: arrayMoveEl,
+
+  arrayIntersect: arrayIntersect
 };
 
 },{}]},{},[3]);

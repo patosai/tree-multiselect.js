@@ -28,6 +28,10 @@ div.tree-multiselect {
 
     div.item {
       margin-left: 16px;
+
+      label {
+        cursor: pointer;
+      }
     }
 
     &.no-border {

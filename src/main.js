@@ -9,15 +9,8 @@ var treeMultiselect = function(opts) {
     var $originalSelect = $(this);
     $originalSelect.attr('multiple', '').css('display', 'none');
 
-    var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
-
-    var $selectionContainer = uiBuilder.$selectionContainer;
-    var $selectedContainer = uiBuilder.$selectedContainer;
-    //updateSelectedAndOnChange($selectionContainer, $selectedContainer, $originalSelect, options);
-
-    var tree = new Tree($originalSelect, uiBuilder.$selectionContainer, uiBuilder.$selectedContainer, options);
+    var tree = new Tree($originalSelect, options);
     tree.initialize();
-
   });
 
   return this;

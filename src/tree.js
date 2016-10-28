@@ -1,10 +1,14 @@
 var Option = require('./option');
+var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
-function Tree($originalSelect, $selectionContainer, $selectedContainer, options) {
+function Tree($originalSelect, options) {
   this.$originalSelect = $originalSelect;
-  this.$selectionContainer = $selectionContainer;
-  this.$selectedContainer = $selectedContainer;
+
+  var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
+  this.$selectionContainer = uiBuilder.$selectionContainer;
+  this.$selectedContainer = uiBuilder.$selectedContainer;
+
   this.options = options;
 
   this.selectOptions = [];

@@ -90,7 +90,7 @@ describe('Adding and Removing', () => {
     var $selectedItems = Common.getSelected();
     assert.equal($selectedItems.length, 2);
 
-    Common.assertSelectedItem($selectedItems[0], {text: 'One2', value: 'two', section: 'section'});
+    Common.assertSelectedItem($selectedItems[0], {text: 'One2', value: 'one', section: 'section'});
     Common.assertSelectedItem($selectedItems[1], {text: 'One3', value: 'one', section: 'section'});
     assert.deepEqual($("select").val(), ['one', 'one']);
   });

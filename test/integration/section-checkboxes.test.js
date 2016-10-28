@@ -73,63 +73,47 @@ describe('Section checkboxes', () => {
     $("select").append("<option value='two' data-section='top'>Two</option>");
     $("select").treeMultiselect();
 
-    assert.equal($("div.title > input[type=checkbox]").length, 3);
-    assert.equal($("div.item > input[type=checkbox]").length, 2);
-    assert.equal($("input[type=checkbox]").length, 5);
-    assert.equal($("input[type=checkbox]:checked").length, 0);
+    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('top')).prop('checked'));
+    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('middle')).prop('checked'));
+    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('inner')).prop('checked'));
+
+    assert.notOk(Common.selectionCheckbox(Common.getSelectionsWithText('One')).prop('checked'));
 
     var $middleSection = Common.getSectionsWithTitle('middle');
+    Common.sectionCheckbox($middleSection).click();
 
-    $middleSection.find("> div.title > input[type=checkbox]").click();
+    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('top')).prop('checked'));
+    assert(Common.sectionCheckbox(Common.getSectionsWithTitle('middle')).prop('checked'));
+    assert(Common.sectionCheckbox(Common.getSectionsWithTitle('inner')).prop('checked'));
 
-    assert.equal($("div.title > input[type=checkbox]:checked").length, 2);
-    assert.equal($("div.item > input[type=checkbox]:checked").length, 1);
-    assert.equal($("input[type=checkbox]:checked").length, 3);
+    assert(Common.selectionCheckbox(Common.getSelectionsWithText('One')).prop('checked'));
+  });
+
+  it('checkbox is indeterminate when some children are selected', () => {
+    $("select").append("<option value='one' data-section='top/middle/inner' selected>One</option>");
+    $("select").append("<option value='two' data-section='top'>Two</option>");
+    $("select").treeMultiselect();
+
+    var $topCheckbox = Common.sectionCheckbox(Common.getSectionsWithTitle('top'));
+    assert.notOk($topCheckbox.prop('checked'));
+    assert($topCheckbox.prop('indeterminate'));
+  });
+
+  it('checkbox is not indeterminate when all children are selected', () => {
+    $("select").append("<option value='one' data-section='top' selected>One</option>");
+    $("select").append("<option value='two' data-section='top' selected>Two</option>");
+    $("select").treeMultiselect();
+
+    var $titleCheckbox = Common.sectionCheckbox(Common.getSectionsWithTitle('top'));
+    assert.notOk($titleCheckbox.prop('indeterminate'));
+  });
+
+  it('checkbox is not indeterminate when no children are selected', () => {
+    $("select").append("<option value='one' data-section='top'>One</option>");
+    $("select").append("<option value='two' data-section='top'>Two</option>");
+    $("select").treeMultiselect();
+
+    var $titleCheckbox = Common.sectionCheckbox(Common.getSectionsWithTitle('top'));
+    assert.notOk($titleCheckbox.prop('indeterminate'));
   });
 });
-
-//QUnit.test("title checkbox is indeterminate when some but not all options are selected", function(assert) {
-  //$("select").append("<option value='one' data-section='top'>One</option>");
-  //$("select").append("<option value='two' data-section='top' selected='selected'>Two</option>");
-  //$("select").treeMultiselect();
-
-  //var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
-  //assert.equal(titleCheckbox.length, 1);
-  //assert.ok(titleCheckbox.prop('indeterminate'));
-//});
-
-//QUnit.test("title checkbox turns indeterminate when some options are selected", function(assert) {
-  //$("select").append("<option value='one' data-section='top'>One</option>");
-  //$("select").append("<option value='two' data-section='top'>Two</option>");
-  //$("select").treeMultiselect();
-
-  //var lastCheckbox = $("div.selections").find("div.item > input[type=checkbox]").last();
-  //lastCheckbox.prop('checked', true).trigger('change');
-
-  //var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
-  //assert.ok(titleCheckbox.prop('indeterminate'));
-//});
-
-//QUnit.test("title checkbox is not indeterminate when all options are selected", function(assert) {
-  //$("select").append("<option value='one' data-section='top'>One</option>");
-  //$("select").append("<option value='two' data-section='top'>Two</option>");
-  //$("select").treeMultiselect();
-
-  //var checkboxes = $("div.selections").find("input[type=checkbox]");
-  //checkboxes.prop('checked', true).trigger('change');
-
-  //var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
-  //assert.ok(!(titleCheckbox.prop('indeterminate')));
-//});
-
-//QUnit.test("title checkbox is not indeterminate when no options are selected", function(assert) {
-  //$("select").append("<option value='one' data-section='top'>One</option>");
-  //$("select").append("<option value='two' data-section='top' selected='selected'>Two</option>");
-  //$("select").treeMultiselect();
-
-  //var checkedCheckboxes = $("div.selections").find("input[type=checkbox]:checked");
-  //checkedCheckboxes.prop('checked', false).trigger('change');
-
-  //var titleCheckbox = $("div.selections").find("div.title > input[type=checkbox]");
-  //assert.ok(!(titleCheckbox.prop('indeterminate')));
-//});

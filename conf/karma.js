@@ -24,10 +24,7 @@ module.exports = function(config) {
       'test/vendor/jquery-1.11.3.min.js',
       'test/vendor/jquery-ui.min.js',
       'src/tree-multiselect.js',
-      'test/integration/initial-load.test.js',
-      'test/integration/adding-removing.test.js',
-      'test/integration/options.test.js',
-      'test/integration/section-checkboxes.test.js'
+      'test/integration/*.test.js'
     ],
 
     exclude: [],
@@ -35,7 +32,7 @@ module.exports = function(config) {
     preprocessors: {
       // browserify handles istanbul coverage
       'src/tree-multiselect.js': ['browserify'],
-      'test/**/*.test.js': ['browserify']
+      'test/integration/*.test.js': ['browserify']
     },
 
     reporters: ['mocha', 'coverage'],

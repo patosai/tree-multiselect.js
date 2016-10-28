@@ -1,3 +1,5 @@
+chai.config.includeStack = true;
+
 beforeEach(() => {
   var $fixture = $("#fixture");
   if (!$fixture.length) {
@@ -13,6 +15,23 @@ beforeEach(() => {
 });
 
 module.exports = {
+  assertSelectionItem(el, params) {
+    var $el = $(el);
+    assert($el.hasClass('item'));
+    assert.equal(this.textOf($el), params.text);
+    assert.equal($el.attr('data-value'), params.value);
+  },
+
+  assertSelectedItem(el, params) {
+    var $el = $(el);
+    assert($el.hasClass('item'));
+    assert.equal(this.textOf($el), params.text);
+    assert.equal($el.attr('data-value'), params.value);
+    var $sectionName = $el.children(".section-name");
+    assert.equal($sectionName.length, 1);
+    assert.equal(this.textOf($sectionName), params.section);
+  },
+
   attributeOf(el, key) {
     return $(el).attr(key);
   },
@@ -57,21 +76,16 @@ module.exports = {
     }
   },
 
-  assertSelectionItem(el, params) {
-    var $el = $(el);
-    assert($el.hasClass('item'));
-    assert.equal(this.textOf($el), params.text);
-    assert.equal($el.attr('data-value'), params.value);
+  sectionTitle(section) {
+    return this.textOf($(section).children("div.title"));
   },
 
-  assertSelectedItem(el, params) {
-    var $el = $(el);
-    assert($el.hasClass('item'));
-    assert.equal(this.textOf($el), params.text);
-    assert.equal($el.attr('data-value'), params.value);
-    var $sectionName = $el.children(".section-name");
-    assert.equal($sectionName.length, 1);
-    assert.equal(this.textOf($sectionName), params.section);
+  sectionCheckbox(section) {
+    return $(section).children("div.title").children("input.section[type=checkbox]");
+  },
+
+  selectionCheckbox(selection) {
+    return $(selection).children("input.option[type=checkbox]");
   }
 };
 

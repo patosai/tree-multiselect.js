@@ -134,7 +134,7 @@ describe('Options', () => {
     $("select").append("<option value='one' data-section='test'>One</option>");
     $("select").treeMultiselect();
 
-    $("div#qunit-fixture").append("<select id='frozen'></select>");
+    $("#fixture").append("<select id='frozen'></select>");
     $("select#frozen").append("<option value='two' data-section='anothertest' selected='selected'>Two</option>");
     var options = {
       freeze: true
@@ -153,8 +153,8 @@ describe('Options', () => {
 
     var $unfrozenSelection = Common.getSelectedWithText("One");
     assert.equal($unfrozenSelection.length, 1);
-    assert.equal($("select").val(), ['one']);
-    assert.equal($("select#frozen").val(), ['two']);
+    assert.deepEqual($("select").val(), ['one']);
+    assert.deepEqual($("select#frozen").val(), ['two']);
   });
 
   it('hides side panel', () => {
@@ -191,12 +191,12 @@ describe('Options', () => {
                     var selection = expectedSecondSelections[i];
                     assert.equal(selection.text, 'Two');
                     assert.equal(selection.value, 'two');
-                    assert.equal(selection.initialIndex, undefined);
+                    assert(isNaN(selection.initialIndex));
                     assert.equal(selection.section, 'test');
                   }
                   assert.equal(all[0].text, 'One');
                   assert.equal(all[0].value, 'one');
-                  assert.equal(all[0].initialIndex, undefined);
+                  assert(isNaN(all[0].initialIndex));
                   assert.equal(all[0].section, 'test');
                   done();
                 }
@@ -215,10 +215,10 @@ describe('Options', () => {
 
     assert.deepEqual($("select").val(), ['one', 'two']);
 
-    var $selections = Common.getSelections();
-    assert.equal($selections.length, 2);
-    var $one = $selections.first();
-    var $two = $selections.last();
+    var $selected = Common.getSelected();
+    assert.equal($selected.length, 2);
+    var $one = $selected.first();
+    var $two = $selected.last();
 
     assert($("div.selected").sortable('option', 'start'));
     $("div.selected").sortable('option', 'start')(null, {
@@ -238,10 +238,10 @@ describe('Options', () => {
     $("select").append("<option value='two' data-section='test' selected>Two</option>");
     $("select").treeMultiselect({ sortable: true });
 
-    var $selections = Common.getSelections();
-    assert.equal($selections.length, 2);
-    var $one = $selections.first();
-    var $two = $selections.last();
+    var $selected = Common.getSelected();
+    assert.equal($selected.length, 2);
+    var $one = $selected.first();
+    var $two = $selected.last();
 
     Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
     Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
@@ -256,10 +256,10 @@ describe('Options', () => {
       item: $one
     });
 
-    $selections = Common.getSelections();
-    assert.equal($selections.length, 2);
-    var $two = $selections.first();
-    var $one = $selections.last();
+    $selected = Common.getSelected();
+    assert.equal($selected.length, 2);
+    var $two = $selected.first();
+    var $one = $selected.last();
     Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
     Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
   });

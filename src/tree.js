@@ -50,17 +50,15 @@ Tree.prototype.generateSelections = function() {
   var keysToAddAtEnd = [];
   this.$originalSelect.find("> option").each(function() {
     var option = this;
-    var attributes = option.attributes;
-    var sectionItem = attributes.getNamedItem("data-section");
-    var section = sectionItem ? sectionItem.value : null;
+    option.setAttribute('data-key', id);
+
+    var section = option.getAttribute('data-section');
     var path = (section && section.length > 0) ? section.split(sectionDelimiter) : [];
 
     var optionValue = option.value;
     var optionName = option.text;
-    var optionDescriptionItem = attributes.getNamedItem("data-description");
-    var optionDescription = optionDescriptionItem ? optionDescriptionItem.value : null;
-    var optionIndexItem = attributes.getNamedItem("data-index");
-    var optionIndex = optionIndexItem ? parseInt(optionIndexItem.value) : null;
+    var optionDescription = option.getAttribute('data-description');
+    var optionIndex = parseInt(option.getAttribute('data-index'));
     var optionObj = new Option(id, optionValue, optionName, optionDescription, optionIndex, section);
     if (optionIndex) {
       self.keysToAdd[optionIndex] = id;
@@ -360,12 +358,12 @@ Tree.prototype.render = function(noCallbacks) {
   this.redrawSectionCheckboxes();
 
   // now fix original select
-  var vals = [];
+  var originalValsHash = {};
   // valHash hashes a value to an index
   var valHash = {};
   for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
     var value = this.selectOptions[this.selectedKeys[ii]].value;
-    vals.push(value);
+    originalValsHash[this.selectedKeys[ii]] = true;
     valHash[value] = ii;
   }
   // TODO is there a better way to sort the values other than by HTML?
@@ -377,7 +375,16 @@ Tree.prototype.render = function(noCallbacks) {
   });
 
   this.$originalSelect.html(options);
-  this.$originalSelect.val(vals).change();
+  this.$originalSelect.find("option").each(function(idx, el) {
+    if (originalValsHash[Util.getKey(el)]) {
+      this.selected = true;
+    } else {
+      this.selected = false;
+    }
+  });
+  // NOTE: the following does not work since jQuery duplicates option values with the same value
+  //this.$originalSelect.val(vals).change();
+  this.$originalSelect.change();
 
   if (!noCallbacks && this.options.onChange) {
     var optionsSelected = this.selectedKeys.map((key) => {

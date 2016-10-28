@@ -25,6 +25,10 @@ module.exports = {
     return $("div.selected div.item");
   },
 
+  getSections() {
+    return $("div.section");
+  },
+
   textOf(el) {
     var $el = $(el);
     var $label = $el.children("label");

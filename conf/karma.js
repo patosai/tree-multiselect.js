@@ -25,7 +25,8 @@ module.exports = function(config) {
       'test/vendor/jquery-ui.min.js',
       'src/tree-multiselect.js',
       'test/integration/initial-load.test.js',
-      'test/integration/adding-removing.test.js'
+      'test/integration/adding-removing.test.js',
+      'test/integration/options.test.js'
     ],
 
     exclude: [],

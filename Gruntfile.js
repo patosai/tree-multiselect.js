@@ -24,7 +24,7 @@ module.exports = function(grunt) {
         force: true
       },
       ci: {
-        src: 'tmp/coverage/**/lcov.info'
+        src: 'coverage/**/lcov.info'
       }
     },
 

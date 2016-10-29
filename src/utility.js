@@ -6,12 +6,7 @@ function assert(bool, message) {
 
 function getKey(el) {
   assert(el);
-  var item = el.attributes.getNamedItem("data-key");
-  if (item) {
-    return parseInt(item.value);
-  } else {
-    return null;
-  }
+  return parseInt(el.getAttribute('data-key'));
 }
 
 function arraySubtract(arr1, arr2) {

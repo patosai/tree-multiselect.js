@@ -2,8 +2,6 @@ var isparta = require('isparta');
 var browserifyIstanbul = require('browserify-istanbul');
 var path = require('path');
 
-const TEMP_DIR = 'tmp/'
-
 module.exports = function(config) {
   config.set({
 
@@ -56,12 +54,13 @@ module.exports = function(config) {
       debug: true,
 
       transform: [
-        ['babelify'],
-
         browserifyIstanbul({
           instrumenter: isparta,
+          instrumenterConfig: { babel: { presets: ["es2015"]  }  },
           ignore: ['**/node_modules/**', '**/test/**']
-        })
+        }),
+
+        ['babelify']
       ],
 
       paths: [
@@ -81,10 +80,11 @@ module.exports = function(config) {
     },
 
     coverageReporter: {
-      dir: path.join(TEMP_DIR, 'coverage/'),
+      dir: 'coverage/',
       reporters: [
-        { type: 'text-summary' },
-        { type: 'lcovonly' }
+        {type: 'text-summary'},
+        {type: 'lcovonly'},
+        {type: 'html'}
       ]
     }
   });

@@ -80,12 +80,10 @@ module.exports = {
   find(container, options) {
     var text = null;
     var value = null;
-    var checked = false;
 
     if (options) {
       text = options.text;
       value = options.value;
-      checked = options.checked;
     }
 
     var selector = container + (value ? `[data-value=${value}]` : '');
@@ -97,12 +95,16 @@ module.exports = {
       });
     }
 
-    if (checked) {
+    return $els;
+  },
+
+  findCheckbox(container, options) {
+    var $els = this.find(container, options).children("input[type=checkbox]");
+    if (options && options.checked) {
       $els = $els.filter((idx, el) => {
-        return el.checked === checked;
+        return el.checked === options.checked;
       });
     }
-
     return $els;
   },
 
@@ -120,11 +122,11 @@ module.exports = {
   },
 
   selectionCheckbox(options) {
-    return this.find(".selections .item", options).children("input.option[type=checkbox]");
+    return this.findCheckbox(".selections .item", options);
   },
 
   sectionCheckbox(options) {
-    return this.find('.selections .section > .title', options).children("input.section[type=checkbox]");
+    return this.findCheckbox(".selections .title", options);
   },
 
   sectionTitle(section) {

@@ -65,19 +65,14 @@ describe('Adding and Removing', () => {
     var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
     assert.equal($checkboxChecked.length, 1);
 
-    var $checkbox = Common.getSelections().children("input[type=checkbox]");
+    var $checkbox = Common.selectionCheckbox();
     assert.equal($checkbox.length, 3);
 
     $checkbox.last().click();
 
-    var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
+    $checkboxChecked = Common.selectionCheckbox({checked: true});
     assert.equal($checkboxChecked.length, 2);
 
-    var $selectedItems = Common.getSelected();
-    assert.equal($selectedItems.length, 2);
-
-    Common.assertSelectedItem($selectedItems[0], {text: 'One2', value: 'one', section: 'section'});
-    Common.assertSelectedItem($selectedItems[1], {text: 'One3', value: 'one', section: 'section'});
     assert.deepEqual($("select").val(), ['one', 'one']);
   });
 

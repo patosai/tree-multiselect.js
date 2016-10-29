@@ -24,7 +24,7 @@ describe('Section checkboxes', () => {
     assert.equal($("input.section[type=checkbox]:checked").length, 0);
     assert.equal($("input.option[type=checkbox]:checked").length, 1);
 
-    Common.getSelections().last().children("input[type=checkbox]").click();
+    Common.selection().last().children("input[type=checkbox]").click();
 
     assert.equal($("input.section[type=checkbox]:checked").length, 1);
     assert.equal($("input.option[type=checkbox]:checked").length, 2);
@@ -77,10 +77,9 @@ describe('Section checkboxes', () => {
     assert.notOk(Common.sectionCheckbox({text: 'middle'}).prop('checked'));
     assert.notOk(Common.sectionCheckbox({text: 'inner'}).prop('checked'));
 
-    assert.notOk(Common.selectionCheckbox(Common.getSelectionsWithText('One')).prop('checked'));
+    assert.notOk(Common.selectionCheckbox({text: 'One'}).prop('checked'));
 
-    var $middleSection = Common.getSectionsWithTitle('middle');
-    Common.sectionCheckbox($middleSection).click();
+    Common.sectionCheckbox({text: 'middle'}).click();
 
     assert.notOk(Common.sectionCheckbox({text: 'top'}).prop('checked'));
     assert(Common.sectionCheckbox({text: 'middle'}).prop('checked'));
@@ -94,7 +93,7 @@ describe('Section checkboxes', () => {
     $("select").append("<option value='two' data-section='top'>Two</option>");
     $("select").treeMultiselect();
 
-    var $topCheckbox = Common.sectionCheckbox(Common.getSectionsWithTitle('top'));
+    var $topCheckbox = Common.sectionCheckbox({text: 'top'});
     assert.notOk($topCheckbox.prop('checked'));
     assert($topCheckbox.prop('indeterminate'));
   });
@@ -104,7 +103,7 @@ describe('Section checkboxes', () => {
     $("select").append("<option value='two' data-section='top' selected>Two</option>");
     $("select").treeMultiselect();
 
-    var $titleCheckbox = Common.sectionCheckbox(Common.getSectionsWithTitle('top'));
+    var $titleCheckbox = Common.sectionCheckbox({text: 'top'});
     assert.notOk($titleCheckbox.prop('indeterminate'));
   });
 
@@ -113,7 +112,7 @@ describe('Section checkboxes', () => {
     $("select").append("<option value='two' data-section='top'>Two</option>");
     $("select").treeMultiselect();
 
-    var $titleCheckbox = Common.sectionCheckbox(Common.getSectionsWithTitle('top'));
+    var $titleCheckbox = Common.sectionCheckbox({text: 'top'});
     assert.notOk($titleCheckbox.prop('indeterminate'));
   });
 });

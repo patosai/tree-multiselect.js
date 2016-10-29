@@ -73,20 +73,20 @@ describe('Section checkboxes', () => {
     $("select").append("<option value='two' data-section='top'>Two</option>");
     $("select").treeMultiselect();
 
-    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('top')).prop('checked'));
-    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('middle')).prop('checked'));
-    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('inner')).prop('checked'));
+    assert.notOk(Common.sectionCheckbox({text: 'top'}).prop('checked'));
+    assert.notOk(Common.sectionCheckbox({text: 'middle'}).prop('checked'));
+    assert.notOk(Common.sectionCheckbox({text: 'inner'}).prop('checked'));
 
     assert.notOk(Common.selectionCheckbox(Common.getSelectionsWithText('One')).prop('checked'));
 
     var $middleSection = Common.getSectionsWithTitle('middle');
     Common.sectionCheckbox($middleSection).click();
 
-    assert.notOk(Common.sectionCheckbox(Common.getSectionsWithTitle('top')).prop('checked'));
-    assert(Common.sectionCheckbox(Common.getSectionsWithTitle('middle')).prop('checked'));
-    assert(Common.sectionCheckbox(Common.getSectionsWithTitle('inner')).prop('checked'));
+    assert.notOk(Common.sectionCheckbox({text: 'top'}).prop('checked'));
+    assert(Common.sectionCheckbox({text: 'middle'}).prop('checked'));
+    assert(Common.sectionCheckbox({text: 'inner'}).prop('checked'));
 
-    assert(Common.selectionCheckbox(Common.getSelectionsWithText('One')).prop('checked'));
+    assert(Common.selectionCheckbox({text: 'One'}).prop('checked'));
   });
 
   it('checkbox is indeterminate when some children are selected', () => {

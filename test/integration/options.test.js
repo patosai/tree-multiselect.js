@@ -1,5 +1,3 @@
-require('tree-multiselect');
-
 var Common = require('./common');
 
 describe('Options', () => {
@@ -262,6 +260,36 @@ describe('Options', () => {
     var $one = $selected.last();
     Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
     Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
+  });
+
+  it("doesn't do anything when sorted in same order", () => {
+    $("select").append("<option value='one' data-section='test' selected>One</option>");
+    $("select").append("<option value='two' data-section='test' selected>Two</option>");
+    $("select").treeMultiselect({ sortable: true });
+
+    var $selected = Common.getSelected();
+    assert.equal($selected.length, 2);
+    var $one = $selected.first();
+    var $two = $selected.last();
+
+    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
+
+    assert($("div.selected").sortable('option', 'start'));
+    $("div.selected").sortable('option', 'start')(null, {
+      item: $one
+    });
+    assert($("div.selected").sortable('option', 'stop'));
+    $("div.selected").sortable('option', 'stop')(null, {
+      item: $one
+    });
+
+    $selected = Common.getSelected();
+    assert.equal($selected.length, 2);
+    var $one = $selected.first();
+    var $two = $selected.last();
+    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
   });
 
   it('select all button works', () => {

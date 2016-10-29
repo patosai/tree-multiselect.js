@@ -1,5 +1,3 @@
-var Util = require('utility');
-
 var Common = require('./common');
 
 describe('Adding and Removing', () => {
@@ -9,17 +7,13 @@ describe('Adding and Removing', () => {
 
     assert.deepEqual($("select").val(), null);
 
-    var $checkbox = Common.getSelections().children("input[type=checkbox]");
+    var $checkbox = Common.selectionCheckbox({checked: false});
     assert.equal($checkbox.length, 1);
     $checkbox.click();
 
-    var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
+    var $checkboxChecked = Common.selectionCheckbox({checked: true});
     assert.equal($checkboxChecked.length, 1);
 
-    var $selectedItems = Common.getSelected();
-    assert.equal($selectedItems.length, 1);
-
-    Common.assertSelectedItem($selectedItems[0], {text: 'One', value: 'one', section: 'section'});
     assert.deepEqual($("select").val(), ['one']);
   });
 
@@ -29,15 +23,13 @@ describe('Adding and Removing', () => {
 
     assert.deepEqual($("select").val(), ['one']);
 
-    var $checkbox = Common.getSelections().children("input[type=checkbox]:checked");
+    var $checkbox = Common.selectionCheckbox({checked: true});
     assert.equal($checkbox.length, 1);
     $checkbox.click();
 
-    var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
+    var $checkboxChecked = Common.selectionCheckbox({checked: true});
     assert.equal($checkboxChecked.length, 0);
 
-    var $selectedItems = Common.getSelected();
-    assert.equal($selectedItems.length, 0);
     assert.deepEqual($("select").val(), null);
   });
 
@@ -48,27 +40,21 @@ describe('Adding and Removing', () => {
 
     assert.deepEqual($("select").val(), ['two']);
 
-    var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
+    var $checkboxChecked = Common.selectionCheckbox({checked: true});
     assert.equal($checkboxChecked.length, 1);
 
-    var $checkbox = Common.getSelections().children("input[type=checkbox]");
+    var $checkbox = Common.selectionCheckbox();
     assert.equal($checkbox.length, 2);
 
     $checkbox.first().click();
 
-    var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
+    $checkboxChecked = Common.selectionCheckbox({checked: true});
     assert.equal($checkboxChecked.length, 2);
 
-    var $selectedItems = Common.getSelected();
-    assert.equal($selectedItems.length, 2);
-
-    Common.assertSelectedItem($selectedItems[0], {text: 'One', value: 'two', section: 'section'});
-    Common.assertSelectedItem($selectedItems[1], {text: 'One', value: 'one', section: 'section'});
     assert.deepEqual($("select").val(), ['two', 'one']);
   });
 
   it('can add an item with the same value', () => {
-    // TODO investigate
     $("select").append("<option value='one' data-section='section'>One</option>");
     $("select").append("<option value='one' data-section='section' selected>One2</option>");
     $("select").append("<option value='one' data-section='section'>One3</option>");

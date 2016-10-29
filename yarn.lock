@@ -509,7 +509,7 @@ babel-plugin-transform-strict-mode@^6.18.0:
     babel-runtime "^6.0.0"
     babel-types "^6.18.0"
 
-babel-preset-es2015@^6.16.0:
+babel-preset-es2015@^6.18.0:
   version "6.18.0"
   resolved "https://registry.yarnpkg.com/babel-preset-es2015/-/babel-preset-es2015-6.18.0.tgz#b8c70df84ec948c43dcf2bf770e988eb7da88312"
   dependencies:
@@ -793,7 +793,7 @@ browserify-zlib@^0.1.4, browserify-zlib@~0.1.2:
   dependencies:
     pako "~0.2.0"
 
-browserify@^13.0.0, browserify@^13.1.0:
+browserify@^13.0.0, browserify@^13.1.1:
   version "13.1.1"
   resolved "https://registry.yarnpkg.com/browserify/-/browserify-13.1.1.tgz#72a2310e2f706ed87db929cf0ee73a5e195d9bb0"
   dependencies:
@@ -1820,7 +1820,7 @@ grunt-banner@^0.6.0:
   dependencies:
     chalk "^1.1.0"
 
-grunt-browserify:
+grunt-browserify@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/grunt-browserify/-/grunt-browserify-5.0.0.tgz#1d333ca98bdac44576f646e0d6680087cbf8c615"
   dependencies:
@@ -1848,14 +1848,14 @@ grunt-contrib-jshint@^1.0.0:
     hooker "^0.2.3"
     jshint "~2.9.1"
 
-grunt-contrib-uglify@^1.0.1:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/grunt-contrib-uglify/-/grunt-contrib-uglify-1.0.2.tgz#ae67a46f9153edd4cb11813a55eb69c70d7db2fb"
+grunt-contrib-uglify@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/grunt-contrib-uglify/-/grunt-contrib-uglify-2.0.0.tgz#8c9970d690936cde6d25aa1193549bd929016930"
   dependencies:
     chalk "^1.0.0"
-    lodash "^4.0.1"
+    lodash.assign "^4.0.9"
     maxmin "^1.1.0"
-    uglify-js "~2.6.2"
+    uglify-js "~2.7.0"
     uri-path "^1.0.0"
 
 grunt-coveralls@^1.0.1:
@@ -1903,7 +1903,7 @@ grunt-legacy-util@~1.0.0:
     underscore.string "~3.2.3"
     which "~1.2.1"
 
-grunt-sass@^1.2.0:
+grunt-sass@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/grunt-sass/-/grunt-sass-1.2.1.tgz#fb87b6caac46fb32d45177fd2e4b6ff7468c1919"
   dependencies:
@@ -2322,10 +2322,6 @@ js-string-escape@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
 
-js-tokens@^1.0.1:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-1.0.3.tgz#14e56eb68c8f1a92c43d59f5014ec29dc20f2ae1"
-
 js-tokens@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-2.0.0.tgz#79903f5563ee778cc1162e6dcf1a0027c97f9cb5"
@@ -2443,7 +2439,7 @@ karma-chai@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/karma-chai/-/karma-chai-0.1.0.tgz#bee5ad40400517811ae34bb945f762909108b79a"
 
-karma-coverage@^1.0.0:
+karma-coverage@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/karma-coverage/-/karma-coverage-1.1.1.tgz#5aff8b39cf6994dc22de4c84362c76001b637cf6"
   dependencies:
@@ -2463,18 +2459,14 @@ karma-mocha@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/karma-mocha/-/karma-mocha-1.2.0.tgz#bca6be2a66805b847417e8d2873fd0b5b27ee7cd"
 
-karma-phantomjs-launcher@^1.0.1:
+karma-phantomjs-launcher@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/karma-phantomjs-launcher/-/karma-phantomjs-launcher-1.0.2.tgz#19e1041498fd75563ed86730a22c1fe579fa8fb1"
   dependencies:
     lodash "^4.0.1"
     phantomjs-prebuilt "^2.1.7"
 
-karma-qunit@^1.1.0:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-1.2.1.tgz#88252afd2127bc03b0cc31978ed6882b139f470a"
-
-karma@^1.1.0:
+karma@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/karma/-/karma-1.3.0.tgz#b2b94e8f499fadd0069d54f9aef4a4d48ec5cc1f"
   dependencies:
@@ -2589,7 +2581,7 @@ lodash._isiterateecall@^3.0.0:
   version "3.0.9"
   resolved "https://registry.yarnpkg.com/lodash._isiterateecall/-/lodash._isiterateecall-3.0.9.tgz#5203ad7ba425fae842460e696db9cf3e6aac057c"
 
-lodash.assign@^4.0.3, lodash.assign@^4.0.6, lodash.assign@^4.2.0:
+lodash.assign@^4.0.3, lodash.assign@^4.0.6, lodash.assign@^4.0.9, lodash.assign@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/lodash.assign/-/lodash.assign-4.2.0.tgz#0d99f3ccd7a6d261d19bdaeb9245005d285808e7"
 
@@ -2629,7 +2621,7 @@ lodash@^3.10.1, lodash@^3.8.0, lodash@~3.10.1:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.0.1, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.2.0, lodash@^4.5.0, lodash@~4.16.4:
+lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.2.0, lodash@^4.5.0, lodash@~4.16.4:
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.16.4.tgz#01ce306b9bad1319f2a5528674f88297aeb70127"
 
@@ -2657,10 +2649,10 @@ longest@^1.0.1:
   resolved "https://registry.yarnpkg.com/longest/-/longest-1.0.1.tgz#30a0b2da38f73770e8294a0d22e6625ed77d0097"
 
 loose-envify@^1.0.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.2.0.tgz#69a65aad3de542cf4ee0f4fe74e8e33c709ccb0f"
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.3.0.tgz#6b26248c42f6d4fa4b0d8542f78edfcde35642a8"
   dependencies:
-    js-tokens "^1.0.1"
+    js-tokens "^2.0.0"
 
 loud-rejection@^1.0.0:
   version "1.6.0"
@@ -3146,7 +3138,7 @@ pend@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
 
-phantomjs-prebuilt@^2.1.7:
+phantomjs-prebuilt@^2.1.13, phantomjs-prebuilt@^2.1.7:
   version "2.1.13"
   resolved "https://registry.yarnpkg.com/phantomjs-prebuilt/-/phantomjs-prebuilt-2.1.13.tgz#66556ad9e965d893ca5a7dc9e763df7e8697f76d"
   dependencies:
@@ -3250,10 +3242,6 @@ querystring-es3@~0.2.0:
 querystring@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
-
-qunitjs@^1.23.1:
-  version "1.23.1"
-  resolved "https://registry.yarnpkg.com/qunitjs/-/qunitjs-1.23.1.tgz#1971cf97ac9be01a64d2315508d2e48e6fd4e719"
 
 randomatic@^1.1.3:
   version "1.1.5"
@@ -3731,8 +3719,8 @@ stream-combiner2@^1.1.1:
     readable-stream "^2.0.2"
 
 stream-http@^2.0.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/stream-http/-/stream-http-2.4.0.tgz#9599aa8e263667ce4190e0dc04a1d065d3595a7e"
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/stream-http/-/stream-http-2.4.1.tgz#8ee5689ae69169e8eb8edd6aeb2ca08ab47e8f59"
   dependencies:
     builtin-status-codes "^2.0.0"
     inherits "^2.0.1"
@@ -3918,18 +3906,9 @@ typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-uglify-js@^2.6:
+uglify-js@^2.6, uglify-js@~2.7.0:
   version "2.7.4"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.7.4.tgz#a295a0de12b6a650c031c40deb0dc40b14568bd2"
-  dependencies:
-    async "~0.2.6"
-    source-map "~0.5.1"
-    uglify-to-browserify "~1.0.0"
-    yargs "~3.10.0"
-
-uglify-js@~2.6.2:
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.6.4.tgz#65ea2fb3059c9394692f15fed87c2b36c16b9adf"
   dependencies:
     async "~0.2.6"
     source-map "~0.5.1"

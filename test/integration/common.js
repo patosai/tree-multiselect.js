@@ -76,16 +76,59 @@ module.exports = {
     }
   },
 
+  // DOM element finders
+  find(container, options) {
+    var text = null;
+    var value = null;
+    var checked = false;
+
+    if (options) {
+      text = options.text;
+      value = options.value;
+      checked = options.checked;
+    }
+
+    var selector = container + (value ? `[data-value=${value}]` : '');
+    var $els = $(selector);
+
+    if (text) {
+      $els = $els.filter((idx, el) => {
+        return this.textOf(el) === text;
+      });
+    }
+
+    if (checked) {
+      $els = $els.filter((idx, el) => {
+        return el.checked === checked;
+      });
+    }
+
+    return $els;
+  },
+
+  selection(options) {
+    return this.find('.selections .item', options);
+  },
+
+  selected(options) {
+    return this.find('.selected .item', options);
+  },
+
+  section(options) {
+    // need to search title text, then go back up to section
+    return this.find('.selections .section > .title', options).parent();
+  },
+
+  selectionCheckbox(options) {
+    return this.find(".selections .item", options).children("input.option[type=checkbox]");
+  },
+
+  sectionCheckbox(options) {
+    return this.find('.selections .section > .title', options).children("input.section[type=checkbox]");
+  },
+
   sectionTitle(section) {
     return this.textOf($(section).children("div.title"));
-  },
-
-  sectionCheckbox(section) {
-    return $(section).children("div.title").children("input.section[type=checkbox]");
-  },
-
-  selectionCheckbox(selection) {
-    return $(selection).children("input.option[type=checkbox]");
   }
 };
 

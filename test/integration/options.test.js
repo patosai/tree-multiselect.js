@@ -24,6 +24,31 @@ describe('Options', () => {
     });
   });
 
+  it('startCollapsed', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    $("select").append("<option value='two' data-section='test/inner'>Two</option>");
+    $("select").append("<option value='three' data-section='test/inner2'>Three</option>");
+    $("select").append("<option value='1' data-section='another'>Beep</option>");
+    var options = {
+      startCollapsed: true
+    };
+    $("select").treeMultiselect(options);
+
+    var $section = Common.section();
+    assert.equal($section.length, 4);
+    var $visibleSections = $section.filter((idx, el) => {
+      return $(el).is(":visible");
+    });
+    assert.equal($visibleSections.length, 2);
+
+    var $selections = Common.selection();
+    assert.equal($selections.length, 4);
+    var $visibleSelections = $selections.filter((idx, el) => {
+      return $(el).is(":visible");
+    });
+    assert.equal($visibleSelections.length, 0);
+  });
+
   it("startCollapsed doesn't do anything if collapsible is false", () => {
     $("select").append("<option value='one' data-section='test'>One</option>");
     $("select").append("<option value='two' data-section='test'>Two</option>");
@@ -176,7 +201,7 @@ describe('Options', () => {
     assert.equal($("input.option[type=checkbox]").length, 0);
   });
 
-  it('calls onChange with correct arguments when item is removed', (done) => {
+  it('calls onChange with correct arguments when item is added', (done) => {
     $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
     $("select").append("<option value='two' data-section='test'>Two</option>");
     var options = {
@@ -202,6 +227,28 @@ describe('Options', () => {
     $("select").treeMultiselect(options);
 
     var $item = Common.selection({text: 'Two'});
+    assert.equal($item.length, 1);
+    $item.find("input[type=checkbox]").click();
+  });
+
+  it('calls onChange with correct arguments when item is removed', (done) => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test'>Two</option>");
+    var options = {
+      onChange: function(all, added, removed) {
+                  assert.equal(all.length, 0);
+                  assert.equal(added.length, 0);
+                  assert.equal(removed.length, 1);
+                  assert.equal(removed[0].text, 'One');
+                  assert.equal(removed[0].value, 'one');
+                  assert(isNaN(removed[0].initialIndex));
+                  assert.equal(removed[0].section, 'test');
+                  done();
+                }
+    };
+    $("select").treeMultiselect(options);
+
+    var $item = Common.selection({text: 'One'});
     assert.equal($item.length, 1);
     $item.find("input[type=checkbox]").click();
   });
@@ -241,8 +288,8 @@ describe('Options', () => {
     var $one = $selected.first();
     var $two = $selected.last();
 
-    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
-    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelected($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelected($two, {text: 'Two', value: 'two', section: 'test'})
 
     assert($("div.selected").sortable('option', 'start'));
     $("div.selected").sortable('option', 'start')(null, {
@@ -258,8 +305,8 @@ describe('Options', () => {
     assert.equal($selected.length, 2);
     var $two = $selected.first();
     var $one = $selected.last();
-    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
-    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelected($two, {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelected($one, {text: 'One', value: 'one', section: 'test'})
   });
 
   it("doesn't do anything when sorted in same order", () => {
@@ -272,8 +319,8 @@ describe('Options', () => {
     var $one = $selected.first();
     var $two = $selected.last();
 
-    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
-    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelected($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelected($two, {text: 'Two', value: 'two', section: 'test'})
 
     assert($("div.selected").sortable('option', 'start'));
     $("div.selected").sortable('option', 'start')(null, {
@@ -288,8 +335,8 @@ describe('Options', () => {
     assert.equal($selected.length, 2);
     var $one = $selected.first();
     var $two = $selected.last();
-    Common.assertSelectedItem($one, {text: 'One', value: 'one', section: 'test'})
-    Common.assertSelectedItem($two, {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelected($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelected($two, {text: 'Two', value: 'two', section: 'test'})
   });
 
   it('select all button works', () => {

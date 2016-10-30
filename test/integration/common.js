@@ -15,14 +15,14 @@ beforeEach(() => {
 });
 
 module.exports = {
-  assertSelectionItem(el, params) {
+  assertSelection(el, params) {
     var $el = $(el);
     assert($el.hasClass('item'));
     assert.equal(this.textOf($el), params.text);
     assert.equal($el.attr('data-value'), params.value);
   },
 
-  assertSelectedItem(el, params) {
+  assertSelected(el, params) {
     var $el = $(el);
     assert($el.hasClass('item'));
     assert.equal(this.textOf($el), params.text);
@@ -92,7 +92,7 @@ module.exports = {
   },
 
   sectionCheckbox(options) {
-    return this.findCheckbox(".selections .title", options);
+    return this.findCheckbox(".selections .section > .title", options);
   },
 
   sectionTitle(section) {

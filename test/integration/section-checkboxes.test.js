@@ -1,6 +1,6 @@
 var Common = require('./common');
 
-describe('Section checkboxes', () => {
+describe('Section Checkboxes', () => {
   it('is all checked when all children are selected initially', () => {
     $("select").append("<option value='one' data-section='foo' selected>One</option>");
     $("select").append("<option value='two' data-section='foo' selected>Two</option>");

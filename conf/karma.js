@@ -22,7 +22,7 @@ module.exports = function(config) {
       'test/vendor/jquery-1.11.3.min.js',
       'test/vendor/jquery-ui.min.js',
       'src/tree-multiselect.js',
-      'test/integration/*.test.js'
+      'test/**/*.test.js'
     ],
 
     exclude: [],
@@ -30,7 +30,7 @@ module.exports = function(config) {
     preprocessors: {
       // browserify handles istanbul coverage
       'src/tree-multiselect.js': ['browserify'],
-      'test/integration/*.test.js': ['browserify']
+      'test/**/*.test.js': ['browserify']
     },
 
     reporters: ['mocha', 'coverage'],

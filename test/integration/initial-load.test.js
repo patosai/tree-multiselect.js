@@ -21,7 +21,7 @@ describe('Initial Load', () => {
 
     var $selection = $selections.first();
 
-    Common.assertSelectionItem($selection, {text: 'One', value: 'one'});
+    Common.assertSelection($selection, {text: 'One', value: 'one'});
 
     var $checkbox = $selection.children("input[type=checkbox]");
     var $label = $selection.children("label");
@@ -38,8 +38,8 @@ describe('Initial Load', () => {
     var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
-    Common.assertSelectionItem($selections[0], {text: 'One', value: 'one'});
-    Common.assertSelectionItem($selections[1], {text: 'Two', value: 'two'});
+    Common.assertSelection($selections[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selections[1], {text: 'Two', value: 'two'});
   });
 
   it('renders options with the same value', () => {
@@ -50,8 +50,8 @@ describe('Initial Load', () => {
     var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
-    Common.assertSelectionItem($selections[0], {text: 'One', value: 'one'});
-    Common.assertSelectionItem($selections[1], {text: 'One duplicate', value: 'one'});
+    Common.assertSelection($selections[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selections[1], {text: 'One duplicate', value: 'one'});
   });
 
   it('renders options with the same value and text', () => {
@@ -62,8 +62,8 @@ describe('Initial Load', () => {
     var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
-    Common.assertSelectionItem($selections[0], {text: 'One', value: 'one'});
-    Common.assertSelectionItem($selections[1], {text: 'One', value: 'one'});
+    Common.assertSelection($selections[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selections[1], {text: 'One', value: 'one'});
   });
 
   it('respects selected attribute', () => {
@@ -102,7 +102,7 @@ describe('Initial Load', () => {
     var $selected = Common.selected();
     assert.equal($selected.length, 1);
 
-    Common.assertSelectionItem($selected, {text: 'One', value: 'one'});
+    Common.assertSelection($selected, {text: 'One', value: 'one'});
 
     var $sectionName = $selected.first().children(".section-name");
     assert.equal($sectionName.length, 1);
@@ -121,9 +121,9 @@ describe('Initial Load', () => {
     var $selected = Common.selected();
     assert.equal($selected.length, 3);
 
-    Common.assertSelectionItem($selected[0], {text: 'One', value: 'one'});
-    Common.assertSelectionItem($selected[1], {text: 'Two', value: 'two'});
-    Common.assertSelectionItem($selected[2], {text: 'Three', value: 'three'});
+    Common.assertSelection($selected[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selected[1], {text: 'Two', value: 'two'});
+    Common.assertSelection($selected[2], {text: 'Three', value: 'three'});
 
     assert.deepEqual($("select").val(), ['one', 'two', 'three']);
   });
@@ -139,8 +139,8 @@ describe('Initial Load', () => {
     var $selected = Common.selected();
     assert.equal($selected.length, 2);
 
-    Common.assertSelectionItem($selected[0], {text: 'One', value: 'one'});
-    Common.assertSelectionItem($selected[1], {text: 'Two', value: 'two'});
+    Common.assertSelection($selected[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selected[1], {text: 'Two', value: 'two'});
 
     assert.deepEqual($("select").val(), ['one', 'two']);
   });
@@ -156,8 +156,8 @@ describe('Initial Load', () => {
     var $selected = Common.selected();
     assert.equal($selected.length, 2);
 
-    Common.assertSelectionItem($selected[0], {text: 'Two', value: 'two'});
-    Common.assertSelectionItem($selected[1], {text: 'One', value: 'one'});
+    Common.assertSelection($selected[0], {text: 'Two', value: 'two'});
+    Common.assertSelection($selected[1], {text: 'One', value: 'one'});
 
     assert.deepEqual($("select").val(), ['two', 'one']);
   });
@@ -173,8 +173,8 @@ describe('Initial Load', () => {
     var $selected = Common.selected();
     assert.equal($selected.length, 2);
 
-    Common.assertSelectionItem($selected[0], {text: 'One', value: 'one'});
-    Common.assertSelectionItem($selected[1], {text: 'Two', value: 'two'});
+    Common.assertSelection($selected[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selected[1], {text: 'Two', value: 'two'});
 
     assert.deepEqual($("select").val(), ['one', 'two']);
   });

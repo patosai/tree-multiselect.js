@@ -1,6 +1,6 @@
 var Common = require('./common');
 
-describe('Adding and Removing', () => {
+describe('Single Selection', () => {
   it('can add an item', () => {
     $("select").append("<option value='one' data-section='section'>One</option>");
     $("select").treeMultiselect();

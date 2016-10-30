@@ -35,7 +35,7 @@ describe('Section checkboxes', () => {
     $("select").append("<option value='two' data-section='foo/baz'>Two</option>");
     $("select").treeMultiselect();
 
-    var $topLevel = Common.getSectionsWithTitle("foo");
+    var $topLevel = Common.section({text: 'foo'});
     assert.notOk($topLevel.find("> div.title > input.section[type=checkbox]").is(":checked"));
   });
 
@@ -45,7 +45,7 @@ describe('Section checkboxes', () => {
 
     assert.equal($("input.section[type=checkbox]:checked").length, 1);
 
-    Common.getSelections().first().children("input.option[type=checkbox]").click();
+    Common.selection().first().children("input.option[type=checkbox]").click();
 
     assert.equal($("input.section[type=checkbox]:checked").length, 0);
   });
@@ -59,7 +59,7 @@ describe('Section checkboxes', () => {
     assert.equal($("input[type=checkbox]").length, 4);
     assert.equal($("input[type=checkbox]:checked").length, 0);
 
-    var $middleSection = Common.getSectionsWithTitle('middle');
+    var $middleSection = Common.section({text: 'middle'});
 
     $middleSection.find("> div.title > input[type=checkbox]").click();
 

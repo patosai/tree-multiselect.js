@@ -7,19 +7,19 @@ describe('Options', () => {
     $("select").append("<option value='three' data-section='test'>Three</option>");
     $("select").treeMultiselect();
 
-    var $section = Common.getSections();
+    var $section = Common.section();
     assert.equal($section.length, 1);
 
     var $title = $section.children("div.title");
     assert.equal($title.length, 1);
 
-    Common.getSelections().each(function() {
+    Common.selection().each(function() {
       assert($(this).is(":visible"));
     });
 
     $title.click();
 
-    Common.getSelections().each(function() {
+    Common.selection().each(function() {
       assert.notOk($(this).is(":visible"));
     });
   });
@@ -40,19 +40,19 @@ describe('Options', () => {
 
     $("select").treeMultiselect(options);
 
-    var $section = Common.getSections();
+    var $section = Common.section();
     assert.equal($section.length, 3);
 
     var $title = $section.children("div.title");
     assert.equal($title.length, 3);
 
-    Common.getSelections().each(function() {
+    Common.selection().each(function() {
       assert($(this).is(":visible"));
     });
 
     $title.each(() => {
       $(this).click();
-      Common.getSelections().each(function() {
+      Common.selection().each(function() {
         assert($(this).is(":visible"));
       });
     });
@@ -69,10 +69,10 @@ describe('Options', () => {
 
     $("select").treeMultiselect(options);
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 3);
 
-    var $sections = Common.getSections();
+    var $sections = Common.section();
     assert.equal($selections.length, 3);
     var $innerSections = $sections.first().children(".section");
     assert.equal($innerSections.length, 2);
@@ -104,7 +104,7 @@ describe('Options', () => {
     };
     $("select").treeMultiselect(options);
 
-    var $selectedItem = Common.getSelections();
+    var $selectedItem = Common.selection();
     assert.equal($selectedItem.length, 1);
     assert.equal($selectedItem.find("span.section-name").length, 0);
   });
@@ -117,7 +117,7 @@ describe('Options', () => {
     };
     $("select").treeMultiselect(options);
 
-    var $checkboxes = Common.getSelections().children("input[type=checkbox]");
+    var $checkboxes = Common.selection().children("input[type=checkbox]");
     assert.equal($checkboxes.length, 2);
     $checkboxes.each(function() {
       var $checkbox = $(this);
@@ -139,17 +139,17 @@ describe('Options', () => {
     };
     $("select#frozen").treeMultiselect(options);
 
-    var $frozenOption = Common.getSelectionsWithText("Two");
+    var $frozenOption = Common.selection({text: 'Two'});
     assert.equal($frozenOption.length, 1);
     assert($frozenOption.find("input[type=checkbox]").attr('disabled'));
 
-    var $unfrozenOption = Common.getSelectionsWithText("One");
+    var $unfrozenOption = Common.selection({text: 'One'});
     assert.equal($unfrozenOption.length, 1);
     var $checkbox = $unfrozenOption.find("input[type=checkbox]");
     assert.notOk($checkbox.attr('disabled'));
     $checkbox.click();
 
-    var $unfrozenSelection = Common.getSelectedWithText("One");
+    var $unfrozenSelection = Common.selected({text: 'One'});
     assert.equal($unfrozenSelection.length, 1);
     assert.deepEqual($("select").val(), ['one']);
     assert.deepEqual($("select#frozen").val(), ['two']);
@@ -201,7 +201,7 @@ describe('Options', () => {
     };
     $("select").treeMultiselect(options);
 
-    var $item = Common.getSelectionsWithText("Two");
+    var $item = Common.selection({text: 'Two'});
     assert.equal($item.length, 1);
     $item.find("input[type=checkbox]").click();
   });
@@ -213,7 +213,7 @@ describe('Options', () => {
 
     assert.deepEqual($("select").val(), ['one', 'two']);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 2);
     var $one = $selected.first();
     var $two = $selected.last();
@@ -236,7 +236,7 @@ describe('Options', () => {
     $("select").append("<option value='two' data-section='test' selected>Two</option>");
     $("select").treeMultiselect({ sortable: true });
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 2);
     var $one = $selected.first();
     var $two = $selected.last();
@@ -254,7 +254,7 @@ describe('Options', () => {
       item: $one
     });
 
-    $selected = Common.getSelected();
+    $selected = Common.selected();
     assert.equal($selected.length, 2);
     var $two = $selected.first();
     var $one = $selected.last();
@@ -267,7 +267,7 @@ describe('Options', () => {
     $("select").append("<option value='two' data-section='test' selected>Two</option>");
     $("select").treeMultiselect({ sortable: true });
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 2);
     var $one = $selected.first();
     var $two = $selected.last();
@@ -284,7 +284,7 @@ describe('Options', () => {
       item: $one
     });
 
-    $selected = Common.getSelected();
+    $selected = Common.selected();
     assert.equal($selected.length, 2);
     var $one = $selected.first();
     var $two = $selected.last();
@@ -300,13 +300,13 @@ describe('Options', () => {
     var $selectAll = $(".select-all");
     assert.equal($selectAll.length, 1);
 
-    var $selectedItems = Common.getSelected();
+    var $selectedItems = Common.selected();
     assert.equal($selectedItems.length, 0);
     assert.deepEqual($("select").val(), null);
 
     $selectAll.click();
 
-    $selectedItems = Common.getSelected();
+    $selectedItems = Common.selected();
     assert.equal($selectedItems.length, 2);
     assert.deepEqual($("select").val(), ['one', 'two']);
   });
@@ -319,13 +319,13 @@ describe('Options', () => {
     var $unselectAll = $(".unselect-all");
     assert.equal($unselectAll.length, 1);
 
-    var $selectedItems = Common.getSelected();
+    var $selectedItems = Common.selected();
     assert.equal($selectedItems.length, 2);
     assert.deepEqual($("select").val(), ['one', 'two']);
 
     $unselectAll.click();
 
-    $selectedItems = Common.getSelected();
+    $selectedItems = Common.selected();
     assert.equal($selectedItems.length, 0);
     assert.deepEqual($("select").val(), null);
   });

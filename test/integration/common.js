@@ -32,40 +32,6 @@ module.exports = {
     assert.equal(this.textOf($sectionName), params.section);
   },
 
-  attributeOf(el, key) {
-    return $(el).attr(key);
-  },
-
-  getSelections() {
-    return $("div.selections div.item");
-  },
-
-  getSelected() {
-    return $("div.selected div.item");
-  },
-
-  getSections() {
-    return $("div.section");
-  },
-
-  getSelectionsWithText(text) {
-    return this.getSelections().filter((idx, el) => {
-      return this.textOf(el) === text;
-    });
-  },
-
-  getSelectedWithText(text) {
-    return this.getSelected().filter((idx, el) => {
-      return this.textOf(el) === text;
-    })
-  },
-
-  getSectionsWithTitle(title) {
-    return this.getSections().filter((idx, el) => {
-      return this.textOf($(el).children("div.title")) === title;
-    });
-  },
-
   textOf(el) {
     var $el = $(el);
     var $label = $el.children("label");

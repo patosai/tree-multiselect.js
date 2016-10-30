@@ -40,7 +40,7 @@ describe('Interactivity', () => {
     $("select").append("<option value='three' data-section='foo' data-description='Three'>Three</option>");
     $("select").treeMultiselect();
 
-    var $title = Common.getSectionsWithTitle('foo').children(".title");
+    var $title = Common.section({text: 'foo'}).children(".title");
     assert.equal($("div.selections div.item:visible").length, 3);
 
     $title.click();

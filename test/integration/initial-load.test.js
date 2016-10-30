@@ -16,7 +16,7 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section'>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 1);
 
     var $selection = $selections.first();
@@ -35,7 +35,7 @@ describe('Initial Load', () => {
     $("select").append("<option value='two' data-section='section'>Two</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
     Common.assertSelectionItem($selections[0], {text: 'One', value: 'one'});
@@ -47,7 +47,7 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section'>One duplicate</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
     Common.assertSelectionItem($selections[0], {text: 'One', value: 'one'});
@@ -59,7 +59,7 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section'>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
     Common.assertSelectionItem($selections[0], {text: 'One', value: 'one'});
@@ -70,10 +70,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section' selected>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 1);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 1);
 
     assert.deepEqual($("select").val(), ['one']);
@@ -83,10 +83,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section' data-index='1'>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 1);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 1);
 
     assert.deepEqual($("select").val(), ['one']);
@@ -96,10 +96,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section/foo/bar' data-index='1'>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 1);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 1);
 
     Common.assertSelectionItem($selected, {text: 'One', value: 'one'});
@@ -115,10 +115,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section' data-index='1'>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 3);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 3);
 
     Common.assertSelectionItem($selected[0], {text: 'One', value: 'one'});
@@ -133,10 +133,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='one' data-section='section' data-index='1'>One</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 2);
 
     Common.assertSelectionItem($selected[0], {text: 'One', value: 'one'});
@@ -150,10 +150,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='two' data-section='section' data-index='300'>Two</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 2);
 
     Common.assertSelectionItem($selected[0], {text: 'Two', value: 'two'});
@@ -167,10 +167,10 @@ describe('Initial Load', () => {
     $("select").append("<option value='two' data-section='section' data-index='10'>Two</option>");
     $("select").treeMultiselect();
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     assert.equal($selections.length, 2);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 2);
 
     Common.assertSelectionItem($selected[0], {text: 'One', value: 'one'});

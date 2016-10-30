@@ -54,7 +54,7 @@ describe('Adding and Removing', () => {
     assert.deepEqual($("select").val(), ['two', 'one']);
   });
 
-  it('can add an item with the same value', () => {
+  it('can add an item with the same value as another', () => {
     $("select").append("<option value='one' data-section='section'>One</option>");
     $("select").append("<option value='one' data-section='section' selected>One2</option>");
     $("select").append("<option value='one' data-section='section'>One3</option>");
@@ -62,7 +62,7 @@ describe('Adding and Removing', () => {
 
     assert.deepEqual($("select").val(), ['one']);
 
-    var $checkboxChecked = Common.getSelections().children("input[type=checkbox]:checked");
+    var $checkboxChecked = Common.selectionCheckbox({checked: true});
     assert.equal($checkboxChecked.length, 1);
 
     var $checkbox = Common.selectionCheckbox();
@@ -76,19 +76,41 @@ describe('Adding and Removing', () => {
     assert.deepEqual($("select").val(), ['one', 'one']);
   });
 
+  it('can remove an item with the same value as another', () => {
+    $("select").append("<option value='one' data-section='section'>One</option>");
+    $("select").append("<option value='one' data-section='section' selected>One2</option>");
+    $("select").append("<option value='one' data-section='section' selected>One3</option>");
+    $("select").treeMultiselect();
+
+    assert.deepEqual($("select").val(), ['one', 'one']);
+
+    var $checkboxChecked = Common.selectionCheckbox({checked: true});
+    assert.equal($checkboxChecked.length, 2);
+
+    var $checkbox = Common.selectionCheckbox();
+    assert.equal($checkbox.length, 3);
+
+    $checkbox.last().click();
+
+    $checkboxChecked = Common.selectionCheckbox({checked: true});
+    assert.equal($checkboxChecked.length, 1);
+
+    assert.deepEqual($("select").val(), ['one']);
+  });
+
   it('can remove an item by selected item remove button', () => {
     $("select").append("<option value='one' data-section='section' selected>One</option>");
     $("select").treeMultiselect();
 
     assert.deepEqual($("select").val(), ['one']);
 
-    var $selected = Common.getSelected();
+    var $selected = Common.selected();
     assert.equal($selected.length, 1);
 
     var $removeSpan = $selected.children(".remove-selected");
     $removeSpan.click();
 
-    assert.equal(Common.getSelected().length, 0);
+    assert.equal(Common.selected().length, 0);
     assert.equal($("select").val(), null);
   });
 
@@ -98,11 +120,10 @@ describe('Adding and Removing', () => {
 
     assert.deepEqual($("select").val(), ['one']);
 
-    var $selections = Common.getSelections();
+    var $selections = Common.selection();
     var $checkbox = $selections.children("input[type=checkbox]");
     $checkbox.click();
 
-    assert.equal(Common.getSelected().length, 0);
     assert.deepEqual($("select").val(), null);
   });
 
@@ -114,13 +135,13 @@ describe('Adding and Removing', () => {
 
     assert.deepEqual($("select").val(), ['one', 'two', 'three']);
 
-    var $selections = Common.getSelected();
+    var $selections = Common.selected();
     assert.equal($selections.length, 3);
 
     var $removeSpan = $selections.first().children(".remove-selected");
     $removeSpan.click();
 
-    assert.equal(Common.getSelected().length, 2);
+    assert.equal(Common.selected().length, 2);
     assert.deepEqual($("select").val(), ['two', 'three']);
   });
 
@@ -132,6 +153,6 @@ describe('Adding and Removing', () => {
       done();
     });
 
-    Common.getSelections().children("input[type=checkbox]").click();
+    Common.selection().children("input[type=checkbox]").click();
   });
 });

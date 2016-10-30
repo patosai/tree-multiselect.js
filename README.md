@@ -46,7 +46,7 @@ Option name             | Default        | Description
 `unselectAllText`       | `Unselect All` | Only used if `enableSelectAll` is active
 `freeze`                | `false`        | Disables selection/deselection of options; aka display-only
 `hideSidePanel`         | `false`        | Hide the right panel showing all the selected items
-`onChange`              | `null`         | Callback for when select is changed. Called with (allSelectedItems, addedItems, removedItems), each of which is an array of objects with the properties `text`, `value`, `initialIndex`, and `sectionName`
+`onChange`              | `null`         | Callback for when select is changed. Called with (allSelectedItems, addedItems, removedItems), each of which is an array of objects with the properties `text`, `value`, `initialIndex`, and `section`
 `onlyBatchSelection`    | `false`        | Only sections can be checked, not individual items
 `sortable`              | `false`        | Selected options can be sorted by dragging (requires jQuery UI)
 `sectionDelimiter`      | `/`            | Separator between sections in the select option `data-section` attribute

@@ -93,10 +93,6 @@ module.exports = {
 
   sectionCheckbox(options) {
     return this.findCheckbox(".selections .section > .title", options);
-  },
-
-  sectionTitle(section) {
-    return this.textOf($(section).children("div.title"));
   }
 };
 

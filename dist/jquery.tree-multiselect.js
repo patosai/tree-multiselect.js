@@ -11,12 +11,16 @@ var treeMultiselect = function treeMultiselect(opts) {
   var _this = this;
 
   var options = mergeDefaultOptions(opts);
+  var uniqueId = 0;
+
   this.each(function () {
     var $originalSelect = $(_this);
     $originalSelect.attr('multiple', '').css('display', 'none');
 
-    var tree = new Tree($originalSelect, options);
+    var tree = new Tree(uniqueId, $originalSelect, options);
     tree.initialize();
+
+    ++uniqueId;
   });
 
   return this;
@@ -71,7 +75,8 @@ var Option = require('./option');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
-function Tree($originalSelect, options) {
+function Tree(id, $originalSelect, options) {
+  this.id = id;
   this.$originalSelect = $originalSelect;
 
   var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
@@ -162,7 +167,7 @@ Tree.prototype.generateHtmlFromData = function (data) {
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
 
-    var optionLabelCheckboxId = 'treemultiselect-' + option.id;
+    var optionLabelCheckboxId = 'treemultiselect-' + this.id + '-' + option.id;
     var descriptionStr = option.description ? ' data-description=\'' + option.description + '\'' : "";
     var indexStr = option.initialIndex ? ' data-index=\'' + option.initialIndex + '\'' : "";
     var optionCheckboxStr = "";
@@ -506,92 +511,70 @@ module.exports = function ($el, hideSidePanel) {
 },{}],6:[function(require,module,exports){
 "use strict";
 
-function assert(bool, message) {
-  if (!bool) {
-    throw new Error(message || "Assertion failed");
-  }
-}
-
-function getKey(el) {
-  assert(el);
-  var item = el.attributes.getNamedItem("data-key");
-  if (item) {
-    return parseInt(item.value);
-  } else {
-    return null;
-  }
-}
-
-function arraySubtract(arr1, arr2) {
-  var hash = {};
-  var returnArr = [];
-  for (var ii = 0; ii < arr2.length; ++ii) {
-    hash[arr2[ii]] = true;
-  }
-  for (var jj = 0; jj < arr1.length; ++jj) {
-    if (!hash[arr1[jj]]) {
-      returnArr.push(arr1[jj]);
-    }
-  }
-  return returnArr;
-}
-
-function arrayUniq(arr) {
-  var hash = {};
-  var newArr = [];
-  for (var ii = 0; ii < arr.length; ++ii) {
-    if (!hash[arr[ii]]) {
-      hash[arr[ii]] = true;
-      newArr.push(arr[ii]);
-    }
-  }
-  return newArr;
-}
-
-function arrayRemoveFalseyExceptZero(arr) {
-  var newArr = [];
-  for (var ii = 0; ii < arr.length; ++ii) {
-    if (arr[ii] || arr[ii] === 0) {
-      newArr.push(arr[ii]);
-    }
-  }
-  return newArr;
-}
-
-function arrayMoveEl(arr, oldPos, newPos) {
-  var el = arr[oldPos];
-  arr.splice(oldPos, 1);
-  arr.splice(newPos, 0, el);
-}
-
-function arrayIntersect(arr, arrExcluded) {
-  var newArr = [];
-  var hash = {};
-  for (var ii = 0; ii < arrExcluded.length; ++ii) {
-    hash[arrExcluded[ii]] = true;
-  }
-  for (var jj = 0; jj < arr.length; ++jj) {
-    if (hash[arr[jj]]) {
-      newArr.push(arr[jj]);
-    }
-  }
-  return newArr;
-}
+// Note: array functions are only tested for for arrays of integers
+// since that is what this plugin needs
 
 module.exports = {
-  assert: assert,
-
-  getKey: getKey,
-
-  arraySubtract: arraySubtract,
-
-  arrayUniq: arrayUniq,
-
-  arrayRemoveFalseyExceptZero: arrayRemoveFalseyExceptZero,
-
-  arrayMoveEl: arrayMoveEl,
-
-  arrayIntersect: arrayIntersect
+  assert: function assert(bool, message) {
+    if (!bool) {
+      throw new Error(message || "Assertion failed");
+    }
+  },
+  getKey: function getKey(el) {
+    this.assert(el);
+    return parseInt(el.getAttribute('data-key'));
+  },
+  arraySubtract: function arraySubtract(arr1, arr2) {
+    var hash = {};
+    var returnArr = [];
+    for (var ii = 0; ii < arr2.length; ++ii) {
+      hash[arr2[ii]] = true;
+    }
+    for (var jj = 0; jj < arr1.length; ++jj) {
+      if (!hash[arr1[jj]]) {
+        returnArr.push(arr1[jj]);
+      }
+    }
+    return returnArr;
+  },
+  arrayUniq: function arrayUniq(arr) {
+    var hash = {};
+    var newArr = [];
+    for (var ii = 0; ii < arr.length; ++ii) {
+      if (!hash[arr[ii]]) {
+        hash[arr[ii]] = true;
+        newArr.push(arr[ii]);
+      }
+    }
+    return newArr;
+  },
+  arrayRemoveFalseyExceptZero: function arrayRemoveFalseyExceptZero(arr) {
+    var newArr = [];
+    for (var ii = 0; ii < arr.length; ++ii) {
+      if (arr[ii] || arr[ii] === 0) {
+        newArr.push(arr[ii]);
+      }
+    }
+    return newArr;
+  },
+  arrayMoveEl: function arrayMoveEl(arr, oldPos, newPos) {
+    var el = arr[oldPos];
+    arr.splice(oldPos, 1);
+    arr.splice(newPos, 0, el);
+  },
+  arrayIntersect: function arrayIntersect(arr, arrExcluded) {
+    var newArr = [];
+    var hash = {};
+    for (var ii = 0; ii < arrExcluded.length; ++ii) {
+      hash[arrExcluded[ii]] = true;
+    }
+    for (var jj = 0; jj < arr.length; ++jj) {
+      if (hash[arr[jj]]) {
+        newArr.push(arr[jj]);
+      }
+    }
+    return newArr;
+  }
 };
 
 },{}]},{},[3]);

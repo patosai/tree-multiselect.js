@@ -2,7 +2,8 @@ var Option = require('./option');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
-function Tree($originalSelect, options) {
+function Tree(id, $originalSelect, options) {
+  this.id = id;
   this.$originalSelect = $originalSelect;
 
   var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
@@ -93,7 +94,7 @@ Tree.prototype.generateHtmlFromData = function(data) {
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
 
-    var optionLabelCheckboxId = `treemultiselect-${option.id}`;
+    var optionLabelCheckboxId = `treemultiselect-${this.id}-${option.id}`;
     var descriptionStr = option.description ? ` data-description='${option.description}'` : "";
     var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : "";
     var optionCheckboxStr = "";

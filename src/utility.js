@@ -9,7 +9,7 @@ module.exports = {
   },
 
   getKey(el) {
-    assert(el);
+    this.assert(el);
     return parseInt(el.getAttribute('data-key'));
   },
 

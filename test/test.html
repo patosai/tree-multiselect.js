@@ -27,8 +27,14 @@
       <option value="passion fruit" data-section="Smoothies/Bubble Tea" data-description="The greatest flavor" selected="selected">Passion Fruit</option>
     </select>
 
+    <select id="test-select-2" multiple="multiple">
+      <option value="foo" data-section="section">foo</option>
+      <option value="bar" data-section="section">bar</option>
+    </select>
+
     <script type="text/javascript">
       $("#test-select").treeMultiselect({ enableSelectAll: true, sortable: true });
+      $("#test-select-2").treeMultiselect();
     </script>
   </body>
 </html>

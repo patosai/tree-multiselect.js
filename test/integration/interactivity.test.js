@@ -61,4 +61,17 @@ describe('Interactivity', () => {
 
     assert.equal($collapse.text(), '+');
   });
+
+  it('has correct label id', () => {
+    $("select").append("<option value='one' data-section='foo' data-description='One'>One</option>");
+    $("select").treeMultiselect();
+    var $option = $("input.option");
+    assert.equal($option.length, 1);
+    assert.equal($("#" + $option.attr('id')).length, 1);
+
+    $("body").append("select#two");
+    $("#two").append("<option value='two' data-section='foo' data-description='Two'>Two</option>");
+    $("#two").treeMultiselect();
+    assert.equal($("#" + $option.attr('id')).length, 1);
+  })
 });

@@ -3,9 +3,10 @@ var Tree = require('./tree');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
+var uniqueId = 0;
+
 var treeMultiselect = function(opts) {
   var options = mergeDefaultOptions(opts);
-  var uniqueId = 0;
 
   this.each(() => {
     var $originalSelect = $(this);

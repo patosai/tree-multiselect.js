@@ -1,7 +1,4 @@
-var Option = require('./option');
 var Tree = require('./tree');
-var UiBuilder = require('./ui-builder');
-var Util = require('./utility');
 
 var uniqueId = 0;
 
@@ -9,7 +6,7 @@ var treeMultiselect = function(opts) {
   var options = mergeDefaultOptions(opts);
 
   this.each(() => {
-    var $originalSelect = $(this);
+    var $originalSelect = jQuery(this);
     $originalSelect.attr('multiple', '').css('display', 'none');
 
     var tree = new Tree(uniqueId, $originalSelect, options);
@@ -37,7 +34,7 @@ function mergeDefaultOptions(options) {
     sortable: false,
     startCollapsed: false
   };
-  return $.extend({}, defaults, options);
+  return jQuery.extend({}, defaults, options);
 }
 
 module.exports = treeMultiselect;

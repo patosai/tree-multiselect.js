@@ -28,15 +28,6 @@ module.exports = function(grunt) {
       }
     },
 
-    // JSHint
-    jshint: {
-      options: {
-        esversion: 6
-      },
-      all: ['src/**/*.js']
-    },
-
-
     // Karma runner
     karma: {
       options: {
@@ -108,12 +99,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-coveralls');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('test-local', ['karma:local', 'jshint']);
+  grunt.registerTask('test-local', ['karma:local']);
   grunt.registerTask('test-travis', ['test-local', 'coveralls']);
   grunt.registerTask('test-watch', ['karma:continuous']);
 

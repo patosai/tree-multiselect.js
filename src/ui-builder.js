@@ -1,13 +1,13 @@
 module.exports = function($el, hideSidePanel) {
-  var $tree = $("<div class='tree-multiselect'></div>");
+  var $tree = jQuery('<div class="tree-multiselect"></div>');
 
-  var $selections = $("<div class='selections'></div>");
+  var $selections = jQuery('<div class="selections"></div>');
   if (hideSidePanel) {
-    $selections.addClass("no-border");
+    $selections.addClass('no-border');
   }
   $tree.append($selections);
 
-  var $selected = $("<div class='selected'></div>");
+  var $selected = jQuery('<div class="selected"></div>');
   if (!hideSidePanel) {
     $tree.append($selected);
   }

@@ -4,7 +4,7 @@
 module.exports = {
   assert(bool, message) {
     if (!bool) {
-      throw new Error(message || "Assertion failed");
+      throw new Error(message || 'Assertion failed');
     }
   },
 

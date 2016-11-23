@@ -83,7 +83,7 @@ Tree.prototype.generateSelections = function() {
 
     ++id;
   });
-  this.keysToAdd = Util.arrayUniq(Util.arrayRemoveFalseyExceptZero(this.keysToAdd).concat(keysToAddAtEnd));
+  this.keysToAdd = Util.array.uniq(Util.array.removeFalseyExceptZero(this.keysToAdd).concat(keysToAddAtEnd));
 
   return data;
 };
@@ -161,9 +161,9 @@ Tree.prototype.handleSectionCheckboxMarkings = function() {
       keys.push(Util.getKey(el));
     });
     if (this.checked) {
-      self.keysToAdd = Util.arrayUniq(self.keysToAdd.concat(keys));
+      self.keysToAdd = Util.array.uniq(self.keysToAdd.concat(keys));
     } else {
-      self.keysToRemove = Util.arrayUniq(self.keysToRemove.concat(keys));
+      self.keysToRemove = Util.array.uniq(self.keysToRemove.concat(keys));
     }
     self.render();
   });
@@ -257,12 +257,12 @@ Tree.prototype.createSelectAllButtons = function() {
     for (var ii = 0; ii < self.selectOptions.length; ++ii) {
       self.keysToAdd.push(ii);
     }
-    self.keysToAdd = Util.arrayUniq(self.keysToAdd);
+    self.keysToAdd = Util.array.uniq(self.keysToAdd);
     self.render();
   });
 
   this.$selectionContainer.on('click', 'span.unselect-all', function() {
-    self.keysToRemove = Util.arrayUniq(self.keysToRemove.concat(self.selectedKeys));
+    self.keysToRemove = Util.array.uniq(self.keysToRemove.concat(self.selectedKeys));
     self.render();
   });
 };
@@ -308,7 +308,7 @@ Tree.prototype.updateSelectedAndOnChange = function() {
         if (startIndex === endIndex) {
           return;
         }
-        Util.arrayMoveEl(self.selectedKeys, startIndex, endIndex);
+        Util.array.moveEl(self.selectedKeys, startIndex, endIndex);
         self.render();
       }
     });
@@ -317,8 +317,8 @@ Tree.prototype.updateSelectedAndOnChange = function() {
 
 Tree.prototype.render = function(noCallbacks) {
   // fix arrays first
-  this.keysToAdd = Util.arraySubtract(this.keysToAdd, this.selectedKeys);
-  this.keysToRemove = Util.arrayIntersect(this.keysToRemove, this.selectedKeys);
+  this.keysToAdd = Util.array.subtract(this.keysToAdd, this.selectedKeys);
+  this.keysToRemove = Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
   // remove items first
   var self = this;
@@ -336,7 +336,7 @@ Tree.prototype.render = function(noCallbacks) {
     return self.keysToRemove.indexOf(key) !== -1;
   }).find('> input[type=checkbox]').prop('checked', false);
 
-  this.selectedKeys = Util.arraySubtract(this.selectedKeys, this.keysToRemove);
+  this.selectedKeys = Util.array.subtract(this.selectedKeys, this.keysToRemove);
 
   // now add items
   var domStr = '';
@@ -357,7 +357,7 @@ Tree.prototype.render = function(noCallbacks) {
     return self.keysToAdd.indexOf(key) !== -1;
   }).find('> input[type=checkbox]').prop('checked', true);
 
-  this.selectedKeys = Util.arrayUniq(this.selectedKeys.concat(this.keysToAdd));
+  this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
 
   // redraw section checkboxes
   this.redrawSectionCheckboxes();

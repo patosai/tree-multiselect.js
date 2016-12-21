@@ -20,8 +20,7 @@ function Tree(id, $originalSelect, options) {
 
 Tree.prototype.initialize = function() {
   var data = this.generateSelections();
-  var generatedHtmlData = this.generateHtmlFromData(data);
-  this.$selectionContainer.append(generatedHtmlData);
+  this.generateHtmlFromData(data, this.$selectionContainer[0]);
 
   this.popupDescriptionHover();
 
@@ -88,47 +87,62 @@ Tree.prototype.generateSelections = function() {
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function(data) {
-  // returns array, 0th el is number of options, 1st el is HTML string
-  var str = '';
+Tree.prototype.generateHtmlFromData = function(data, parentNode) {
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
 
-    var optionLabelCheckboxId = `treemultiselect-${this.id}-${option.id}`;
-    var descriptionStr = option.description ? ` data-description='${option.description}'` : '';
-    var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : '';
-    var optionCheckboxStr = '';
-    var optionLabelStr = '';
-    if (!this.options.onlyBatchSelection) {
-      optionCheckboxStr += `<input class='option' type='checkbox' id='${optionLabelCheckboxId}'`;
-      if (this.options.freeze) {
-        optionCheckboxStr += ' disabled';
-      }
-      optionCheckboxStr += '/>';
-      optionLabelStr += `<label for='${optionLabelCheckboxId}'>${option.text || option.value}</label>`;
-    } else {
-      optionLabelStr += `${option.text || option.value}`;
-    }
-    var descriptionPopupStr = option.description ? '<span class="description">?</span>' : '';
-
-    str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${optionLabelStr}</div>`;
+    var selection = Util.dom.createSelection(option, this.id, !this.options.onlyBatchSelection, this.options.freeze);
+    parentNode.appendChild(selection);
   }
 
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
-    var sectionCheckboxStr = '';
-    if (this.options.onlyBatchSelection || this.options.allowBatchSelection) {
-      sectionCheckboxStr += '<input class="section" type="checkbox"';
-      if (this.options.freeze) {
-        sectionCheckboxStr += ' disabled';
-      }
-      sectionCheckboxStr += '/>';
-    }
+    var title = keys[jj];
 
-    var generatedData = this.generateHtmlFromData(data[1][keys[jj]]);
-    str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData}</div>`;
+    var sectionNode = Util.dom.createSection(title, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
+    parentNode.appendChild(sectionNode);
+    this.generateHtmlFromData(data[1][keys[jj]], sectionNode);
   }
-  return str;
+
+  //var str = '';
+  //for (var ii = 0; ii < data[0].length; ++ii) {
+    //var option = data[0][ii];
+
+    //var optionLabelCheckboxId = `treemultiselect-${this.id}-${option.id}`;
+    //var descriptionStr = option.description ? ` data-description='${option.description}'` : '';
+    //var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : '';
+    //var optionCheckboxStr = '';
+    //var optionLabelStr = '';
+    //if (!this.options.onlyBatchSelection) {
+      //optionCheckboxStr += `<input class='option' type='checkbox' id='${optionLabelCheckboxId}'`;
+      //if (this.options.freeze) {
+        //optionCheckboxStr += ' disabled';
+      //}
+      //optionCheckboxStr += '/>';
+      //optionLabelStr += `<label for='${optionLabelCheckboxId}'>${option.text || option.value}</label>`;
+    //} else {
+      //optionLabelStr += `${option.text || option.value}`;
+    //}
+    //var descriptionPopupStr = option.description ? '<span class="description">?</span>' : '';
+
+    //str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${optionLabelStr}</div>`;
+  //}
+
+  //var keys = Object.keys(data[1]);
+  //for (var jj = 0; jj < keys.length; ++jj) {
+    //var sectionCheckboxStr = '';
+    //if (this.options.onlyBatchSelection || this.options.allowBatchSelection) {
+      //sectionCheckboxStr += '<input class="section" type="checkbox"';
+      //if (this.options.freeze) {
+        //sectionCheckboxStr += ' disabled';
+      //}
+      //sectionCheckboxStr += '/>';
+    //}
+
+    //var generatedData = this.generateHtmlFromData(data[1][keys[jj]]);
+    //str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData}</div>`;
+  //}
+  //return str;
 };
 
 Tree.prototype.popupDescriptionHover = function() {

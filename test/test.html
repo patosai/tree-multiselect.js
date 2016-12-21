@@ -32,9 +32,16 @@
       <option value="bar" data-section="section">bar</option>
     </select>
 
+    <select id="test-select-3" multiple="multiple">
+      <option value="baz" data-section="section">baz</option>
+      <option value="quux" data-section="section">quux</option>
+    </select>
+
+
     <script type="text/javascript">
       $("#test-select").treeMultiselect({ enableSelectAll: true, sortable: true });
       $("#test-select-2").treeMultiselect();
+      $("#test-select-3").treeMultiselect({allowBatchSelection: true});
     </script>
   </body>
 </html>

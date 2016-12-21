@@ -74,12 +74,87 @@ module.exports = {
   dom: {
     createNode(tag, props) {
       var node = document.createElement(tag);
-      for (var key in props) {
-        if (props.hasOwnProperty(key)) {
-          node.setAttribute(key, props[key]);
+
+      if (props) {
+        for (var key in props) {
+          if (props.hasOwnProperty(key) && key !== 'text') {
+            node.setAttribute(key, props[key]);
+          }
+        }
+        if (props.text) {
+          node.textContent = props.text;
         }
       }
       return node;
+    },
+
+    createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
+      var props = {
+        class: 'item',
+        'data-key': option.id,
+        'data-value': option.value
+      };
+
+      var hasDescription = !!option.description;
+
+      if (hasDescription) {
+        props['data-description'] = option.description;
+      }
+      if (option.initialIndex) {
+        props['data-index'] = option.initialIndex;
+      }
+
+      var selectionNode = this.createNode('div', props);
+
+      if (hasDescription) {
+        var popup = this.createNode('span', {class: 'description', text: '?'});
+        selectionNode.appendChild(popup);
+      }
+
+      if (createCheckboxes) {
+        var optionLabelCheckboxId = `treemultiselect-${treeId}-${option.id}`;
+        var inputCheckboxProps = {
+          class: 'option',
+          type: 'checkbox',
+          id: optionLabelCheckboxId,
+        };
+        if (disableCheckboxes) {
+          inputCheckboxProps.disabled = true;
+        }
+        var inputCheckbox = this.createNode('input', inputCheckboxProps);
+        // prepend child
+        selectionNode.insertBefore(inputCheckbox, selectionNode.firstChild);
+
+        var labelProps = {
+          for: optionLabelCheckboxId,
+          text: option.text || option.value
+        };
+        var label = this.createNode('label', labelProps);
+        selectionNode.appendChild(label);
+      } else {
+        selectionNode.innerText = option.text || option.value;
+      }
+
+      return selectionNode;
+    },
+
+    createSection(sectionName, createCheckboxes, disableCheckboxes) {
+      var sectionNode = this.createNode('div', {class: 'section'});
+
+      var titleNode = this.createNode('div', {class: 'title', text: sectionName});
+      if (createCheckboxes) {
+        var checkboxProps = {
+          class: 'section',
+          type: 'checkbox'
+        };
+        if (disableCheckboxes) {
+          checkboxProps.disabled = true;
+        }
+        var checkboxNode = this.createNode('input', checkboxProps);
+        titleNode.insertBefore(checkboxNode, titleNode.firstChild);
+      }
+      sectionNode.appendChild(titleNode);
+      return sectionNode;
     }
   }
 };

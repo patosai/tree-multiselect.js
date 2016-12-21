@@ -115,13 +115,16 @@ describe('Utility', () => {
     it('creates nodes with correct properties', () => {
       var props = {
         foo: 'bar',
-        baz: 'over 9000'
+        baz: 'over 9000',
+        text: 'foo'
       }
       var node = Util.dom.createNode('div', props);
 
       assert.equal(node.attributes.length, 2);
       assert.equal(node.getAttribute('foo'), props.foo);
       assert.equal(node.getAttribute('baz'), props.baz);
+
+      assert.equal(node.textContent, props.text);
     });
   });
 });

@@ -214,17 +214,14 @@ Tree.prototype.addCollapsibility = function() {
 };
 
 Tree.prototype.createSelectAllButtons = function() {
-  var $selectAll = jQuery('<span class="select-all"></span>');
-  $selectAll.text(this.options.selectAllText);
-  var $unselectAll = jQuery('<span class="unselect-all"></span>');
-  $unselectAll.text(this.options.unselectAllText);
+  var selectAllNode = Util.dom.createNode('span', {class: 'select-all', text: this.options.selectAllText});
+  var unselectAllNode = Util.dom.createNode('span', {class: 'unselect-all', text: this.options.unselectAllText});
 
-  var $selectAllContainer = jQuery('<div class="select-all-container"></div>');
+  var selectAllContainer = Util.dom.createNode('div', {class: 'select-all-container'});
+  selectAllContainer.appendChild(selectAllNode);
+  selectAllContainer.appendChild(unselectAllNode);
 
-  $selectAllContainer.prepend($unselectAll);
-  $selectAllContainer.prepend($selectAll);
-
-  this.$selectionContainer.prepend($selectAllContainer);
+  this.$selectionContainer.prepend(selectAllContainer);
 
   var self = this;
   this.$selectionContainer.on('click', 'span.select-all', function() {
@@ -313,17 +310,14 @@ Tree.prototype.render = function(noCallbacks) {
   this.selectedKeys = Util.array.subtract(this.selectedKeys, this.keysToRemove);
 
   // now add items
-  var domStr = '';
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
     var key = this.keysToAdd[jj];
     var option = this.selectOptions[key];
     this.selectedKeys.push(key);
 
-    var freezeStr = this.options.freeze ? '' : '<span class="remove-selected">×</span>';
-    var sectionNameStr = this.options.showSectionOnSelected ? `<span class='section-name'>${option.section}</span>` : '';
-    domStr += `<div class='item' data-key='${option.id}' data-value='${option.value}'>${freezeStr}${sectionNameStr}${option.text}</div>`;
+    var selectedNode = Util.dom.createSelected(option, this.options.freeze, this.options.showSectionOnSelected);
+    this.$selectedContainer.append(selectedNode);
   }
-  this.$selectedContainer.append(domStr);
 
   // check the checkboxes
   $selectionItems.filter(function() {

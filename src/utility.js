@@ -88,30 +88,28 @@ module.exports = {
       return node;
     },
 
-    createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
+    createSelection(option, treeId, createCheckboxes, disableCheckboxes, collapsible) {
       var props = {
         class: 'item',
         'data-key': option.id,
         'data-value': option.value
       };
-
       var hasDescription = !!option.description;
-
       if (hasDescription) {
         props['data-description'] = option.description;
       }
       if (option.initialIndex) {
         props['data-index'] = option.initialIndex;
       }
-
       var selectionNode = this.createNode('div', props);
 
       if (hasDescription) {
         var popup = this.createNode('span', {class: 'description', text: '?'});
         selectionNode.appendChild(popup);
       }
-
-      if (createCheckboxes) {
+      if (!createCheckboxes) {
+        selectionNode.innerText = option.text || option.value;
+      } else {
         var optionLabelCheckboxId = `treemultiselect-${treeId}-${option.id}`;
         var inputCheckboxProps = {
           class: 'option',
@@ -131,11 +129,30 @@ module.exports = {
         };
         var label = this.createNode('label', labelProps);
         selectionNode.appendChild(label);
-      } else {
-        selectionNode.innerText = option.text || option.value;
       }
 
       return selectionNode;
+    },
+
+    createSelected(option, disableRemoval, showSectionOnSelected) {
+      var node = this.createNode('div', {
+        class: 'item',
+        'data-key': option.id,
+        'data-value': option.value,
+        text: option.text
+      });
+
+      if (!disableRemoval) {
+        var removalSpan = this.createNode('span', {class: 'remove-selected', text: '×'});
+        node.insertBefore(removalSpan, node.firstChild);
+      }
+
+      if (showSectionOnSelected) {
+        var sectionSpan = this.createNode('span', {class: 'section-name', text: option.section});
+        node.appendChild(sectionSpan);
+      }
+
+      return node;
     },
 
     createSection(sectionName, createCheckboxes, disableCheckboxes) {

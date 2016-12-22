@@ -1,4 +1,3 @@
-/* jQuery Tree Multiselect v2.0.2 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -174,46 +173,6 @@ Tree.prototype.generateHtmlFromData = function (data, parentNode) {
     parentNode.appendChild(sectionNode);
     this.generateHtmlFromData(data[1][keys[jj]], sectionNode);
   }
-
-  //var str = '';
-  //for (var ii = 0; ii < data[0].length; ++ii) {
-  //var option = data[0][ii];
-
-  //var optionLabelCheckboxId = `treemultiselect-${this.id}-${option.id}`;
-  //var descriptionStr = option.description ? ` data-description='${option.description}'` : '';
-  //var indexStr = option.initialIndex ? ` data-index='${option.initialIndex}'` : '';
-  //var optionCheckboxStr = '';
-  //var optionLabelStr = '';
-  //if (!this.options.onlyBatchSelection) {
-  //optionCheckboxStr += `<input class='option' type='checkbox' id='${optionLabelCheckboxId}'`;
-  //if (this.options.freeze) {
-  //optionCheckboxStr += ' disabled';
-  //}
-  //optionCheckboxStr += '/>';
-  //optionLabelStr += `<label for='${optionLabelCheckboxId}'>${option.text || option.value}</label>`;
-  //} else {
-  //optionLabelStr += `${option.text || option.value}`;
-  //}
-  //var descriptionPopupStr = option.description ? '<span class="description">?</span>' : '';
-
-  //str += `<div class='item' data-key='${option.id}'data-value='${option.value}'${descriptionStr}${indexStr}>${optionCheckboxStr}${descriptionPopupStr}${optionLabelStr}</div>`;
-  //}
-
-  //var keys = Object.keys(data[1]);
-  //for (var jj = 0; jj < keys.length; ++jj) {
-  //var sectionCheckboxStr = '';
-  //if (this.options.onlyBatchSelection || this.options.allowBatchSelection) {
-  //sectionCheckboxStr += '<input class="section" type="checkbox"';
-  //if (this.options.freeze) {
-  //sectionCheckboxStr += ' disabled';
-  //}
-  //sectionCheckboxStr += '/>';
-  //}
-
-  //var generatedData = this.generateHtmlFromData(data[1][keys[jj]]);
-  //str += `<div class='section'><div class='title'>${sectionCheckboxStr}${keys[jj]}</div>${generatedData}</div>`;
-  //}
-  //return str;
 };
 
 Tree.prototype.popupDescriptionHover = function () {
@@ -325,17 +284,14 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSelectAllButtons = function () {
-  var $selectAll = jQuery('<span class="select-all"></span>');
-  $selectAll.text(this.options.selectAllText);
-  var $unselectAll = jQuery('<span class="unselect-all"></span>');
-  $unselectAll.text(this.options.unselectAllText);
+  var selectAllNode = Util.dom.createNode('span', { class: 'select-all', text: this.options.selectAllText });
+  var unselectAllNode = Util.dom.createNode('span', { class: 'unselect-all', text: this.options.unselectAllText });
 
-  var $selectAllContainer = jQuery('<div class="select-all-container"></div>');
+  var selectAllContainer = Util.dom.createNode('div', { class: 'select-all-container' });
+  selectAllContainer.appendChild(selectAllNode);
+  selectAllContainer.appendChild(unselectAllNode);
 
-  $selectAllContainer.prepend($unselectAll);
-  $selectAllContainer.prepend($selectAll);
-
-  this.$selectionContainer.prepend($selectAllContainer);
+  this.$selectionContainer.prepend(selectAllContainer);
 
   var self = this;
   this.$selectionContainer.on('click', 'span.select-all', function () {
@@ -425,17 +381,14 @@ Tree.prototype.render = function (noCallbacks) {
   this.selectedKeys = Util.array.subtract(this.selectedKeys, this.keysToRemove);
 
   // now add items
-  var domStr = '';
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
     var key = this.keysToAdd[jj];
     var option = this.selectOptions[key];
     this.selectedKeys.push(key);
 
-    var freezeStr = this.options.freeze ? '' : '<span class="remove-selected">×</span>';
-    var sectionNameStr = this.options.showSectionOnSelected ? '<span class=\'section-name\'>' + option.section + '</span>' : '';
-    domStr += '<div class=\'item\' data-key=\'' + option.id + '\' data-value=\'' + option.value + '\'>' + freezeStr + sectionNameStr + option.text + '</div>';
+    var selectedNode = Util.dom.createSelected(option, this.options.freeze, this.options.showSectionOnSelected);
+    this.$selectedContainer.append(selectedNode);
   }
-  this.$selectedContainer.append(domStr);
 
   // check the checkboxes
   $selectionItems.filter(function () {
@@ -608,30 +561,28 @@ module.exports = {
       }
       return node;
     },
-    createSelection: function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
+    createSelection: function createSelection(option, treeId, createCheckboxes, disableCheckboxes, collapsible) {
       var props = {
         class: 'item',
         'data-key': option.id,
         'data-value': option.value
       };
-
       var hasDescription = !!option.description;
-
       if (hasDescription) {
         props['data-description'] = option.description;
       }
       if (option.initialIndex) {
         props['data-index'] = option.initialIndex;
       }
-
       var selectionNode = this.createNode('div', props);
 
       if (hasDescription) {
         var popup = this.createNode('span', { class: 'description', text: '?' });
         selectionNode.appendChild(popup);
       }
-
-      if (createCheckboxes) {
+      if (!createCheckboxes) {
+        selectionNode.innerText = option.text || option.value;
+      } else {
         var optionLabelCheckboxId = 'treemultiselect-' + treeId + '-' + option.id;
         var inputCheckboxProps = {
           class: 'option',
@@ -651,11 +602,29 @@ module.exports = {
         };
         var label = this.createNode('label', labelProps);
         selectionNode.appendChild(label);
-      } else {
-        selectionNode.innerText = option.text || option.value;
       }
 
       return selectionNode;
+    },
+    createSelected: function createSelected(option, disableRemoval, showSectionOnSelected) {
+      var node = this.createNode('div', {
+        class: 'item',
+        'data-key': option.id,
+        'data-value': option.value,
+        text: option.text
+      });
+
+      if (!disableRemoval) {
+        var removalSpan = this.createNode('span', { class: 'remove-selected', text: '×' });
+        node.insertBefore(removalSpan, node.firstChild);
+      }
+
+      if (showSectionOnSelected) {
+        var sectionSpan = this.createNode('span', { class: 'section-name', text: option.section });
+        node.appendChild(sectionSpan);
+      }
+
+      return node;
     },
     createSection: function createSection(sectionName, createCheckboxes, disableCheckboxes) {
       var sectionNode = this.createNode('div', { class: 'section' });

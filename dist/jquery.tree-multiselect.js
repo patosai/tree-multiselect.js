@@ -60,37 +60,138 @@ module.exports = function (id, value, text, description, initialIndex, section) 
 },{}],3:[function(require,module,exports){
 'use strict';
 
-var index = {};
-var nodeHash = {};
+var Util = require('./utility');
 
-// takes in string values
+var index = {}; // key: at most three-letter combinations, value: array of data-key
+var nodeHash = {}; // key: data-key, value: DOM node
+var nodeHashKeys = [];
+
+var SAMPLE_SIZE = 3;
+
+function addToIndex(key, id) {
+  for (var ii = 1; ii <= SAMPLE_SIZE; ++ii) {
+    for (var jj = 0; jj < key.length - ii + 1; ++jj) {
+      var minikey = key.substring(jj, jj + ii);
+
+      if (!index[minikey]) {
+        index[minikey] = [];
+      }
+
+      // don't duplicate
+      // this takes advantage of the fact that the minikeys with same id's are added sequentially
+      var length = index[minikey].length;
+      if (length === 0 || index[minikey][length - 1] !== id) {
+        index[minikey].push(id);
+      }
+    }
+  }
+}
+
+// split word into three letter (or less) pieces
+function splitWord(word) {
+  if (!word) {
+    return [];
+  }
+
+  if (word.length < SAMPLE_SIZE) {
+    return [word];
+  }
+
+  var chunks = [];
+  for (var ii = 0; ii < word.length - SAMPLE_SIZE + 1; ++ii) {
+    chunks.push(word.substring(ii, ii + SAMPLE_SIZE));
+  }
+  return chunks;
+}
+
 function buildIndex(options, inNodeHash) {
+  // options are sorted by id already
+  // trigrams
   for (var ii = 0; ii < options.length; ++ii) {
     var option = options[ii];
-    var searchString = option.value + option.text + option.description + option.section;
-    index[option.id] = searchString;
+    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]);
+    for (var jj = 0; jj < searchWords.length; ++jj) {
+      var words = searchWords[jj].split(' ');
+      for (var kk = 0; kk < words.length; ++kk) {
+        addToIndex(words[kk], option.id);
+      }
+    }
   }
   nodeHash = inNodeHash;
+  nodeHashKeys = Object.keys(inNodeHash);
 }
 
 function search(value) {
-  var ids = Object.keys(index);
-
   if (!value) {
-    for (var ii = 0; ii < ids.length; ++ii) {
-      nodeHash[ids[ii]].style.display = '';
+    for (var ii = 0; ii < nodeHashKeys.length; ++ii) {
+      var id = nodeHashKeys[ii];
+      nodeHash[id].style.display = '';
     }
     return;
   }
 
-  var regex = new RegExp(value, 'i');
-  for (var ii = 0; ii < ids.length; ++ii) {
-    var id = parseInt(ids[ii]);
-    var node = nodeHash[id];
-    if (regex.test(index[id])) {
-      node.style.display = '';
-    } else {
-      node.style.display = 'none';
+  var searchWords = value.split(' ');
+  var searchChunks = [];
+  for (var ii = 0; ii < searchWords.length; ++ii) {
+    var chunks = splitWord(searchWords[ii]);
+    for (var jj = 0; jj < searchWords.length; ++jj) {
+      var chunk = chunks[jj];
+      searchChunks.push(index[chunk] || []);
+    }
+  }
+
+  // since the the indices are sorted, keep track of index locations as we progress
+  var indexLocations = [];
+  var maxIndexLocations = [];
+  for (var ii = 0; ii < searchChunks.length; ++ii) {
+    indexLocations.push(0);
+    maxIndexLocations.push(searchChunks[ii].length - 1);
+  }
+
+  var finalOutput = [];
+  for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
+    // advance indices to be at least equal to first array element
+    var terminate = false;
+    for (var ii = 1; ii < searchChunks.length; ++ii) {
+      while (searchChunks[ii][indexLocations[ii]] < searchChunks[0][indexLocations[0]] && indexLocations[ii] <= maxIndexLocations[ii]) {
+        ++indexLocations[ii];
+      }
+      if (indexLocations[ii] > maxIndexLocations[ii]) {
+        terminate = true;
+        break;
+      }
+    }
+
+    if (terminate) {
+      break;
+    }
+
+    // check element equality
+    var shouldAdd = true;
+    for (var ii = 1; ii < searchChunks.length; ++ii) {
+      if (searchChunks[0][indexLocations[0]] !== searchChunks[ii][indexLocations[ii]]) {
+        shouldAdd = false;
+        break;
+      }
+    }
+
+    if (shouldAdd) {
+      finalOutput.push(searchChunks[0][indexLocations[0]]);
+    }
+  }
+
+  // now we have id's that match search query
+  var finalOutputHash = {};
+  for (var ii = 0; ii < finalOutput.length; ++ii) {
+    var id = finalOutput[ii];
+    finalOutputHash[id] = true;
+    nodeHash[id].style.display = '';
+  }
+  var allIds = nodeHashKeys;
+  for (var ii = 0; ii < nodeHashKeys.length; ++ii) {
+    var id = nodeHashKeys[ii];
+    if (!finalOutputHash[nodeHashKeys[ii]]) {
+      nodeHash[id].style.display = 'none';
     }
   }
 }
@@ -100,7 +201,7 @@ module.exports = {
   search: search
 };
 
-},{}],4:[function(require,module,exports){
+},{"./utility":9}],4:[function(require,module,exports){
 'use strict';
 
 (function ($) {
@@ -129,6 +230,7 @@ function Tree(id, $originalSelect, options) {
 
   this.selectOptions = [];
   this.selectNodes = {}; // data-key is key, provides DOM node
+  this.selectedNodes = {}; // data-key is key, provides DOM node for selected
   this.selectedKeys = [];
   this.keysToAdd = [];
   this.keysToRemove = [];
@@ -423,17 +525,15 @@ Tree.prototype.render = function (noCallbacks) {
   this.keysToRemove = Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
   // remove items first
-  var self = this;
-  var $selectionItems = this.$selectionContainer.find('div.item');
-
-  // remove the selected divs
-  this.$selectedContainer.find('div.item').filter(function () {
-    var key = Util.getKey(this);
-    return self.keysToRemove.indexOf(key) !== -1;
-  }).remove();
-
-  // uncheck these checkboxes
   for (var ii = 0; ii < this.keysToRemove.length; ++ii) {
+    // remove the selected divs
+    var node = this.selectedNodes[this.keysToRemove[ii]];
+    if (node) {
+      node.remove();
+      this.selectedNodes[this.keysToRemove[ii]] = null;
+    }
+
+    // uncheck these checkboxes
     var selectionNode = this.selectNodes[this.keysToRemove[ii]];
     selectionNode.getElementsByTagName('INPUT')[0].checked = false;
   }
@@ -442,18 +542,17 @@ Tree.prototype.render = function (noCallbacks) {
 
   // now add items
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
+    // create selected divs
     var key = this.keysToAdd[jj];
     var option = this.selectOptions[key];
     this.selectedKeys.push(key);
 
     var selectedNode = Util.dom.createSelected(option, this.options.freeze, this.options.showSectionOnSelected);
+    this.selectedNodes[option.id] = selectedNode;
     this.$selectedContainer.append(selectedNode);
-  }
 
-  // check the checkboxes
-  for (var ii = 0; ii < this.keysToAdd.length; ++ii) {
-    var selectionNode = this.selectNodes[this.keysToAdd[ii]];
-    selectionNode.getElementsByTagName('INPUT')[0].checked = true;
+    // check the checkboxes
+    this.selectNodes[this.keysToAdd[jj]].getElementsByTagName('INPUT')[0].checked = true;
   }
 
   this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
@@ -465,10 +564,10 @@ Tree.prototype.render = function (noCallbacks) {
   var originalValsHash = {};
   // valHash hashes a value to an index
   var valHash = {};
-  for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
-    var value = this.selectOptions[this.selectedKeys[ii]].value;
-    originalValsHash[this.selectedKeys[ii]] = true;
-    valHash[value] = ii;
+  for (var kk = 0; kk < this.selectedKeys.length; ++kk) {
+    var value = this.selectOptions[this.selectedKeys[kk]].value;
+    originalValsHash[this.selectedKeys[kk]] = true;
+    valHash[value] = kk;
   }
   // TODO is there a better way to sort the values other than by HTML?
   var options = this.$originalSelect.find('option').toArray();
@@ -619,7 +718,7 @@ function createNode(tag, props) {
   return node;
 }
 
-function createSelection(option, treeId, createCheckboxes, disableCheckboxes, collapsible) {
+function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
     'data-key': option.id,

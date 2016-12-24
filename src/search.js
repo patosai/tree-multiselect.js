@@ -22,8 +22,8 @@ function search(value) {
   }
 
   var regex = new RegExp(value, 'i');
-  for (var ii = 0; ii < ids.length; ++ii) {
-    var id = parseInt(ids[ii]);
+  for (var jj = 0; jj < ids.length; ++jj) {
+    var id = parseInt(ids[jj]);
     var node = nodeHash[id];
     if (regex.test(index[id])) {
       node.style.display = '';

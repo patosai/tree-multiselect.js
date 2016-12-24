@@ -227,7 +227,7 @@ Tree.prototype.createSearchBar = function() {
     var searchText = this.value;
     Search.search(searchText);
   });
-}
+};
 
 Tree.prototype.createSelectAllButtons = function() {
   var selectAllNode = Util.dom.createNode('span', {class: 'select-all', text: this.options.selectAllText});
@@ -309,7 +309,6 @@ Tree.prototype.render = function(noCallbacks) {
 
   // remove items first
   var self = this;
-  var $selectionItems = this.$selectionContainer.find('div.item');
 
   // remove the selected divs
   this.$selectedContainer.find('div.item').filter(function() {
@@ -336,9 +335,8 @@ Tree.prototype.render = function(noCallbacks) {
   }
 
   // check the checkboxes
-  for (var ii = 0; ii < this.keysToAdd.length; ++ii) {
-    var selectionNode = this.selectNodes[this.keysToAdd[ii]];
-    selectionNode.getElementsByTagName('INPUT')[0].checked = true;
+  for (var kk = 0; kk < this.keysToAdd.length; ++kk) {
+    (this.selectNodes[this.keysToAdd[kk]]).getElementsByTagName('INPUT')[0].checked = true;
   }
 
   this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
@@ -350,10 +348,10 @@ Tree.prototype.render = function(noCallbacks) {
   var originalValsHash = {};
   // valHash hashes a value to an index
   var valHash = {};
-  for (var ii = 0; ii < this.selectedKeys.length; ++ii) {
-    var value = this.selectOptions[this.selectedKeys[ii]].value;
-    originalValsHash[this.selectedKeys[ii]] = true;
-    valHash[value] = ii;
+  for (var mm = 0; mm < this.selectedKeys.length; ++mm) {
+    var value = this.selectOptions[this.selectedKeys[mm]].value;
+    originalValsHash[this.selectedKeys[mm]] = true;
+    valHash[value] = mm;
   }
   // TODO is there a better way to sort the values other than by HTML?
   var options = this.$originalSelect.find('option').toArray();

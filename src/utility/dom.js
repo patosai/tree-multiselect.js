@@ -14,7 +14,7 @@ function createNode(tag, props) {
   return node;
 }
 
-function createSelection(option, treeId, createCheckboxes, disableCheckboxes, collapsible) {
+function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
     'data-key': option.id,

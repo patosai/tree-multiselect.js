@@ -38,6 +38,7 @@
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-coveralls": "^1.0.1",
+    "grunt-eslint": "^19.0.0",
     "grunt-karma": "^2.0.0",
     "grunt-sass": "^1.2.1",
     "isparta": "^4.0.0",

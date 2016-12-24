@@ -18,4 +18,4 @@ module.exports = {
 
   array: utilArray,
   dom: utilDom
-}
+};

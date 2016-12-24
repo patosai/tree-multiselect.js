@@ -6,6 +6,13 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
 
+    eslint: {
+      target: ['src/**/*.js'],
+      options: {
+        configFile: '.eslintrc.yml'
+      }
+    },
+
     browserify: {
       dist: {
         options: {
@@ -99,11 +106,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-coveralls');
+  grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('test-local', ['karma:local']);
+  grunt.registerTask('test-local', ['eslint', 'karma:local']);
   grunt.registerTask('test-travis', ['test-local', 'coveralls']);
   grunt.registerTask('test-watch', ['karma:continuous']);
 

@@ -1,4 +1,5 @@
 var Option = require('./option');
+var Search = require('./search');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
@@ -13,6 +14,7 @@ function Tree(id, $originalSelect, options) {
   this.options = options;
 
   this.selectOptions = [];
+  this.selectNodes = {}; // data-key is key, provides DOM node
   this.selectedKeys = [];
   this.keysToAdd = [];
   this.keysToRemove = [];
@@ -30,6 +32,10 @@ Tree.prototype.initialize = function() {
 
   if (this.options.collapsible) {
     this.addCollapsibility();
+  }
+
+  if (this.options.searchable) {
+    this.createSearchBar();
   }
 
   if (this.options.enableSelectAll) {
@@ -90,15 +96,14 @@ Tree.prototype.generateSelections = function() {
 Tree.prototype.generateHtmlFromData = function(data, parentNode) {
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
-
     var selection = Util.dom.createSelection(option, this.id, !this.options.onlyBatchSelection, this.options.freeze);
+    this.selectNodes[option.id] = selection;
     parentNode.appendChild(selection);
   }
 
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
     var title = keys[jj];
-
     var sectionNode = Util.dom.createSection(title, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
     parentNode.appendChild(sectionNode);
     this.generateHtmlFromData(data[1][keys[jj]], sectionNode);
@@ -190,15 +195,14 @@ Tree.prototype.addCollapsibility = function() {
   var titleSelector = 'div.title';
   var $titleDivs = this.$selectionContainer.find(titleSelector);
 
-  var collapseDiv = document.createElement('span');
-  collapseDiv.className = 'collapse-section';
+  var collapseSpan = Util.dom.createNode('span', {class: 'collapse-section'});
   if (this.options.startCollapsed) {
-    jQuery(collapseDiv).text(expandIndicator);
+    jQuery(collapseSpan).text(expandIndicator);
     $titleDivs.siblings().toggle();
   } else {
-    jQuery(collapseDiv).text(hideIndicator);
+    jQuery(collapseSpan).text(hideIndicator);
   }
-  $titleDivs.prepend(collapseDiv);
+  $titleDivs.prepend(collapseSpan);
 
   this.$selectionContainer.on('click', titleSelector, function(event) {
     if (event.target.nodeName == 'INPUT') {
@@ -212,6 +216,18 @@ Tree.prototype.addCollapsibility = function() {
     $title.siblings().toggle();
   });
 };
+
+Tree.prototype.createSearchBar = function() {
+  Search.buildIndex(this.selectOptions, this.selectNodes);
+
+  var searchNode = Util.dom.createNode('input', {class: 'search', placeholder: 'Search...'});
+  this.$selectionContainer.prepend(searchNode);
+
+  this.$selectionContainer.on('input', 'input.search', function() {
+    var searchText = this.value;
+    Search.search(searchText);
+  });
+}
 
 Tree.prototype.createSelectAllButtons = function() {
   var selectAllNode = Util.dom.createNode('span', {class: 'select-all', text: this.options.selectAllText});
@@ -302,10 +318,10 @@ Tree.prototype.render = function(noCallbacks) {
   }).remove();
 
   // uncheck these checkboxes
-  $selectionItems.filter(function() {
-    var key = Util.getKey(this);
-    return self.keysToRemove.indexOf(key) !== -1;
-  }).find('> input[type=checkbox]').prop('checked', false);
+  for (var ii = 0; ii < this.keysToRemove.length; ++ii) {
+    var selectionNode = this.selectNodes[this.keysToRemove[ii]];
+    selectionNode.getElementsByTagName('INPUT')[0].checked = false;
+  }
 
   this.selectedKeys = Util.array.subtract(this.selectedKeys, this.keysToRemove);
 
@@ -320,10 +336,10 @@ Tree.prototype.render = function(noCallbacks) {
   }
 
   // check the checkboxes
-  $selectionItems.filter(function() {
-    var key = Util.getKey(this);
-    return self.keysToAdd.indexOf(key) !== -1;
-  }).find('> input[type=checkbox]').prop('checked', true);
+  for (var ii = 0; ii < this.keysToAdd.length; ++ii) {
+    var selectionNode = this.selectNodes[this.keysToAdd[ii]];
+    selectionNode.getElementsByTagName('INPUT')[0].checked = true;
+  }
 
   this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
 

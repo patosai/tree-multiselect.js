@@ -29,6 +29,7 @@ function mergeDefaultOptions(options) {
     hideSidePanel: false,
     onChange: null,
     onlyBatchSelection: false,
+    searchable: false,
     sectionDelimiter: '/',
     showSectionOnSelected: true,
     sortable: false,

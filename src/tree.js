@@ -15,6 +15,7 @@ function Tree(id, $originalSelect, options) {
 
   this.selectOptions = [];
   this.selectNodes = {}; // data-key is key, provides DOM node
+  this.selectedNodes = {}; // data-key is key, provides DOM node for selected
   this.selectedKeys = [];
   this.keysToAdd = [];
   this.keysToRemove = [];
@@ -308,16 +309,15 @@ Tree.prototype.render = function(noCallbacks) {
   this.keysToRemove = Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
   // remove items first
-  var self = this;
-
-  // remove the selected divs
-  this.$selectedContainer.find('div.item').filter(function() {
-    var key = Util.getKey(this);
-    return self.keysToRemove.indexOf(key) !== -1;
-  }).remove();
-
-  // uncheck these checkboxes
   for (var ii = 0; ii < this.keysToRemove.length; ++ii) {
+    // remove the selected divs
+    var node = this.selectedNodes[this.keysToRemove[ii]];
+    if (node) {
+      node.remove();
+      this.selectedNodes[this.keysToRemove[ii]] = null;
+    }
+
+    // uncheck these checkboxes
     var selectionNode = this.selectNodes[this.keysToRemove[ii]];
     selectionNode.getElementsByTagName('INPUT')[0].checked = false;
   }
@@ -326,17 +326,17 @@ Tree.prototype.render = function(noCallbacks) {
 
   // now add items
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
+    // create selected divs
     var key = this.keysToAdd[jj];
     var option = this.selectOptions[key];
     this.selectedKeys.push(key);
 
     var selectedNode = Util.dom.createSelected(option, this.options.freeze, this.options.showSectionOnSelected);
+    this.selectedNodes[option.id] = selectedNode;
     this.$selectedContainer.append(selectedNode);
-  }
 
-  // check the checkboxes
-  for (var kk = 0; kk < this.keysToAdd.length; ++kk) {
-    (this.selectNodes[this.keysToAdd[kk]]).getElementsByTagName('INPUT')[0].checked = true;
+    // check the checkboxes
+    (this.selectNodes[this.keysToAdd[jj]]).getElementsByTagName('INPUT')[0].checked = true;
   }
 
   this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
@@ -348,10 +348,10 @@ Tree.prototype.render = function(noCallbacks) {
   var originalValsHash = {};
   // valHash hashes a value to an index
   var valHash = {};
-  for (var mm = 0; mm < this.selectedKeys.length; ++mm) {
-    var value = this.selectOptions[this.selectedKeys[mm]].value;
-    originalValsHash[this.selectedKeys[mm]] = true;
-    valHash[value] = mm;
+  for (var kk = 0; kk < this.selectedKeys.length; ++kk) {
+    var value = this.selectOptions[this.selectedKeys[kk]].value;
+    originalValsHash[this.selectedKeys[kk]] = true;
+    valHash[value] = kk;
   }
   // TODO is there a better way to sort the values other than by HTML?
   var options = this.$originalSelect.find('option').toArray();

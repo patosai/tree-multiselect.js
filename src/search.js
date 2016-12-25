@@ -1,8 +1,11 @@
 var Util = require('./utility');
 
 var index = {}; // key: at most three-letter combinations, value: array of data-key
-var nodeHash = {}; // key: data-key, value: DOM node
-var nodeHashKeys = [];
+var selectionNodeHash = {}; // key: data-key, value: DOM node
+var selectionNodeHashKeys = [];
+
+var sectionNodeHash = {};
+var sectionNodeHashKeys = [];
 
 const SAMPLE_SIZE = 3;
 
@@ -42,7 +45,7 @@ function splitWord(word) {
   return chunks;
 }
 
-function buildIndex(options, inNodeHash) {
+function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
   // options are sorted by id already
   // trigrams
   for (var ii = 0; ii < options.length; ++ii) {
@@ -55,15 +58,22 @@ function buildIndex(options, inNodeHash) {
       }
     }
   }
-  nodeHash = inNodeHash;
-  nodeHashKeys = Object.keys(inNodeHash);
+  selectionNodeHash = inSelectionNodeHash;
+  selectionNodeHashKeys = Object.keys(inSelectionNodeHash);
+
+  sectionNodeHash = inSectionNodeHash;
+  sectionNodeHashKeys = Object.keys(inSectionNodeHash);
 }
 
 function search(value) {
   if (!value) {
-    for (var ii = 0; ii < nodeHashKeys.length; ++ii) {
-      var id = nodeHashKeys[ii];
-      nodeHash[id].style.display = '';
+    for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
+      var id = selectionNodeHashKeys[ii];
+      selectionNodeHash[id].style.display = '';
+    }
+    for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
+      var id = sectionNodeHashKeys[ii];
+      sectionNodeHash[id].style.display = '';
     }
     return;
   }
@@ -121,16 +131,43 @@ function search(value) {
 
   // now we have id's that match search query
   var finalOutputHash = {};
+  var sectionsToNotHideHash = {};
   for (var ii = 0; ii < finalOutput.length; ++ii) {
     var id = finalOutput[ii];
     finalOutputHash[id] = true;
-    nodeHash[id].style.display = '';
+    var node = selectionNodeHash[id];
+    node.style.display = '';
+
+    // now search for parent sections
+    node = node.parentNode;
+    while (!node.className.match(/tree-multiselect/)) {
+      if (node.className.match(/section/)) {
+        var key = Util.getKey(node);
+        Util.assert(key || key === 0);
+        if (sectionsToNotHideHash[key]) {
+          break;
+        } else {
+          sectionsToNotHideHash[key] = true;
+          node.style.display = '';
+        }
+      }
+      node = node.parentNode;
+    }
   }
-  var allIds = nodeHashKeys;
-  for (var ii = 0; ii < nodeHashKeys.length; ++ii) {
-    var id = nodeHashKeys[ii];
-    if (!finalOutputHash[nodeHashKeys[ii]]) {
-      nodeHash[id].style.display = 'none';
+
+  // hide selections
+  for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
+    var id = selectionNodeHashKeys[ii];
+    if (!finalOutputHash[selectionNodeHashKeys[ii]]) {
+      selectionNodeHash[id].style.display = 'none';
+    }
+  }
+
+  // hide sections
+  for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
+    var id = sectionNodeHashKeys[ii];
+    if (!sectionsToNotHideHash[ii]) {
+      sectionNodeHash[id].style.display = 'none';
     }
   }
 }

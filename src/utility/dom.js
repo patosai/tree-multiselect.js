@@ -81,8 +81,8 @@ function createSelected(option, disableRemoval, showSectionOnSelected) {
   return node;
 }
 
-function createSection(sectionName, createCheckboxes, disableCheckboxes) {
-  var sectionNode = createNode('div', {class: 'section'});
+function createSection(sectionName, sectionId, createCheckboxes, disableCheckboxes) {
+  var sectionNode = createNode('div', {class: 'section', 'data-key': sectionId});
 
   var titleNode = createNode('div', {class: 'title', text: sectionName});
   if (createCheckboxes) {

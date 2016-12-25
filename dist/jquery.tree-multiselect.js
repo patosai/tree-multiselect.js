@@ -63,8 +63,11 @@ module.exports = function (id, value, text, description, initialIndex, section) 
 var Util = require('./utility');
 
 var index = {}; // key: at most three-letter combinations, value: array of data-key
-var nodeHash = {}; // key: data-key, value: DOM node
-var nodeHashKeys = [];
+var selectionNodeHash = {}; // key: data-key, value: DOM node
+var selectionNodeHashKeys = [];
+
+var sectionNodeHash = {};
+var sectionNodeHashKeys = [];
 
 var SAMPLE_SIZE = 3;
 
@@ -104,7 +107,7 @@ function splitWord(word) {
   return chunks;
 }
 
-function buildIndex(options, inNodeHash) {
+function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
   // options are sorted by id already
   // trigrams
   for (var ii = 0; ii < options.length; ++ii) {
@@ -117,15 +120,22 @@ function buildIndex(options, inNodeHash) {
       }
     }
   }
-  nodeHash = inNodeHash;
-  nodeHashKeys = Object.keys(inNodeHash);
+  selectionNodeHash = inSelectionNodeHash;
+  selectionNodeHashKeys = Object.keys(inSelectionNodeHash);
+
+  sectionNodeHash = inSectionNodeHash;
+  sectionNodeHashKeys = Object.keys(inSectionNodeHash);
 }
 
 function search(value) {
   if (!value) {
-    for (var ii = 0; ii < nodeHashKeys.length; ++ii) {
-      var id = nodeHashKeys[ii];
-      nodeHash[id].style.display = '';
+    for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
+      var id = selectionNodeHashKeys[ii];
+      selectionNodeHash[id].style.display = '';
+    }
+    for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
+      var id = sectionNodeHashKeys[ii];
+      sectionNodeHash[id].style.display = '';
     }
     return;
   }
@@ -182,16 +192,43 @@ function search(value) {
 
   // now we have id's that match search query
   var finalOutputHash = {};
+  var sectionsToNotHideHash = {};
   for (var ii = 0; ii < finalOutput.length; ++ii) {
     var id = finalOutput[ii];
     finalOutputHash[id] = true;
-    nodeHash[id].style.display = '';
+    var node = selectionNodeHash[id];
+    node.style.display = '';
+
+    // now search for parent sections
+    node = node.parentNode;
+    while (!node.className.match(/tree-multiselect/)) {
+      if (node.className.match(/section/)) {
+        var key = Util.getKey(node);
+        Util.assert(key || key === 0);
+        if (sectionsToNotHideHash[key]) {
+          break;
+        } else {
+          sectionsToNotHideHash[key] = true;
+          node.style.display = '';
+        }
+      }
+      node = node.parentNode;
+    }
   }
-  var allIds = nodeHashKeys;
-  for (var ii = 0; ii < nodeHashKeys.length; ++ii) {
-    var id = nodeHashKeys[ii];
-    if (!finalOutputHash[nodeHashKeys[ii]]) {
-      nodeHash[id].style.display = 'none';
+
+  // hide selections
+  for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
+    var id = selectionNodeHashKeys[ii];
+    if (!finalOutputHash[selectionNodeHashKeys[ii]]) {
+      selectionNodeHash[id].style.display = 'none';
+    }
+  }
+
+  // hide sections
+  for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
+    var id = sectionNodeHashKeys[ii];
+    if (!sectionsToNotHideHash[ii]) {
+      sectionNodeHash[id].style.display = 'none';
     }
   }
 }
@@ -229,8 +266,12 @@ function Tree(id, $originalSelect, options) {
   this.options = options;
 
   this.selectOptions = [];
-  this.selectNodes = {}; // data-key is key, provides DOM node
-  this.selectedNodes = {}; // data-key is key, provides DOM node for selected
+
+  // data-key is key, provides DOM node
+  this.selectNodes = {};
+  this.sectionNodes = {};
+  this.selectedNodes = {};
+
   this.selectedKeys = [];
   this.keysToAdd = [];
   this.keysToRemove = [];
@@ -309,7 +350,10 @@ Tree.prototype.generateSelections = function () {
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function (data, parentNode) {
+Tree.prototype.generateHtmlFromData = function (data, parentNode, sectionIdStart) {
+  sectionIdStart = sectionIdStart || 0;
+  var numItems = 0;
+
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
     var selection = Util.dom.createSelection(option, this.id, !this.options.onlyBatchSelection, this.options.freeze);
@@ -320,10 +364,15 @@ Tree.prototype.generateHtmlFromData = function (data, parentNode) {
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
     var title = keys[jj];
-    var sectionNode = Util.dom.createSection(title, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
+    var id = numItems + sectionIdStart;
+    var sectionNode = Util.dom.createSection(title, id, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
+    this.sectionNodes[id] = sectionNode;
+    ++numItems;
     parentNode.appendChild(sectionNode);
-    this.generateHtmlFromData(data[1][keys[jj]], sectionNode);
+    numItems += this.generateHtmlFromData(data[1][keys[jj]], sectionNode, sectionIdStart + numItems);
   }
+
+  return numItems;
 };
 
 Tree.prototype.popupDescriptionHover = function () {
@@ -434,7 +483,7 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSearchBar = function () {
-  Search.buildIndex(this.selectOptions, this.selectNodes);
+  Search.buildIndex(this.selectOptions, this.selectNodes, this.sectionNodes);
 
   var searchNode = Util.dom.createNode('input', { class: 'search', placeholder: 'Search...' });
   this.$selectionContainer.prepend(searchNode);
@@ -785,8 +834,8 @@ function createSelected(option, disableRemoval, showSectionOnSelected) {
   return node;
 }
 
-function createSection(sectionName, createCheckboxes, disableCheckboxes) {
-  var sectionNode = createNode('div', { class: 'section' });
+function createSection(sectionName, sectionId, createCheckboxes, disableCheckboxes) {
+  var sectionNode = createNode('div', { class: 'section', 'data-key': sectionId });
 
   var titleNode = createNode('div', { class: 'title', text: sectionName });
   if (createCheckboxes) {

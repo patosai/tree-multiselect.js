@@ -14,8 +14,12 @@ function Tree(id, $originalSelect, options) {
   this.options = options;
 
   this.selectOptions = [];
-  this.selectNodes = {}; // data-key is key, provides DOM node
-  this.selectedNodes = {}; // data-key is key, provides DOM node for selected
+
+  // data-key is key, provides DOM node
+  this.selectNodes = {};
+  this.sectionNodes = {};
+  this.selectedNodes = {};
+
   this.selectedKeys = [];
   this.keysToAdd = [];
   this.keysToRemove = [];
@@ -94,7 +98,10 @@ Tree.prototype.generateSelections = function() {
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function(data, parentNode) {
+Tree.prototype.generateHtmlFromData = function(data, parentNode, sectionIdStart) {
+  sectionIdStart = sectionIdStart || 0;
+  var numItems = 0;
+
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
     var selection = Util.dom.createSelection(option, this.id, !this.options.onlyBatchSelection, this.options.freeze);
@@ -105,10 +112,15 @@ Tree.prototype.generateHtmlFromData = function(data, parentNode) {
   var keys = Object.keys(data[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
     var title = keys[jj];
-    var sectionNode = Util.dom.createSection(title, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
+    var id = numItems + sectionIdStart;
+    var sectionNode = Util.dom.createSection(title, id, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
+    this.sectionNodes[id] = sectionNode;
+    ++numItems;
     parentNode.appendChild(sectionNode);
-    this.generateHtmlFromData(data[1][keys[jj]], sectionNode);
+    numItems += this.generateHtmlFromData(data[1][keys[jj]], sectionNode, sectionIdStart + numItems);
   }
+
+  return numItems;
 };
 
 Tree.prototype.popupDescriptionHover = function() {
@@ -219,7 +231,7 @@ Tree.prototype.addCollapsibility = function() {
 };
 
 Tree.prototype.createSearchBar = function() {
-  Search.buildIndex(this.selectOptions, this.selectNodes);
+  Search.buildIndex(this.selectOptions, this.selectNodes, this.sectionNodes);
 
   var searchNode = Util.dom.createNode('input', {class: 'search', placeholder: 'Search...'});
   this.$selectionContainer.prepend(searchNode);

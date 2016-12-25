@@ -75,49 +75,10 @@ Search.prototype.search = function(value) {
     });
   });
 
-  // since the the indices are sorted, keep track of index locations as we progress
-  var indexLocations = [];
-  var maxIndexLocations = [];
-  searchChunks.forEach((chunk) => {
-    indexLocations.push(0);
-    maxIndexLocations.push(chunk.length - 1);
-  });
-
-  var finalOutput = [];
-  for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
-    // advance indices to be at least equal to first array element
-    var terminate = false;
-    for (var ii = 1; ii < searchChunks.length; ++ii) {
-      while (searchChunks[ii][indexLocations[ii]] < searchChunks[0][indexLocations[0]] &&
-             indexLocations[ii] <= maxIndexLocations[ii]) {
-        ++indexLocations[ii];
-      }
-      if (indexLocations[ii] > maxIndexLocations[ii]) {
-        terminate = true;
-        break;
-      }
-    }
-
-    if (terminate) {
-      break;
-    }
-
-    // check element equality
-    var shouldAdd = true;
-    for (var jj = 1; jj < searchChunks.length; ++jj) {
-      if (searchChunks[0][indexLocations[0]] !== searchChunks[jj][indexLocations[jj]]) {
-        shouldAdd = false;
-        break;
-      }
-    }
-
-    if (shouldAdd) {
-      finalOutput.push(searchChunks[0][indexLocations[0]]);
-    }
-  }
+  var matchedNodeIds = Util.array.intersectMany(searchChunks);
 
   // now we have id's that match search query
-  this._handleNodeVisbilities(finalOutput);
+  this._handleNodeVisbilities(matchedNodeIds);
 };
 
 Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
@@ -160,9 +121,7 @@ Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
 
 // split word into three letter (or less) pieces
 function splitWord(word) {
-  if (!word) {
-    return [];
-  }
+  Util.assert(word);
 
   if (word.length < MAX_SAMPLE_SIZE) {
     return [word];

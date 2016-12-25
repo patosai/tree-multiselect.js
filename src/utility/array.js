@@ -54,10 +54,57 @@ function intersect(arr, arrExcluded) {
   return newArr;
 }
 
+// takes in array of arrays
+// arrays are presorted
+function intersectMany(arrays) {
+  var indexLocations = [];
+  var maxIndexLocations = [];
+  arrays.forEach((array) => {
+    indexLocations.push(0);
+    maxIndexLocations.push(array.length - 1);
+  });
+
+  var finalOutput = [];
+  for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
+    // advance indices to be at least equal to first array element
+    var terminate = false;
+    for (var ii = 1; ii < arrays.length; ++ii) {
+      while (arrays[ii][indexLocations[ii]] < arrays[0][indexLocations[0]] &&
+             indexLocations[ii] <= maxIndexLocations[ii]) {
+        ++indexLocations[ii];
+      }
+      if (indexLocations[ii] > maxIndexLocations[ii]) {
+        terminate = true;
+        break;
+      }
+    }
+
+    if (terminate) {
+      break;
+    }
+
+    // check element equality
+    var shouldAdd = true;
+    for (var jj = 1; jj < arrays.length; ++jj) {
+      if (arrays[0][indexLocations[0]] !== arrays[jj][indexLocations[jj]]) {
+        shouldAdd = false;
+        break;
+      }
+    }
+
+    if (shouldAdd) {
+      finalOutput.push(arrays[0][indexLocations[0]]);
+    }
+  }
+
+  return finalOutput;
+}
+
 module.exports = {
   subtract: subtract,
   uniq: uniq,
   removeFalseyExceptZero: removeFalseyExceptZero,
   moveEl: moveEl,
-  intersect: intersect
+  intersect: intersect,
+  intersectMany: intersectMany
 };

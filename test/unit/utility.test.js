@@ -101,6 +101,20 @@ describe('Utility', () => {
       assert.deepEqual(Util.array.intersect(arr, arr2), [0, 0, 0, 0, 0, 0]);
       assert.deepEqual(Util.array.intersect(arr2, arr), [0]);
     });
+
+    it('intersectMany', () => {
+      var arrays = [[1, 3, 5, 7], [2, 3, 6, 7], [3, 9]];
+      assert.deepEqual(Util.array.intersectMany(arrays), [3]);
+
+      var arrays = [[1, 3, 5, 7], [2, 3, 6, 7], [9]];
+      assert.deepEqual(Util.array.intersectMany(arrays), []);
+
+      var arrays = [[1, 2, 3, 4], [4, 5, 6, 7], [8, 9]];
+      assert.deepEqual(Util.array.intersectMany(arrays), []);
+
+      var arrays = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]];
+      assert.deepEqual(Util.array.intersectMany(arrays), [1, 2, 3, 4]);
+    });
   });
 
   describe('dom', () => {

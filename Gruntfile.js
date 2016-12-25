@@ -25,16 +25,6 @@ module.exports = function(grunt) {
       }
     },
 
-    // Upload LCOV data to coveralls.io
-    coveralls: {
-      options: {
-        force: true
-      },
-      ci: {
-        src: 'coverage/**/lcov.info'
-      }
-    },
-
     // Karma runner
     karma: {
       options: {
@@ -105,20 +95,18 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-coveralls');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('test-local', ['eslint', 'karma:local']);
-  grunt.registerTask('test-travis', ['test-local', 'coveralls']);
+  grunt.registerTask('test', ['eslint', 'karma:local']);
   grunt.registerTask('test-watch', ['karma:continuous']);
 
   grunt.registerTask('build', ['browserify']);
 
-  grunt.registerTask('release', ['test-local', 'build', 'uglify', 'sass:build', 'sass:min', 'usebanner']);
+  grunt.registerTask('release', ['test', 'build', 'uglify', 'sass:build', 'sass:min', 'usebanner']);
   grunt.registerTask('watch', ['test-watch']);
 
-  grunt.registerTask('default', 'test-local');
+  grunt.registerTask('default', 'test');
 };

@@ -4,11 +4,14 @@ node_js:
   - 5
 
 before_script:
-  - npm install grunt-cli eslint -g
+  - yarn global add grunt-cli eslint codecov
 
 script:
   - eslint src/*.js
-  - grunt test-travis --verbose
+  - grunt test --verbose
+
+after_script:
+  - codecov
 
 notifications:
   email:

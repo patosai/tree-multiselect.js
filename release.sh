@@ -1,6 +1,7 @@
 #!/bin/sh
 set -x
 VERSION=$(node -e "console.log(require('./package.json').version);")
+grunt release
 git add .
 git commit -m "Release version $VERSION"
 git tag v$VERSION

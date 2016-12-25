@@ -1,3 +1,4 @@
+/* jQuery Tree Multiselect v2.1.0 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -141,48 +142,10 @@ Search.prototype.search = function (value) {
     });
   });
 
-  // since the the indices are sorted, keep track of index locations as we progress
-  var indexLocations = [];
-  var maxIndexLocations = [];
-  searchChunks.forEach(function (chunk) {
-    indexLocations.push(0);
-    maxIndexLocations.push(chunk.length - 1);
-  });
-
-  var finalOutput = [];
-  for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
-    // advance indices to be at least equal to first array element
-    var terminate = false;
-    for (var ii = 1; ii < searchChunks.length; ++ii) {
-      while (searchChunks[ii][indexLocations[ii]] < searchChunks[0][indexLocations[0]] && indexLocations[ii] <= maxIndexLocations[ii]) {
-        ++indexLocations[ii];
-      }
-      if (indexLocations[ii] > maxIndexLocations[ii]) {
-        terminate = true;
-        break;
-      }
-    }
-
-    if (terminate) {
-      break;
-    }
-
-    // check element equality
-    var shouldAdd = true;
-    for (var jj = 1; jj < searchChunks.length; ++jj) {
-      if (searchChunks[0][indexLocations[0]] !== searchChunks[jj][indexLocations[jj]]) {
-        shouldAdd = false;
-        break;
-      }
-    }
-
-    if (shouldAdd) {
-      finalOutput.push(searchChunks[0][indexLocations[0]]);
-    }
-  }
+  var matchedNodeIds = Util.array.intersectMany(searchChunks);
 
   // now we have id's that match search query
-  this._handleNodeVisbilities(finalOutput);
+  this._handleNodeVisbilities(matchedNodeIds);
 };
 
 Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
@@ -227,9 +190,7 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
 
 // split word into three letter (or less) pieces
 function splitWord(word) {
-  if (!word) {
-    return [];
-  }
+  Util.assert(word);
 
   if (word.length < MAX_SAMPLE_SIZE) {
     return [word];
@@ -751,12 +712,58 @@ function intersect(arr, arrExcluded) {
   return newArr;
 }
 
+// takes in array of arrays
+// arrays are presorted
+function intersectMany(arrays) {
+  var indexLocations = [];
+  var maxIndexLocations = [];
+  arrays.forEach(function (array) {
+    indexLocations.push(0);
+    maxIndexLocations.push(array.length - 1);
+  });
+
+  var finalOutput = [];
+  for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
+    // advance indices to be at least equal to first array element
+    var terminate = false;
+    for (var ii = 1; ii < arrays.length; ++ii) {
+      while (arrays[ii][indexLocations[ii]] < arrays[0][indexLocations[0]] && indexLocations[ii] <= maxIndexLocations[ii]) {
+        ++indexLocations[ii];
+      }
+      if (indexLocations[ii] > maxIndexLocations[ii]) {
+        terminate = true;
+        break;
+      }
+    }
+
+    if (terminate) {
+      break;
+    }
+
+    // check element equality
+    var shouldAdd = true;
+    for (var jj = 1; jj < arrays.length; ++jj) {
+      if (arrays[0][indexLocations[0]] !== arrays[jj][indexLocations[jj]]) {
+        shouldAdd = false;
+        break;
+      }
+    }
+
+    if (shouldAdd) {
+      finalOutput.push(arrays[0][indexLocations[0]]);
+    }
+  }
+
+  return finalOutput;
+}
+
 module.exports = {
   subtract: subtract,
   uniq: uniq,
   removeFalseyExceptZero: removeFalseyExceptZero,
   moveEl: moveEl,
-  intersect: intersect
+  intersect: intersect,
+  intersectMany: intersectMany
 };
 
 },{}],8:[function(require,module,exports){

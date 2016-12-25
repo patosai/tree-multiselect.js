@@ -1,3 +1,4 @@
+var Option = require('option');
 var Util = require('utility');
 
 describe('Utility', () => {
@@ -142,6 +143,19 @@ describe('Utility', () => {
       assert.equal(node.getAttribute('baz'), props.baz);
 
       assert.equal(node.textContent, props.text);
+    });
+
+    it('creates selection node with all properties', () => {
+      var option = new Option(0, 'val', 'text', 'description');
+      var node = Util.dom.createSelection(option, 0, true, true);
+      assert.equal(node.getAttribute('data-value'), 'val');
+      assert.equal(node.getAttribute('data-description'), 'description');
+    });
+
+    it('creates selection node with value as text', () => {
+      var option = new Option(0, 'val', null);
+      var node = Util.dom.createSelection(option, 0, true, true);
+      assert.equal(node.getAttribute('data-value'), 'val');
     });
   });
 });

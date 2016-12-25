@@ -50,7 +50,10 @@ function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
   // trigrams
   for (var ii = 0; ii < options.length; ++ii) {
     var option = options[ii];
-    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]);
+    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]).map((item) => {
+      return item.toLowerCase();
+    });
+
     for (var jj = 0; jj < searchWords.length; ++jj) {
       var words = searchWords[jj].split(' ');
       for (var kk = 0; kk < words.length; ++kk) {
@@ -67,34 +70,33 @@ function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
 
 function search(value) {
   if (!value) {
-    for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
-      var id = selectionNodeHashKeys[ii];
+    selectionNodeHashKeys.forEach((id) => {
       selectionNodeHash[id].style.display = '';
-    }
-    for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
-      var id = sectionNodeHashKeys[ii];
+    });
+    sectionNodeHashKeys.forEach((id) => {
       sectionNodeHash[id].style.display = '';
-    }
+    });
     return;
   }
 
+  value = value.toLowerCase();
+
   var searchWords = value.split(' ');
   var searchChunks = [];
-  for (var ii = 0; ii < searchWords.length; ++ii) {
-    var chunks = splitWord(searchWords[ii]) ;
-    for (var jj = 0; jj < searchWords.length; ++jj) {
-      var chunk = chunks[jj];
+  searchWords.forEach((searchWord) => {
+    var chunks = splitWord(searchWord);
+    chunks.forEach((chunk) => {
       searchChunks.push(index[chunk] || []);
-    }
-  }
+    });
+  });
 
   // since the the indices are sorted, keep track of index locations as we progress
   var indexLocations = [];
   var maxIndexLocations = [];
-  for (var ii = 0; ii < searchChunks.length; ++ii) {
+  searchChunks.forEach((chunk) => {
     indexLocations.push(0);
-    maxIndexLocations.push(searchChunks[ii].length - 1);
-  }
+    maxIndexLocations.push(chunk.length - 1);
+  });
 
   var finalOutput = [];
   for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
@@ -117,8 +119,8 @@ function search(value) {
 
     // check element equality
     var shouldAdd = true;
-    for (var ii = 1; ii < searchChunks.length; ++ii) {
-      if (searchChunks[0][indexLocations[0]] !== searchChunks[ii][indexLocations[ii]]) {
+    for (var jj = 1; jj < searchChunks.length; ++jj) {
+      if (searchChunks[0][indexLocations[0]] !== searchChunks[jj][indexLocations[jj]]) {
         shouldAdd = false;
         break;
       }
@@ -132,8 +134,7 @@ function search(value) {
   // now we have id's that match search query
   var finalOutputHash = {};
   var sectionsToNotHideHash = {};
-  for (var ii = 0; ii < finalOutput.length; ++ii) {
-    var id = finalOutput[ii];
+  finalOutput.forEach((id) => {
     finalOutputHash[id] = true;
     var node = selectionNodeHash[id];
     node.style.display = '';
@@ -153,23 +154,19 @@ function search(value) {
       }
       node = node.parentNode;
     }
-  }
+  });
 
   // hide selections
-  for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
-    var id = selectionNodeHashKeys[ii];
-    if (!finalOutputHash[selectionNodeHashKeys[ii]]) {
+  selectionNodeHashKeys.forEach((id) => {
+    if (!finalOutputHash[id]) {
       selectionNodeHash[id].style.display = 'none';
     }
-  }
-
-  // hide sections
-  for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
-    var id = sectionNodeHashKeys[ii];
-    if (!sectionsToNotHideHash[ii]) {
+  });
+  sectionNodeHashKeys.forEach((id) => {
+    if (!sectionsToNotHideHash[id]) {
       sectionNodeHash[id].style.display = 'none';
     }
-  }
+  });
 }
 
 module.exports = {

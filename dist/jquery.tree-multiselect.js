@@ -1,3 +1,4 @@
+/* jQuery Tree Multiselect v2.0.2 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -112,7 +113,10 @@ function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
   // trigrams
   for (var ii = 0; ii < options.length; ++ii) {
     var option = options[ii];
-    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]);
+    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]).map(function (item) {
+      return item.toLowerCase();
+    });
+
     for (var jj = 0; jj < searchWords.length; ++jj) {
       var words = searchWords[jj].split(' ');
       for (var kk = 0; kk < words.length; ++kk) {
@@ -129,34 +133,33 @@ function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
 
 function search(value) {
   if (!value) {
-    for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
-      var id = selectionNodeHashKeys[ii];
+    selectionNodeHashKeys.forEach(function (id) {
       selectionNodeHash[id].style.display = '';
-    }
-    for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
-      var id = sectionNodeHashKeys[ii];
+    });
+    sectionNodeHashKeys.forEach(function (id) {
       sectionNodeHash[id].style.display = '';
-    }
+    });
     return;
   }
 
+  value = value.toLowerCase();
+
   var searchWords = value.split(' ');
   var searchChunks = [];
-  for (var ii = 0; ii < searchWords.length; ++ii) {
-    var chunks = splitWord(searchWords[ii]);
-    for (var jj = 0; jj < searchWords.length; ++jj) {
-      var chunk = chunks[jj];
+  searchWords.forEach(function (searchWord) {
+    var chunks = splitWord(searchWord);
+    chunks.forEach(function (chunk) {
       searchChunks.push(index[chunk] || []);
-    }
-  }
+    });
+  });
 
   // since the the indices are sorted, keep track of index locations as we progress
   var indexLocations = [];
   var maxIndexLocations = [];
-  for (var ii = 0; ii < searchChunks.length; ++ii) {
+  searchChunks.forEach(function (chunk) {
     indexLocations.push(0);
-    maxIndexLocations.push(searchChunks[ii].length - 1);
-  }
+    maxIndexLocations.push(chunk.length - 1);
+  });
 
   var finalOutput = [];
   for (; indexLocations.length > 0 && indexLocations[0] <= maxIndexLocations[0]; ++indexLocations[0]) {
@@ -178,8 +181,8 @@ function search(value) {
 
     // check element equality
     var shouldAdd = true;
-    for (var ii = 1; ii < searchChunks.length; ++ii) {
-      if (searchChunks[0][indexLocations[0]] !== searchChunks[ii][indexLocations[ii]]) {
+    for (var jj = 1; jj < searchChunks.length; ++jj) {
+      if (searchChunks[0][indexLocations[0]] !== searchChunks[jj][indexLocations[jj]]) {
         shouldAdd = false;
         break;
       }
@@ -193,8 +196,7 @@ function search(value) {
   // now we have id's that match search query
   var finalOutputHash = {};
   var sectionsToNotHideHash = {};
-  for (var ii = 0; ii < finalOutput.length; ++ii) {
-    var id = finalOutput[ii];
+  finalOutput.forEach(function (id) {
     finalOutputHash[id] = true;
     var node = selectionNodeHash[id];
     node.style.display = '';
@@ -214,23 +216,19 @@ function search(value) {
       }
       node = node.parentNode;
     }
-  }
+  });
 
   // hide selections
-  for (var ii = 0; ii < selectionNodeHashKeys.length; ++ii) {
-    var id = selectionNodeHashKeys[ii];
-    if (!finalOutputHash[selectionNodeHashKeys[ii]]) {
+  selectionNodeHashKeys.forEach(function (id) {
+    if (!finalOutputHash[id]) {
       selectionNodeHash[id].style.display = 'none';
     }
-  }
-
-  // hide sections
-  for (var ii = 0; ii < sectionNodeHashKeys.length; ++ii) {
-    var id = sectionNodeHashKeys[ii];
-    if (!sectionsToNotHideHash[ii]) {
+  });
+  sectionNodeHashKeys.forEach(function (id) {
+    if (!sectionsToNotHideHash[id]) {
       sectionNodeHash[id].style.display = 'none';
     }
-  }
+  });
 }
 
 module.exports = {

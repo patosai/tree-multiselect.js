@@ -289,12 +289,17 @@ Tree.prototype.initialize = function () {
     this.addCollapsibility();
   }
 
-  if (this.options.searchable) {
-    this.createSearchBar();
-  }
+  if (this.options.searchable || this.options.enableSelectAll) {
+    var auxiliaryBox = Util.dom.createNode('div', { class: 'auxiliary' });
+    this.$selectionContainer.prepend(auxiliaryBox, this.$selectionContainer.firstChild);
 
-  if (this.options.enableSelectAll) {
-    this.createSelectAllButtons();
+    if (this.options.searchable) {
+      this.createSearchBar(auxiliaryBox);
+    }
+
+    if (this.options.enableSelectAll) {
+      this.createSelectAllButtons(auxiliaryBox);
+    }
   }
 
   this.armRemoveSelectedOnClick();
@@ -480,11 +485,11 @@ Tree.prototype.addCollapsibility = function () {
   });
 };
 
-Tree.prototype.createSearchBar = function () {
+Tree.prototype.createSearchBar = function (parentNode) {
   Search.buildIndex(this.selectOptions, this.selectNodes, this.sectionNodes);
 
   var searchNode = Util.dom.createNode('input', { class: 'search', placeholder: 'Search...' });
-  this.$selectionContainer.prepend(searchNode);
+  parentNode.appendChild(searchNode);
 
   this.$selectionContainer.on('input', 'input.search', function () {
     var searchText = this.value;
@@ -492,7 +497,7 @@ Tree.prototype.createSearchBar = function () {
   });
 };
 
-Tree.prototype.createSelectAllButtons = function () {
+Tree.prototype.createSelectAllButtons = function (parentNode) {
   var selectAllNode = Util.dom.createNode('span', { class: 'select-all', text: this.options.selectAllText });
   var unselectAllNode = Util.dom.createNode('span', { class: 'unselect-all', text: this.options.unselectAllText });
 
@@ -500,7 +505,7 @@ Tree.prototype.createSelectAllButtons = function () {
   selectAllContainer.appendChild(selectAllNode);
   selectAllContainer.appendChild(unselectAllNode);
 
-  this.$selectionContainer.prepend(selectAllContainer);
+  parentNode.appendChild(selectAllContainer);
 
   var self = this;
   this.$selectionContainer.on('click', 'span.select-all', function () {

@@ -124,19 +124,34 @@ div.tree-multiselect {
     font-style: italic;
   }
 
-  .select-all-container {
-    span.select-all,
-    span.unselect-all {
-      padding-right: 5px;
-      margin-right: 5px;
+  .auxiliary {
+    display: table;
+    width: 100%;
 
-      &:hover {
-        cursor: pointer;
-      }
+    input.search {
+      padding: 5px;
+      border: 2px solid $color-border-light;
+      display: table-cell;
+      width: 100%;
     }
 
-    span.select-all {
-      border-right: 2px solid $color-border-light;
+    .select-all-container {
+      display: table-cell;
+      text-align: right;
+
+      span.select-all,
+      span.unselect-all {
+        padding-right: 5px;
+        margin-right: 5px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      span.select-all {
+        border-right: 2px solid $color-border-light;
+      }
     }
   }
 }

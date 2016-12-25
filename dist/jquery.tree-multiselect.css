@@ -70,12 +70,23 @@ div.tree-multiselect {
   div.tree-multiselect span.section-name {
     float: right;
     font-style: italic; }
-  div.tree-multiselect .select-all-container span.select-all,
-  div.tree-multiselect .select-all-container span.unselect-all {
-    padding-right: 5px;
-    margin-right: 5px; }
-    div.tree-multiselect .select-all-container span.select-all:hover,
-    div.tree-multiselect .select-all-container span.unselect-all:hover {
-      cursor: pointer; }
-  div.tree-multiselect .select-all-container span.select-all {
-    border-right: 2px solid #D8D8D8; }
+  div.tree-multiselect .auxiliary {
+    display: table;
+    width: 100%; }
+    div.tree-multiselect .auxiliary input.search {
+      padding: 5px;
+      border: 2px solid #D8D8D8;
+      display: table-cell;
+      width: 100%; }
+    div.tree-multiselect .auxiliary .select-all-container {
+      display: table-cell;
+      text-align: right; }
+      div.tree-multiselect .auxiliary .select-all-container span.select-all,
+      div.tree-multiselect .auxiliary .select-all-container span.unselect-all {
+        padding-right: 5px;
+        margin-right: 5px; }
+        div.tree-multiselect .auxiliary .select-all-container span.select-all:hover,
+        div.tree-multiselect .auxiliary .select-all-container span.unselect-all:hover {
+          cursor: pointer; }
+      div.tree-multiselect .auxiliary .select-all-container span.select-all {
+        border-right: 2px solid #D8D8D8; }

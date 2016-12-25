@@ -114,6 +114,9 @@ describe('Utility', () => {
 
       var arrays = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]];
       assert.deepEqual(Util.array.intersectMany(arrays), [1, 2, 3, 4]);
+
+      var arrays = [[9, 10, 11, 12], [1, 2, 3, 4], [1, 2, 3, 4]];
+      assert.deepEqual(Util.array.intersectMany(arrays), []);
     });
   });
 

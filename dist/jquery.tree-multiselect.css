@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.1.1 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.1.2 | (c) Patrick Tsai | MIT Licensed */
 div.tree-multiselect {
   border: 2px solid #D8D8D8;
   border-radius: 5px;
@@ -75,6 +75,7 @@ div.tree-multiselect {
     width: 100%; }
     div.tree-multiselect .auxiliary input.search {
       padding: 5px;
+      margin: 0;
       border: 2px solid #D8D8D8;
       display: table-cell;
       width: 100%; }

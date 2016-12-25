@@ -1,4 +1,3 @@
-/* jQuery Tree Multiselect v2.0.2 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -63,81 +62,70 @@ module.exports = function (id, value, text, description, initialIndex, section) 
 
 var Util = require('./utility');
 
-var index = {}; // key: at most three-letter combinations, value: array of data-key
-var selectionNodeHash = {}; // key: data-key, value: DOM node
-var selectionNodeHashKeys = [];
+var MAX_SAMPLE_SIZE = 3;
 
-var sectionNodeHash = {};
-var sectionNodeHashKeys = [];
+function Search(options, inSelectionNodeHash, inSectionNodeHash) {
+  this.options = options;
 
-var SAMPLE_SIZE = 3;
+  this.index = {}; // key: at most three-letter combinations, value: array of data-key
 
-function addToIndex(key, id) {
-  for (var ii = 1; ii <= SAMPLE_SIZE; ++ii) {
-    for (var jj = 0; jj < key.length - ii + 1; ++jj) {
-      var minikey = key.substring(jj, jj + ii);
+  // key: data-key, value: DOM node
+  this.selectionNodeHash = inSelectionNodeHash;
+  this.selectionNodeHashKeys = Object.keys(inSelectionNodeHash);
 
-      if (!index[minikey]) {
-        index[minikey] = [];
-      }
+  this.sectionNodeHash = inSectionNodeHash;
+  this.sectionNodeHashKeys = Object.keys(inSectionNodeHash);
 
-      // don't duplicate
-      // this takes advantage of the fact that the minikeys with same id's are added sequentially
-      var length = index[minikey].length;
-      if (length === 0 || index[minikey][length - 1] !== id) {
-        index[minikey].push(id);
-      }
-    }
-  }
+  this.buildIndex();
 }
 
-// split word into three letter (or less) pieces
-function splitWord(word) {
-  if (!word) {
-    return [];
-  }
+Search.prototype.buildIndex = function () {
+  var _this = this;
 
-  if (word.length < SAMPLE_SIZE) {
-    return [word];
-  }
-
-  var chunks = [];
-  for (var ii = 0; ii < word.length - SAMPLE_SIZE + 1; ++ii) {
-    chunks.push(word.substring(ii, ii + SAMPLE_SIZE));
-  }
-  return chunks;
-}
-
-function buildIndex(options, inSelectionNodeHash, inSectionNodeHash) {
   // options are sorted by id already
   // trigrams
-  for (var ii = 0; ii < options.length; ++ii) {
-    var option = options[ii];
+  this.options.forEach(function (option) {
     var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]).map(function (item) {
       return item.toLowerCase();
     });
 
-    for (var jj = 0; jj < searchWords.length; ++jj) {
-      var words = searchWords[jj].split(' ');
-      for (var kk = 0; kk < words.length; ++kk) {
-        addToIndex(words[kk], option.id);
+    searchWords.forEach(function (searchWord) {
+      var words = searchWord.split(' ');
+      words.forEach(function (word) {
+        _this._addToIndex(word, option.id);
+      });
+    });
+  });
+};
+
+Search.prototype._addToIndex = function (key, id) {
+  for (var sample_size = 1; sample_size <= MAX_SAMPLE_SIZE; ++sample_size) {
+    for (var start_offset = 0; start_offset < key.length - sample_size + 1; ++start_offset) {
+      var minikey = key.substring(start_offset, start_offset + sample_size);
+
+      if (!this.index[minikey]) {
+        this.index[minikey] = [];
+      }
+
+      // don't duplicate
+      // this takes advantage of the fact that the minikeys with same id's are added sequentially
+      var length = this.index[minikey].length;
+      if (length === 0 || this.index[minikey][length - 1] !== id) {
+        this.index[minikey].push(id);
       }
     }
   }
-  selectionNodeHash = inSelectionNodeHash;
-  selectionNodeHashKeys = Object.keys(inSelectionNodeHash);
+};
 
-  sectionNodeHash = inSectionNodeHash;
-  sectionNodeHashKeys = Object.keys(inSectionNodeHash);
-}
+Search.prototype.search = function (value) {
+  var _this2 = this;
 
-function search(value) {
   if (!value) {
-    selectionNodeHashKeys.forEach(function (id) {
-      selectionNodeHash[id].style.display = '';
+    this.selectionNodeHashKeys.forEach(function (id) {
+      _this2.selectionNodeHash[id].style.display = '';
     });
-    sectionNodeHashKeys.forEach(function (id) {
-      sectionNodeHash[id].style.display = '';
+    this.sectionNodeHashKeys.forEach(function (id) {
+      _this2.sectionNodeHash[id].style.display = '';
     });
     return;
   }
@@ -149,7 +137,7 @@ function search(value) {
   searchWords.forEach(function (searchWord) {
     var chunks = splitWord(searchWord);
     chunks.forEach(function (chunk) {
-      searchChunks.push(index[chunk] || []);
+      searchChunks.push(_this2.index[chunk] || []);
     });
   });
 
@@ -194,11 +182,17 @@ function search(value) {
   }
 
   // now we have id's that match search query
-  var finalOutputHash = {};
+  this._handleNodeVisbilities(finalOutput);
+};
+
+Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
+  var _this3 = this;
+
+  var shownNodeIdsHash = {};
   var sectionsToNotHideHash = {};
-  finalOutput.forEach(function (id) {
-    finalOutputHash[id] = true;
-    var node = selectionNodeHash[id];
+  shownNodeIds.forEach(function (id) {
+    shownNodeIdsHash[id] = true;
+    var node = _this3.selectionNodeHash[id];
     node.style.display = '';
 
     // now search for parent sections
@@ -219,22 +213,36 @@ function search(value) {
   });
 
   // hide selections
-  selectionNodeHashKeys.forEach(function (id) {
-    if (!finalOutputHash[id]) {
-      selectionNodeHash[id].style.display = 'none';
+  this.selectionNodeHashKeys.forEach(function (id) {
+    if (!shownNodeIdsHash[id]) {
+      _this3.selectionNodeHash[id].style.display = 'none';
     }
   });
-  sectionNodeHashKeys.forEach(function (id) {
+  this.sectionNodeHashKeys.forEach(function (id) {
     if (!sectionsToNotHideHash[id]) {
-      sectionNodeHash[id].style.display = 'none';
+      _this3.sectionNodeHash[id].style.display = 'none';
     }
   });
+};
+
+// split word into three letter (or less) pieces
+function splitWord(word) {
+  if (!word) {
+    return [];
+  }
+
+  if (word.length < MAX_SAMPLE_SIZE) {
+    return [word];
+  }
+
+  var chunks = [];
+  for (var ii = 0; ii < word.length - MAX_SAMPLE_SIZE + 1; ++ii) {
+    chunks.push(word.substring(ii, ii + MAX_SAMPLE_SIZE));
+  }
+  return chunks;
 }
 
-module.exports = {
-  buildIndex: buildIndex,
-  search: search
-};
+module.exports = Search;
 
 },{"./utility":9}],4:[function(require,module,exports){
 'use strict';
@@ -486,14 +494,14 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSearchBar = function (parentNode) {
-  Search.buildIndex(this.selectOptions, this.selectNodes, this.sectionNodes);
+  var searchObj = new Search(this.selectOptions, this.selectNodes, this.sectionNodes);
 
   var searchNode = Util.dom.createNode('input', { class: 'search', placeholder: 'Search...' });
   parentNode.appendChild(searchNode);
 
   this.$selectionContainer.on('input', 'input.search', function () {
     var searchText = this.value;
-    Search.search(searchText);
+    searchObj.search(searchText);
   });
 };
 

@@ -236,14 +236,14 @@ Tree.prototype.addCollapsibility = function() {
 };
 
 Tree.prototype.createSearchBar = function(parentNode) {
-  Search.buildIndex(this.selectOptions, this.selectNodes, this.sectionNodes);
+  var searchObj = new Search(this.selectOptions, this.selectNodes, this.sectionNodes);
 
   var searchNode = Util.dom.createNode('input', {class: 'search', placeholder: 'Search...'});
   parentNode.appendChild(searchNode);
 
   this.$selectionContainer.on('input', 'input.search', function() {
     var searchText = this.value;
-    Search.search(searchText);
+    searchObj.search(searchText);
   });
 };
 

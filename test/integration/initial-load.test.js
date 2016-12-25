@@ -66,6 +66,18 @@ describe('Initial Load', () => {
     Common.assertSelection($selections[1], {text: 'One', value: 'one'});
   });
 
+  it('renders options without data-section', () => {
+    $("select").append("<option value='one'>One</option>");
+    $("select").append("<option value='two'>Two</option>");
+    $("select").treeMultiselect();
+
+    var $selections = Common.selection();
+    assert.equal($selections.length, 2);
+
+    Common.assertSelection($selections[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selections[1], {text: 'Two', value: 'two'});
+  });
+
   it('respects selected attribute', () => {
     $("select").append("<option value='one' data-section='section' selected>One</option>");
     $("select").treeMultiselect();

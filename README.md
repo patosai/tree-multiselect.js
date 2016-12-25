@@ -23,9 +23,11 @@ Make sure your `select` has the `multiple` attribute set. Also, make sure you've
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------
 `selected`                    | Have the option pre-selected. This is actually part of the HTML spec
-`data-section` **(required)** | The section the option will be in; can be nested
+`data-section`                | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect
 `data-index`                  | For pre-selected options, display options in this order, lowest index first. Conflicts will be overwritten by the last item with the same `data-index`
+
+All of the above are optional.
 
 Your `data-section` can have multiple section names, separated by the `sectionDelimiter` option.
 

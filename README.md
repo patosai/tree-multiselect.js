@@ -5,7 +5,7 @@
 
 
 **This plugin allows you to add a sweet treeview frontend to a `select` element.**
-There seems to be a common misconception that the `select` you call this on is tossed into the void. All this does is make the selection process a little more organized. Your `select` element will still act the same in forms, in JavaScript, etc.
+The underlying `select` element can be used as it was before.
 
 * Requires jQuery v1.8+
 * Does not work on IE8. Pull requests welcome!
@@ -37,10 +37,10 @@ Ex. `data-section="top/middle/inner"` will show up as
     - `inner`
       - your option
 
-#### Options
-You can pass in options like `treeMultiselect(options)`. It is an object where you can set the following features:
+#### Params
+You can pass in params like `treeMultiselect(params)`. It is an object where you can set the following features:
 
-Option name             | Default        | Description
+Name                    | Default        | Description
 ----------------------- | -------------- | ---------------
 `allowBatchSelection`   | `true`         | Sections have checkboxes which when checked, check everything within them
 `collapsible`           | `true`         | Adds collapsibility to sections
@@ -52,6 +52,7 @@ Option name             | Default        | Description
 `onChange`              | `null`         | Callback for when select is changed. Called with (allSelectedItems, addedItems, removedItems), each of which is an array of objects with the properties `text`, `value`, `initialIndex`, and `section`
 `onlyBatchSelection`    | `false`        | Only sections can be checked, not individual items
 `sortable`              | `false`        | Selected options can be sorted by dragging (requires jQuery UI)
+`searchable`            | `false`        | Allows searching of options
 `sectionDelimiter`      | `/`            | Separator between sections in the select option `data-section` attribute
 `showSectionOnSelected` | `true`         | Show section name on the selected items
 `startCollapsed`        | `false`        | Activated only if `collapsible` is true; sections are collapsed initially
@@ -60,31 +61,6 @@ Option name             | Default        | Description
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).
 
 You can also use bower - `bower install tree-multiselect`
-
-### Custom styling
-So, you want to exercise your css-fu. Alright then.
-
-The plugin adds a `div.tree-multiselect` immediately after the specified `select`. The hierarchy is shown below.
-
-- `div.tree-multiselect`
-  - `div.selections`
-    - a lot of `div.section`, each of which has
-      - `div.title`, which has
-        - `span.collapse-section` holding the collapsible indicators if collapsibility is enabled
-        - `input` of type `checkbox` for selection if allowBatchSelection is enabled
-        - the title text
-      - a lot of `div.item`, containing
-        - `input` of type `checkbox` for selection
-        - the item text
-      - and possibly more `div.section`
-  - `div.selected`
-    - a lot of `div.item`, each containing...
-      - `span.remove-selected` holding the indicator to remove element from selection
-      - the option name
-      - `span.section-name` if `showSectionOnSelected` is enabled, showing the section name(s)
-
-### Testing
-`grunt`
 
 ### FAQ
 `Help! The first element is selected when I create the tree. How do I make the first element not selected?`

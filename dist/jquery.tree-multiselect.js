@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.1.2 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.1.3 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -36,6 +36,7 @@ function mergeDefaultOptions(options) {
     onChange: null,
     onlyBatchSelection: false,
     searchable: false,
+    searchParams: ['value', 'text', 'description', 'section'],
     sectionDelimiter: '/',
     showSectionOnSelected: true,
     sortable: false,
@@ -65,7 +66,7 @@ var Util = require('./utility');
 
 var MAX_SAMPLE_SIZE = 3;
 
-function Search(options, inSelectionNodeHash, inSectionNodeHash) {
+function Search(options, inSelectionNodeHash, inSectionNodeHash, searchParams) {
   this.options = options;
 
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
@@ -77,8 +78,28 @@ function Search(options, inSelectionNodeHash, inSectionNodeHash) {
   this.sectionNodeHash = inSectionNodeHash;
   this.sectionNodeHashKeys = Object.keys(inSectionNodeHash);
 
+  this.setSearchParams(searchParams);
+
   this.buildIndex();
 }
+
+Search.prototype.setSearchParams = function (searchParams) {
+  Util.assert(Array.isArray(searchParams));
+
+  var allowedParams = {
+    'value': true,
+    'text': true,
+    'description': true,
+    'section': true
+  };
+
+  this.searchParams = [];
+  for (var ii = 0; ii < searchParams.length; ++ii) {
+    if (allowedParams[searchParams[ii]]) {
+      this.searchParams.push(searchParams[ii]);
+    }
+  }
+};
 
 Search.prototype.buildIndex = function () {
   var _this = this;
@@ -86,7 +107,11 @@ Search.prototype.buildIndex = function () {
   // options are sorted by id already
   // trigrams
   this.options.forEach(function (option) {
-    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]).map(function (item) {
+    var searchItems = [];
+    _this.searchParams.forEach(function (searchParam) {
+      searchItems.push(option[searchParam]);
+    });
+    var searchWords = Util.array.removeFalseyExceptZero(searchItems).map(function (item) {
       return item.toLowerCase();
     });
 
@@ -222,15 +247,15 @@ var Search = require('./search');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
-function Tree(id, $originalSelect, options) {
+function Tree(id, $originalSelect, params) {
   this.id = id;
   this.$originalSelect = $originalSelect;
 
-  var uiBuilder = new UiBuilder($originalSelect, options.hideSidePanel);
+  var uiBuilder = new UiBuilder($originalSelect, params.hideSidePanel);
   this.$selectionContainer = uiBuilder.$selectionContainer;
   this.$selectedContainer = uiBuilder.$selectedContainer;
 
-  this.options = options;
+  this.params = params;
 
   this.selectOptions = [];
 
@@ -250,23 +275,23 @@ Tree.prototype.initialize = function () {
 
   this.popupDescriptionHover();
 
-  if (this.options.allowBatchSelection) {
+  if (this.params.allowBatchSelection) {
     this.handleSectionCheckboxMarkings();
   }
 
-  if (this.options.collapsible) {
+  if (this.params.collapsible) {
     this.addCollapsibility();
   }
 
-  if (this.options.searchable || this.options.enableSelectAll) {
+  if (this.params.searchable || this.params.enableSelectAll) {
     var auxiliaryBox = Util.dom.createNode('div', { class: 'auxiliary' });
     this.$selectionContainer.prepend(auxiliaryBox, this.$selectionContainer.firstChild);
 
-    if (this.options.searchable) {
+    if (this.params.searchable) {
       this.createSearchBar(auxiliaryBox);
     }
 
-    if (this.options.enableSelectAll) {
+    if (this.params.enableSelectAll) {
       this.createSelectAllButtons(auxiliaryBox);
     }
   }
@@ -282,7 +307,7 @@ Tree.prototype.generateSelections = function () {
   // [ [options directly under this section], {nested sections}]
   var data = [[], {}];
 
-  var sectionDelimiter = this.options.sectionDelimiter;
+  var sectionDelimiter = this.params.sectionDelimiter;
 
   var self = this;
   var id = 0;
@@ -328,7 +353,7 @@ Tree.prototype.generateHtmlFromData = function (data, parentNode, sectionIdStart
 
   for (var ii = 0; ii < data[0].length; ++ii) {
     var option = data[0][ii];
-    var selection = Util.dom.createSelection(option, this.id, !this.options.onlyBatchSelection, this.options.freeze);
+    var selection = Util.dom.createSelection(option, this.id, !this.params.onlyBatchSelection, this.params.freeze);
     this.selectNodes[option.id] = selection;
     parentNode.appendChild(selection);
   }
@@ -337,7 +362,7 @@ Tree.prototype.generateHtmlFromData = function (data, parentNode, sectionIdStart
   for (var jj = 0; jj < keys.length; ++jj) {
     var title = keys[jj];
     var id = numItems + sectionIdStart;
-    var sectionNode = Util.dom.createSection(title, id, this.options.onlyBatchSelection || this.options.allowBatchSelection, this.options.freeze);
+    var sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
     this.sectionNodes[id] = sectionNode;
     ++numItems;
     parentNode.appendChild(sectionNode);
@@ -433,7 +458,7 @@ Tree.prototype.addCollapsibility = function () {
   var $titleDivs = this.$selectionContainer.find(titleSelector);
 
   var collapseSpan = Util.dom.createNode('span', { class: 'collapse-section' });
-  if (this.options.startCollapsed) {
+  if (this.params.startCollapsed) {
     jQuery(collapseSpan).text(expandIndicator);
     $titleDivs.siblings().toggle();
   } else {
@@ -455,7 +480,7 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSearchBar = function (parentNode) {
-  var searchObj = new Search(this.selectOptions, this.selectNodes, this.sectionNodes);
+  var searchObj = new Search(this.selectOptions, this.selectNodes, this.sectionNodes, this.params.searchParams);
 
   var searchNode = Util.dom.createNode('input', { class: 'search', placeholder: 'Search...' });
   parentNode.appendChild(searchNode);
@@ -467,8 +492,8 @@ Tree.prototype.createSearchBar = function (parentNode) {
 };
 
 Tree.prototype.createSelectAllButtons = function (parentNode) {
-  var selectAllNode = Util.dom.createNode('span', { class: 'select-all', text: this.options.selectAllText });
-  var unselectAllNode = Util.dom.createNode('span', { class: 'unselect-all', text: this.options.unselectAllText });
+  var selectAllNode = Util.dom.createNode('span', { class: 'select-all', text: this.params.selectAllText });
+  var unselectAllNode = Util.dom.createNode('span', { class: 'unselect-all', text: this.params.unselectAllText });
 
   var selectAllContainer = Util.dom.createNode('div', { class: 'select-all-container' });
   selectAllContainer.appendChild(selectAllNode);
@@ -518,7 +543,7 @@ Tree.prototype.updateSelectedAndOnChange = function () {
     self.render();
   });
 
-  if (this.options.sortable && !this.options.freeze) {
+  if (this.params.sortable && !this.params.freeze) {
     var startIndex = null;
     var endIndex = null;
     this.$selectedContainer.sortable({
@@ -568,7 +593,7 @@ Tree.prototype.render = function (noCallbacks) {
     var option = this.selectOptions[key];
     this.selectedKeys.push(key);
 
-    var selectedNode = Util.dom.createSelected(option, this.options.freeze, this.options.showSectionOnSelected);
+    var selectedNode = Util.dom.createSelected(option, this.params.freeze, this.params.showSectionOnSelected);
     this.selectedNodes[option.id] = selectedNode;
     this.$selectedContainer.append(selectedNode);
 
@@ -610,7 +635,7 @@ Tree.prototype.render = function (noCallbacks) {
   //this.$originalSelect.val(vals).change();
   this.$originalSelect.change();
 
-  if (!noCallbacks && this.options.onChange) {
+  if (!noCallbacks && this.params.onChange) {
     var optionsSelected = this.selectedKeys.map(function (key) {
       return _this.selectOptions[key];
     });
@@ -620,7 +645,7 @@ Tree.prototype.render = function (noCallbacks) {
     var optionsRemoved = this.keysToRemove.map(function (key) {
       return _this.selectOptions[key];
     });
-    this.options.onChange(optionsSelected, optionsAdded, optionsRemoved);
+    this.params.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }
 
   this.keysToRemove = [];

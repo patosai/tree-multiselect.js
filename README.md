@@ -53,6 +53,7 @@ Name                    | Default        | Description
 `onlyBatchSelection`    | `false`        | Only sections can be checked, not individual items
 `sortable`              | `false`        | Selected options can be sorted by dragging (requires jQuery UI)
 `searchable`            | `false`        | Allows searching of options
+`searchParams`          | ['value', 'text', 'description', 'section'] | Set items to be searched. Array must contain `'value'`, `'text'`, or `'description'`, and/or `'section'`
 `sectionDelimiter`      | `/`            | Separator between sections in the select option `data-section` attribute
 `showSectionOnSelected` | `true`         | Show section name on the selected items
 `startCollapsed`        | `false`        | Activated only if `collapsible` is true; sections are collapsed initially

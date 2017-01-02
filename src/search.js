@@ -2,7 +2,7 @@ var Util = require('./utility');
 
 const MAX_SAMPLE_SIZE = 3;
 
-function Search(options, inSelectionNodeHash, inSectionNodeHash) {
+function Search(options, inSelectionNodeHash, inSectionNodeHash, searchParams) {
   this.options = options;
 
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
@@ -14,14 +14,38 @@ function Search(options, inSelectionNodeHash, inSectionNodeHash) {
   this.sectionNodeHash = inSectionNodeHash;
   this.sectionNodeHashKeys = Object.keys(inSectionNodeHash);
 
+  this.setSearchParams(searchParams);
+
   this.buildIndex();
 }
+
+Search.prototype.setSearchParams = function(searchParams) {
+  Util.assert(Array.isArray(searchParams));
+
+  var allowedParams = {
+    'value': true,
+    'text': true,
+    'description': true,
+    'section': true,
+  };
+
+  this.searchParams = [];
+  for (var ii = 0; ii < searchParams.length; ++ii) {
+    if (allowedParams[searchParams[ii]]) {
+      this.searchParams.push(searchParams[ii]);
+    }
+  }
+};
 
 Search.prototype.buildIndex = function() {
   // options are sorted by id already
   // trigrams
   this.options.forEach((option) => {
-    var searchWords = Util.array.removeFalseyExceptZero([option.value, option.text, option.description, option.section]).map((item) => {
+    var searchItems = [];
+    this.searchParams.forEach((searchParam) => {
+      searchItems.push(option[searchParam]);
+    });
+    var searchWords = Util.array.removeFalseyExceptZero(searchItems).map((item) => {
       return item.toLowerCase();
     });
 

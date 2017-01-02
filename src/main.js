@@ -30,6 +30,7 @@ function mergeDefaultOptions(options) {
     onChange: null,
     onlyBatchSelection: false,
     searchable: false,
+    searchParams: ['value', 'text', 'description', 'section'],
     sectionDelimiter: '/',
     showSectionOnSelected: true,
     sortable: false,

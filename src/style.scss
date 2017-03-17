@@ -56,6 +56,19 @@ div.tree-multiselect {
     > div.item {
       padding-left: 20px;
     }
+
+    &.collapsed {
+      > div.title span.collapse-section {
+        &:after {
+          content: "+";
+        }
+      }
+
+      > .item,
+      > .section {
+        display: none;
+      }
+    }
   }
 
   div.title,
@@ -75,6 +88,10 @@ div.tree-multiselect {
     > span.collapse-section {
       margin: 0 3px;
       width: 8px;
+
+      &:after {
+        content: "-";
+      }
     }
 
     &:hover {

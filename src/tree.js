@@ -207,31 +207,27 @@ Tree.prototype.redrawSectionCheckboxes = function($section) {
 };
 
 Tree.prototype.addCollapsibility = function() {
-  var hideIndicator = '-';
-  var expandIndicator = '+';
-
   var titleSelector = 'div.title';
   var $titleDivs = this.$selectionContainer.find(titleSelector);
 
   var collapseSpan = Util.dom.createNode('span', {class: 'collapse-section'});
-  if (this.params.startCollapsed) {
-    jQuery(collapseSpan).text(expandIndicator);
-    $titleDivs.siblings().toggle();
-  } else {
-    jQuery(collapseSpan).text(hideIndicator);
-  }
   $titleDivs.prepend(collapseSpan);
+
+  var sectionSelector = 'div.section';
+  var $sectionDivs = this.$selectionContainer.find(sectionSelector);
+
+  if (this.params.startCollapsed) {
+    $sectionDivs.addClass('collapsed');
+  }
 
   this.$selectionContainer.on('click', titleSelector, function(event) {
     if (event.target.nodeName == 'INPUT') {
       return;
     }
 
-    var $collapseSection = jQuery(this).find('> span.collapse-section');
-    var indicator = $collapseSection.text();
-    $collapseSection.text(indicator ==  hideIndicator ? expandIndicator : hideIndicator);
-    var $title = $collapseSection.parent();
-    $title.siblings().toggle();
+    var $section = jQuery(this).parent();
+    $section.toggleClass('collapsed');
+    event.stopPropagation();
   });
 };
 

@@ -34,33 +34,33 @@ describe('Interactivity', () => {
     assert.equal($tempPopup.length, 0);
   });
 
-  it('collapses when clicking on titlebar', () => {
-    $("select").append("<option value='one' data-section='foo' data-description='One'>One</option>");
-    $("select").append("<option value='two' data-section='foo' selected='selected' data-description='Two'>Two</option>");
-    $("select").append("<option value='three' data-section='foo' data-description='Three'>Three</option>");
-    $("select").treeMultiselect();
+  //it('collapses when clicking on titlebar', () => {
+    //$("select").append("<option value='one' data-section='foo' data-description='One'>One</option>");
+    //$("select").append("<option value='two' data-section='foo' selected='selected' data-description='Two'>Two</option>");
+    //$("select").append("<option value='three' data-section='foo' data-description='Three'>Three</option>");
+    //$("select").treeMultiselect();
 
-    var $title = Common.section({text: 'foo'}).children(".title");
-    assert.equal($("div.selections div.item:visible").length, 3);
+    //var $title = Common.section({text: 'foo'}).children(".title");
+    //assert.equal($("div.selections div.item:visible").length, 3);
 
-    $title.click();
-    assert.equal($("div.selections div.item:visible").length, 0);
-  });
+    //$title.click();
+    //assert.equal($("div.selections div.item:visible").length, 0);
+  //});
 
-  it('collapse indicator changes', () => {
-    $("select").append("<option value='one' data-section='foo' data-description='One'>One</option>");
-    $("select").append("<option value='two' data-section='foo' selected='selected' data-description='Two'>Two</option>");
-    $("select").append("<option value='three' data-section='foo' data-description='Three'>Three</option>");
-    $("select").treeMultiselect();
+  //it('collapse indicator changes', () => {
+    //$("select").append("<option value='one' data-section='foo' data-description='One'>One</option>");
+    //$("select").append("<option value='two' data-section='foo' selected='selected' data-description='Two'>Two</option>");
+    //$("select").append("<option value='three' data-section='foo' data-description='Three'>Three</option>");
+    //$("select").treeMultiselect();
 
-    var $title = Common.section({text: 'foo'}).children(".title");
-    var $collapse = $title.children(".collapse-section");
-    assert.equal($collapse.text(), '-');
+    //var $title = Common.section({text: 'foo'}).children(".title");
+    //var $collapse = $title.children(".collapse-section");
+    //assert.equal($collapse.text(), '-');
 
-    $title.click();
+    //$title.click();
 
-    assert.equal($collapse.text(), '+');
-  });
+    //assert.equal($collapse.text(), '+');
+  //});
 
   it('has correct label id', () => {
     $("select").append("<option value='one' data-section='foo' data-description='One'>One</option>");

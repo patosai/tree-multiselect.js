@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.1.3 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.1.4 | (c) Patrick Tsai | MIT Licensed */
 div.tree-multiselect {
   border: 2px solid #D8D8D8;
   border-radius: 5px;
@@ -32,6 +32,11 @@ div.tree-multiselect {
   div.tree-multiselect div.section > div.section,
   div.tree-multiselect div.section > div.item {
     padding-left: 20px; }
+  div.tree-multiselect div.section.collapsed > div.title span.collapse-section:after {
+    content: "+"; }
+  div.tree-multiselect div.section.collapsed > .item,
+  div.tree-multiselect div.section.collapsed > .section {
+    display: none; }
   div.tree-multiselect div.title,
   div.tree-multiselect div.item {
     margin-bottom: 2px; }
@@ -44,6 +49,8 @@ div.tree-multiselect {
     div.tree-multiselect div.title > span.collapse-section {
       margin: 0 3px;
       width: 8px; }
+      div.tree-multiselect div.title > span.collapse-section:after {
+        content: "-"; }
     div.tree-multiselect div.title:hover {
       cursor: pointer; }
   div.tree-multiselect input[type=checkbox] {

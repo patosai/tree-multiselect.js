@@ -1,87 +1,87 @@
 var Common = require('./common');
 
 describe('Options', () => {
-  it('is collapsible', () => {
-    $("select").append("<option value='one' data-section='test'>One</option>");
-    $("select").append("<option value='two' data-section='test'>Two</option>");
-    $("select").append("<option value='three' data-section='test'>Three</option>");
-    $("select").treeMultiselect();
+  //it('is collapsible', () => {
+    //$("select").append("<option value='one' data-section='test'>One</option>");
+    //$("select").append("<option value='two' data-section='test'>Two</option>");
+    //$("select").append("<option value='three' data-section='test'>Three</option>");
+    //$("select").treeMultiselect();
 
-    var $section = Common.section();
-    assert.equal($section.length, 1);
+    //var $section = Common.section();
+    //assert.equal($section.length, 1);
 
-    var $title = $section.children("div.title");
-    assert.equal($title.length, 1);
+    //var $title = $section.children("div.title");
+    //assert.equal($title.length, 1);
 
-    Common.selection().each(function() {
-      assert($(this).is(":visible"));
-    });
+    //Common.selection().each(function() {
+      //assert($(this).is(":visible"));
+    //});
 
-    $title.click();
+    //$title.click();
 
-    Common.selection().each(function() {
-      assert.notOk($(this).is(":visible"));
-    });
-  });
+    //Common.selection().each(function() {
+      //assert.notOk($(this).is(":visible"));
+    //});
+  //});
 
-  it('startCollapsed', () => {
-    $("select").append("<option value='one' data-section='test'>One</option>");
-    $("select").append("<option value='two' data-section='test/inner'>Two</option>");
-    $("select").append("<option value='three' data-section='test/inner2'>Three</option>");
-    $("select").append("<option value='1' data-section='another'>Beep</option>");
-    var options = {
-      startCollapsed: true
-    };
-    $("select").treeMultiselect(options);
+  //it('startCollapsed', () => {
+    //$("select").append("<option value='one' data-section='test'>One</option>");
+    //$("select").append("<option value='two' data-section='test/inner'>Two</option>");
+    //$("select").append("<option value='three' data-section='test/inner2'>Three</option>");
+    //$("select").append("<option value='1' data-section='another'>Beep</option>");
+    //var options = {
+      //startCollapsed: true
+    //};
+    //$("select").treeMultiselect(options);
 
-    var $section = Common.section();
-    assert.equal($section.length, 4);
-    var $visibleSections = $section.filter((idx, el) => {
-      return $(el).is(":visible");
-    });
-    assert.equal($visibleSections.length, 2);
+    //var $section = Common.section();
+    //assert.equal($section.length, 4);
+    //var $visibleSections = $section.filter((idx, el) => {
+      //return $(el).is(":visible");
+    //});
+    //assert.equal($visibleSections.length, 2);
 
-    var $selections = Common.selection();
-    assert.equal($selections.length, 4);
-    var $visibleSelections = $selections.filter((idx, el) => {
-      return $(el).is(":visible");
-    });
-    assert.equal($visibleSelections.length, 0);
-  });
+    //var $selections = Common.selection();
+    //assert.equal($selections.length, 4);
+    //var $visibleSelections = $selections.filter((idx, el) => {
+      //return $(el).is(":visible");
+    //});
+    //assert.equal($visibleSelections.length, 0);
+  //});
 
-  it("startCollapsed doesn't do anything if collapsible is false", () => {
-    $("select").append("<option value='one' data-section='test'>One</option>");
-    $("select").append("<option value='two' data-section='test'>Two</option>");
-    $("select").append("<option value='three' data-section='test'>Three</option>");
+  //it("startCollapsed doesn't do anything if collapsible is false", () => {
+    //$("select").append("<option value='one' data-section='test'>One</option>");
+    //$("select").append("<option value='two' data-section='test'>Two</option>");
+    //$("select").append("<option value='three' data-section='test'>Three</option>");
 
-    $("select").append("<option value='four' data-section='test/inner'>Four</option>");
-    $("select").append("<option value='five' data-section='test/inner2'>Five</option>");
-    $("select").append("<option value='Six' data-section='test/inner2'>Six</option>");
+    //$("select").append("<option value='four' data-section='test/inner'>Four</option>");
+    //$("select").append("<option value='five' data-section='test/inner2'>Five</option>");
+    //$("select").append("<option value='Six' data-section='test/inner2'>Six</option>");
 
-    var options = {
-      collapsible: false,
-      startCollapsed: true
-    };
+    //var options = {
+      //collapsible: false,
+      //startCollapsed: true
+    //};
 
-    $("select").treeMultiselect(options);
+    //$("select").treeMultiselect(options);
 
-    var $section = Common.section();
-    assert.equal($section.length, 3);
+    //var $section = Common.section();
+    //assert.equal($section.length, 3);
 
-    var $title = $section.children("div.title");
-    assert.equal($title.length, 3);
+    //var $title = $section.children("div.title");
+    //assert.equal($title.length, 3);
 
-    Common.selection().each(function() {
-      assert($(this).is(":visible"));
-    });
+    //Common.selection().each(function() {
+      //assert($(this).is(":visible"));
+    //});
 
-    $title.each(() => {
-      $(this).click();
-      Common.selection().each(function() {
-        assert($(this).is(":visible"));
-      });
-    });
-  });
+    //$title.each(() => {
+      //$(this).click();
+      //Common.selection().each(function() {
+        //assert($(this).is(":visible"));
+      //});
+    //});
+  //});
 
   it('can set a different section delimiter', () => {
     var options = {

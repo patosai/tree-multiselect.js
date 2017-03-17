@@ -5,16 +5,16 @@
 
     <meta charset="UTF-8">
 
-    <script src="./vendor/jquery-1.11.3.min.js"></script>
-    <script src="./vendor/jquery-ui.min.js"></script>
-    <script src="../dist/jquery.tree-multiselect.js"></script>
-
     <style>
       * {
         font-family: sans-serif;
       }
     </style>
     <link rel="stylesheet" href="../dist/jquery.tree-multiselect.min.css">
+
+    <script src="./vendor/jquery-1.11.3.min.js"></script>
+    <script src="./vendor/jquery-ui.min.js"></script>
+    <script src="../dist/jquery.tree-multiselect.js"></script>
   </head>
 
   <body>
@@ -33,8 +33,16 @@
     </select>
 
     <select id="test-select-3" multiple="multiple">
-      <option value="baz" data-section="section">baz</option>
-      <option value="quux" data-section="section">quux</option>
+      <option value="baz1" data-section="hidden stuff">baz1</option>
+      <option value="baz2" data-section="hidden stuff">baz2</option>
+      <option value="baz3" data-section="hidden stuff">baz3</option>
+      <option value="baz4" data-section="hidden stuff">baz4</option>
+      <option value="quux1" data-section="section">quux1</option>
+      <option value="quux2" data-section="section">quux2</option>
+      <option value="quux3" data-section="section">quux3</option>
+      <option value="quux4" data-section="section">quux4</option>
+      <option value="abc" data-section="section/ayy">abc</option>
+      <option value="taeyeon" data-section="section/ayy">태연</option>
       <option value="ayyy" >ayyy</option>
     </select>
 
@@ -42,7 +50,7 @@
     <script type="text/javascript">
       $("#test-select").treeMultiselect({ enableSelectAll: true, sortable: true });
       $("#test-select-2").treeMultiselect({searchable: true});
-      $("#test-select-3").treeMultiselect({enableSelectAll: true, allowBatchSelection: false, searchable: true});
+      $("#test-select-3").treeMultiselect({enableSelectAll: true, allowBatchSelection: false, searchable: true, startCollapsed: true});
     </script>
   </body>
 </html>

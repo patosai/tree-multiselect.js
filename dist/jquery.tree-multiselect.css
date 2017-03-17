@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.1.4 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.1.5 | (c) Patrick Tsai | MIT Licensed */
 div.tree-multiselect {
   border: 2px solid #D8D8D8;
   border-radius: 5px;
@@ -34,8 +34,8 @@ div.tree-multiselect {
     padding-left: 20px; }
   div.tree-multiselect div.section.collapsed > div.title span.collapse-section:after {
     content: "+"; }
-  div.tree-multiselect div.section.collapsed > .item,
-  div.tree-multiselect div.section.collapsed > .section {
+  div.tree-multiselect div.section.collapsed:not([searchhit]) > .item,
+  div.tree-multiselect div.section.collapsed:not([searchhit]) > .section {
     display: none; }
   div.tree-multiselect div.title,
   div.tree-multiselect div.item {

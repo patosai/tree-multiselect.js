@@ -64,9 +64,11 @@ div.tree-multiselect {
         }
       }
 
-      > .item,
-      > .section {
-        display: none;
+      &:not([searchhit]) {
+        > .item,
+        > .section {
+          display: none;
+        }
       }
     }
   }

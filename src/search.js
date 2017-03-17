@@ -84,6 +84,7 @@ Search.prototype.search = function(value) {
     });
     this.sectionNodeHashKeys.forEach((id) => {
       this.sectionNodeHash[id].style.display = '';
+      this.sectionNodeHash[id].removeAttribute('searchhit');
     });
     return;
   }
@@ -124,6 +125,7 @@ Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
         } else {
           sectionsToNotHideHash[key] = true;
           node.style.display = '';
+          node.setAttribute('searchhit', true);
         }
       }
       node = node.parentNode;

@@ -326,7 +326,8 @@ Tree.prototype.render = function(noCallbacks) {
     // remove the selected divs
     var node = this.selectedNodes[this.keysToRemove[ii]];
     if (node) {
-      node.remove();
+      // slightly more verbose than node.remove(), but more browser support
+      node.parentNode.removeChild(node);
       this.selectedNodes[this.keysToRemove[ii]] = null;
     }
 

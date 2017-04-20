@@ -1,37 +1,32 @@
-exports.subtract = function(arr1, arr2) {
-  var hash = {};
-  var returnArr = [];
-  for (var ii = 0; ii < arr2.length; ++ii) {
-    hash[arr2[ii]] = true;
-  }
-  for (var jj = 0; jj < arr1.length; ++jj) {
-    if (!hash[arr1[jj]]) {
-      returnArr.push(arr1[jj]);
+// keeps if pred is true
+function filterInPlace(arr, pred) {
+  var idx = 0;
+  for (var ii = 0; ii < arr.length; ++ii) {
+    if (pred(arr[ii])) {
+      arr[idx] = arr[ii];
+      ++idx;
     }
   }
-  return returnArr;
-};
+  arr.length = idx;
+  //arr.slice(0, idx);
+}
 
 exports.uniq = function(arr) {
   var hash = {};
-  var newArr = [];
-  for (var ii = 0; ii < arr.length; ++ii) {
-    if (!hash[arr[ii]]) {
-      hash[arr[ii]] = true;
-      newArr.push(arr[ii]);
-    }
-  }
-  return newArr;
+
+  var pred = function(val) {
+    var returnVal = !hash[val];
+    hash[val] = true;
+    return returnVal;
+  };
+  filterInPlace(arr, pred);
 };
 
 exports.removeFalseyExceptZero = function(arr) {
-  var newArr = [];
-  for (var ii = 0; ii < arr.length; ++ii) {
-    if (arr[ii] || arr[ii] === 0) {
-      newArr.push(arr[ii]);
-    }
-  }
-  return newArr;
+  var pred = function(val) {
+    return val || val === 0;
+  };
+  filterInPlace(arr, pred);
 };
 
 exports.moveEl = function(arr, oldPos, newPos) {
@@ -40,18 +35,30 @@ exports.moveEl = function(arr, oldPos, newPos) {
   arr.splice(newPos, 0, el);
 };
 
-exports.intersect = function(arr, arrExcluded) {
-  var newArr = [];
+exports.subtract = function(arr, arrExcluded) {
   var hash = {};
+
   for (var ii = 0; ii < arrExcluded.length; ++ii) {
     hash[arrExcluded[ii]] = true;
   }
-  for (var jj = 0; jj < arr.length; ++jj) {
-    if (hash[arr[jj]]) {
-      newArr.push(arr[jj]);
-    }
+
+  var pred = function(val) {
+    return !hash[val];
+  };
+  filterInPlace(arr, pred);
+};
+
+exports.intersect = function(arr, arrExcluded) {
+  var hash = {};
+
+  for (var ii = 0; ii < arrExcluded.length; ++ii) {
+    hash[arrExcluded[ii]] = true;
   }
-  return newArr;
+
+  var pred = function(val) {
+    return hash[val];
+  };
+  filterInPlace(arr, pred);
 };
 
 // takes in array of arrays

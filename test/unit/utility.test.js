@@ -34,42 +34,52 @@ describe('Utility', () => {
     it('subtract', () => {
       var arr1 = [1, 2, 5, 7, 0];
       var arr2 = [2, 7, 8];
-      assert.deepEqual(Util.array.subtract(arr1, arr2), [1, 5, 0]);
+      Util.array.subtract(arr1, arr2);
+      assert.deepEqual(arr1, [1, 5, 0]);
 
       arr1 = [];
       arr2 = [];
-      assert.deepEqual(Util.array.subtract(arr1, arr2), []);
+      Util.array.subtract(arr1, arr2);
+      assert.deepEqual(arr1, []);
 
       arr1 = [];
       arr2 = [0];
-      assert.deepEqual(Util.array.subtract(arr1, arr2), []);
+      Util.array.subtract(arr1, arr2);
+      assert.deepEqual(arr1, []);
 
       arr1 = [6, 8, 1256];
       arr2 = [];
-      assert.deepEqual(Util.array.subtract(arr1, arr2), [6, 8, 1256]);
+      Util.array.subtract(arr1, arr2);
+      assert.deepEqual(arr1, [6, 8, 1256]);
 
       arr1 = ["foo", "bar"];
       arr2 = ["baz"];
-      assert.deepEqual(Util.array.subtract(arr1, arr2), ["foo", "bar"]);
+      Util.array.subtract(arr1, arr2);
+      assert.deepEqual(arr1, ["foo", "bar"]);
     });
 
     it('uniq', () => {
       var arr = [1, 2, 5, 7, 0];
-      assert.deepEqual(Util.array.uniq(arr), [1, 2, 5, 7, 0]);
+      Util.array.uniq(arr);
+      assert.deepEqual(arr, [1, 2, 5, 7, 0]);
 
       arr = [];
-      assert.deepEqual(Util.array.uniq(arr), []);
+      Util.array.uniq(arr);
+      assert.deepEqual(arr, []);
 
       arr = ["abc", "abc", "ghi"];
-      assert.deepEqual(Util.array.uniq(arr), ["abc", "ghi"]);
+      Util.array.uniq(arr);
+      assert.deepEqual(arr, ["abc", "ghi"]);
 
       arr = [123, 678, 900, 123];
-      assert.deepEqual(Util.array.uniq(arr), [123, 678, 900]);
+      Util.array.uniq(arr);
+      assert.deepEqual(arr, [123, 678, 900]);
     });
 
     it('removeFalseyExceptZero', () => {
       var arr = [1, 4, 0, null, NaN, undefined, 3];
-      assert.deepEqual(Util.array.removeFalseyExceptZero(arr), [1, 4, 0, 3]);
+      Util.array.removeFalseyExceptZero(arr);
+      assert.deepEqual(arr, [1, 4, 0, 3]);
     });
 
     it('moveEl in-place', () => {
@@ -89,18 +99,18 @@ describe('Utility', () => {
     it('intersect', () => {
       var arr = [0, 1, 2, 3, 4, 5];
       var arr2 = [0, 2, 4, 6];
-      assert.deepEqual(Util.array.intersect(arr, arr2), [0, 2, 4]);
-      assert.deepEqual(Util.array.intersect(arr2, arr), [0, 2, 4]);
+      Util.array.intersect(arr, arr2);
+      assert.deepEqual(arr, [0, 2, 4]);
 
       arr = [1, 17, 536, 24];
       arr2 = [536, 0, 0, 0];
-      assert.deepEqual(Util.array.intersect(arr, arr2), [536]);
-      assert.deepEqual(Util.array.intersect(arr2, arr), [536]);
+      Util.array.intersect(arr, arr2);
+      assert.deepEqual(arr, [536]);
 
       arr = [0, 0, 0, 0, 0, 0];
       arr2 = [0, 1];
-      assert.deepEqual(Util.array.intersect(arr, arr2), [0, 0, 0, 0, 0, 0]);
-      assert.deepEqual(Util.array.intersect(arr2, arr), [0]);
+      Util.array.intersect(arr, arr2);
+      assert.deepEqual(arr, [0, 0, 0, 0, 0, 0]);
     });
 
     it('intersectMany', () => {

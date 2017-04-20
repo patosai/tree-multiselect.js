@@ -1,4 +1,4 @@
-function createNode(tag, props) {
+exports.createNode = function(tag, props) {
   var node = document.createElement(tag);
 
   if (props) {
@@ -12,9 +12,9 @@ function createNode(tag, props) {
     }
   }
   return node;
-}
+};
 
-function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
+exports.createSelection = function(option, treeId, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
     'data-key': option.id,
@@ -27,10 +27,10 @@ function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
   if (option.initialIndex) {
     props['data-index'] = option.initialIndex;
   }
-  var selectionNode = createNode('div', props);
+  var selectionNode = exports.createNode('div', props);
 
   if (hasDescription) {
-    var popup = createNode('span', {class: 'description', text: '?'});
+    var popup = exports.createNode('span', {class: 'description', text: '?'});
     selectionNode.appendChild(popup);
   }
   if (!createCheckboxes) {
@@ -45,7 +45,7 @@ function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
     if (disableCheckboxes) {
       inputCheckboxProps.disabled = true;
     }
-    var inputCheckbox = createNode('input', inputCheckboxProps);
+    var inputCheckbox = exports.createNode('input', inputCheckboxProps);
     // prepend child
     selectionNode.insertBefore(inputCheckbox, selectionNode.firstChild);
 
@@ -53,15 +53,15 @@ function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
       for: optionLabelCheckboxId,
       text: option.text || option.value
     };
-    var label = createNode('label', labelProps);
+    var label = exports.createNode('label', labelProps);
     selectionNode.appendChild(label);
   }
 
   return selectionNode;
-}
+};
 
-function createSelected(option, disableRemoval, showSectionOnSelected) {
-  var node = createNode('div', {
+exports.createSelected = function(option, disableRemoval, showSectionOnSelected) {
+  var node = exports.createNode('div', {
     class: 'item',
     'data-key': option.id,
     'data-value': option.value,
@@ -69,22 +69,22 @@ function createSelected(option, disableRemoval, showSectionOnSelected) {
   });
 
   if (!disableRemoval) {
-    var removalSpan = createNode('span', {class: 'remove-selected', text: '×'});
+    var removalSpan = exports.createNode('span', {class: 'remove-selected', text: '×'});
     node.insertBefore(removalSpan, node.firstChild);
   }
 
   if (showSectionOnSelected) {
-    var sectionSpan = createNode('span', {class: 'section-name', text: option.section});
+    var sectionSpan = exports.createNode('span', {class: 'section-name', text: option.section});
     node.appendChild(sectionSpan);
   }
 
   return node;
-}
+};
 
-function createSection(sectionName, sectionId, createCheckboxes, disableCheckboxes) {
-  var sectionNode = createNode('div', {class: 'section', 'data-key': sectionId});
+exports.createSection = function(sectionName, sectionId, createCheckboxes, disableCheckboxes) {
+  var sectionNode = exports.createNode('div', {class: 'section', 'data-key': sectionId});
 
-  var titleNode = createNode('div', {class: 'title', text: sectionName});
+  var titleNode = exports.createNode('div', {class: 'title', text: sectionName});
   if (createCheckboxes) {
     var checkboxProps = {
       class: 'section',
@@ -93,16 +93,9 @@ function createSection(sectionName, sectionId, createCheckboxes, disableCheckbox
     if (disableCheckboxes) {
       checkboxProps.disabled = true;
     }
-    var checkboxNode = createNode('input', checkboxProps);
+    var checkboxNode = exports.createNode('input', checkboxProps);
     titleNode.insertBefore(checkboxNode, titleNode.firstChild);
   }
   sectionNode.appendChild(titleNode);
   return sectionNode;
-}
-
-module.exports = {
-  createNode: createNode,
-  createSelection: createSelection,
-  createSelected: createSelected,
-  createSection: createSection
 };

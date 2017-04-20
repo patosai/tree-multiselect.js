@@ -1,4 +1,4 @@
-function subtract(arr1, arr2) {
+exports.subtract = function(arr1, arr2) {
   var hash = {};
   var returnArr = [];
   for (var ii = 0; ii < arr2.length; ++ii) {
@@ -10,9 +10,9 @@ function subtract(arr1, arr2) {
     }
   }
   return returnArr;
-}
+};
 
-function uniq(arr) {
+exports.uniq = function(arr) {
   var hash = {};
   var newArr = [];
   for (var ii = 0; ii < arr.length; ++ii) {
@@ -22,9 +22,9 @@ function uniq(arr) {
     }
   }
   return newArr;
-}
+};
 
-function removeFalseyExceptZero(arr) {
+exports.removeFalseyExceptZero = function(arr) {
   var newArr = [];
   for (var ii = 0; ii < arr.length; ++ii) {
     if (arr[ii] || arr[ii] === 0) {
@@ -32,15 +32,15 @@ function removeFalseyExceptZero(arr) {
     }
   }
   return newArr;
-}
+};
 
-function moveEl(arr, oldPos, newPos) {
+exports.moveEl = function(arr, oldPos, newPos) {
   var el = arr[oldPos];
   arr.splice(oldPos, 1);
   arr.splice(newPos, 0, el);
-}
+};
 
-function intersect(arr, arrExcluded) {
+exports.intersect = function(arr, arrExcluded) {
   var newArr = [];
   var hash = {};
   for (var ii = 0; ii < arrExcluded.length; ++ii) {
@@ -52,11 +52,11 @@ function intersect(arr, arrExcluded) {
     }
   }
   return newArr;
-}
+};
 
 // takes in array of arrays
 // arrays are presorted
-function intersectMany(arrays) {
+exports.intersectMany = function(arrays) {
   var indexLocations = [];
   var maxIndexLocations = [];
   arrays.forEach((array) => {
@@ -98,13 +98,4 @@ function intersectMany(arrays) {
   }
 
   return finalOutput;
-}
-
-module.exports = {
-  subtract: subtract,
-  uniq: uniq,
-  removeFalseyExceptZero: removeFalseyExceptZero,
-  moveEl: moveEl,
-  intersect: intersect,
-  intersectMany: intersectMany
 };

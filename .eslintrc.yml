@@ -5,6 +5,7 @@ extends: 'eslint:recommended'
 globals:
   jQuery: true
   module: true
+  exports: true
   require: true
 parserOptions:
   sourceType: module

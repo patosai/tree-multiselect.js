@@ -1,21 +1,14 @@
-var utilArray = require('./array');
-var utilDom = require('./dom');
+exports.array = require('./array');
 
-function assert(bool, message) {
+exports.assert = function(bool, message) {
   if (!bool) {
     throw new Error(message || 'Assertion failed');
   }
-}
+};
 
-function getKey(el) {
-  assert(el);
+exports.dom = require('./dom');
+
+exports.getKey = function(el) {
+  exports.assert(el);
   return parseInt(el.getAttribute('data-key'));
-}
-
-module.exports = {
-  assert: assert,
-  getKey: getKey,
-
-  array: utilArray,
-  dom: utilDom
 };

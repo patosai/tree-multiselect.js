@@ -45,7 +45,8 @@ Search.prototype.buildIndex = function() {
     this.searchParams.forEach((searchParam) => {
       searchItems.push(option[searchParam]);
     });
-    var searchWords = Util.array.removeFalseyExceptZero(searchItems).map((item) => {
+    Util.array.removeFalseyExceptZero(searchItems);
+    var searchWords = searchItems.map((item) => {
       return item.toLowerCase();
     });
 

@@ -1,5 +1,5 @@
-var Option = require('./option');
 var Search = require('./search');
+var Option = require('./option');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
@@ -26,8 +26,7 @@ function Tree(id, $originalSelect, params) {
 }
 
 Tree.prototype.initialize = function() {
-  var data = this.generateSelections();
-  this.generateHtmlFromData(data, this.$selectionContainer[0]);
+  this.generateSelections(this.$selectionContainer[0]);
 
   this.popupDescriptionHover();
 
@@ -58,28 +57,29 @@ Tree.prototype.initialize = function() {
   this.render(true);
 };
 
-Tree.prototype.generateSelections = function() {
-  // nested objects and arrays
-  // [ [options directly under this section], {nested sections}]
+Tree.prototype.generateSelections = function(parentNode) {
+  var options = this.$originalSelect.find('> option');
+  var ast = this.createAst(options);
+  this.generateHtml(ast, parentNode);
+};
+
+Tree.prototype.createAst = function(options) {
   var data = [[], {}];
-
-  var sectionDelimiter = this.params.sectionDelimiter;
-
   var self = this;
   var id = 0;
   var keysToAddAtEnd = [];
-  this.$originalSelect.find('> option').each(function() {
+  options.each(function() {
     var option = this;
     option.setAttribute('data-key', id);
 
     var section = option.getAttribute('data-section');
-    var path = (section && section.length > 0) ? section.split(sectionDelimiter) : [];
 
     var optionValue = option.value;
     var optionName = option.text;
     var optionDescription = option.getAttribute('data-description');
     var optionIndex = parseInt(option.getAttribute('data-index'));
     var optionObj = new Option(id, optionValue, optionName, optionDescription, optionIndex, section);
+
     if (optionIndex) {
       self.keysToAdd[optionIndex] = id;
     } else if (option.hasAttribute('selected')) {
@@ -88,33 +88,36 @@ Tree.prototype.generateSelections = function() {
     self.selectOptions[id] = optionObj;
 
     var currentPosition = data;
+    var path = (section && section.length > 0) ? section.split(self.params.sectionDelimiter) : [];
     for (var ii = 0; ii < path.length; ++ii) {
-      if (!currentPosition[1][path[ii]]) {
-        currentPosition[1][path[ii]] = [[], {}];
+      var pathPart = path[ii];
+      if (!currentPosition[1][pathPart]) {
+        currentPosition[1][pathPart] = [[], {}];
       }
-      currentPosition = currentPosition[1][path[ii]];
+      currentPosition = currentPosition[1][pathPart];
     }
     currentPosition[0].push(optionObj);
 
     ++id;
   });
-  this.keysToAdd = Util.array.uniq(Util.array.removeFalseyExceptZero(this.keysToAdd).concat(keysToAddAtEnd));
-
+  Util.array.removeFalseyExceptZero(this.keysToAdd);
+  this.keysToAdd.push(...keysToAddAtEnd);
+  Util.array.uniq(this.keysToAdd);
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function(data, parentNode, sectionIdStart) {
+Tree.prototype.generateHtml = function(ast, parentNode, sectionIdStart) {
   sectionIdStart = sectionIdStart || 0;
   var numItems = 0;
 
-  for (var ii = 0; ii < data[0].length; ++ii) {
-    var option = data[0][ii];
+  for (var ii = 0; ii < ast[0].length; ++ii) {
+    var option = ast[0][ii];
     var selection = Util.dom.createSelection(option, this.id, !this.params.onlyBatchSelection, this.params.freeze);
     this.selectNodes[option.id] = selection;
     parentNode.appendChild(selection);
   }
 
-  var keys = Object.keys(data[1]);
+  var keys = Object.keys(ast[1]);
   for (var jj = 0; jj < keys.length; ++jj) {
     var title = keys[jj];
     var id = numItems + sectionIdStart;
@@ -122,7 +125,7 @@ Tree.prototype.generateHtmlFromData = function(data, parentNode, sectionIdStart)
     this.sectionNodes[id] = sectionNode;
     ++numItems;
     parentNode.appendChild(sectionNode);
-    numItems += this.generateHtmlFromData(data[1][keys[jj]], sectionNode, sectionIdStart + numItems);
+    numItems += this.generateHtml(ast[1][keys[jj]], sectionNode, sectionIdStart + numItems);
   }
 
   return numItems;
@@ -158,9 +161,11 @@ Tree.prototype.handleSectionCheckboxMarkings = function() {
       keys.push(Util.getKey(el));
     });
     if (this.checked) {
-      self.keysToAdd = Util.array.uniq(self.keysToAdd.concat(keys));
+      self.keysToAdd.push(...keys);
+      Util.array.uniq(self.keysToAdd);
     } else {
-      self.keysToRemove = Util.array.uniq(self.keysToRemove.concat(keys));
+      self.keysToRemove.push(...keys);
+      Util.array.uniq(self.keysToRemove);
     }
     self.render();
   });
@@ -258,12 +263,13 @@ Tree.prototype.createSelectAllButtons = function(parentNode) {
     for (var ii = 0; ii < self.selectOptions.length; ++ii) {
       self.keysToAdd.push(ii);
     }
-    self.keysToAdd = Util.array.uniq(self.keysToAdd);
+    Util.array.uniq(self.keysToAdd);
     self.render();
   });
 
   this.$selectionContainer.on('click', 'span.unselect-all', function() {
-    self.keysToRemove = Util.array.uniq(self.keysToRemove.concat(self.selectedKeys));
+    self.keysToRemove.push(...self.selectedKeys);
+    Util.array.uniq(self.keysToRemove);
     self.render();
   });
 };
@@ -318,8 +324,8 @@ Tree.prototype.updateSelectedAndOnChange = function() {
 
 Tree.prototype.render = function(noCallbacks) {
   // fix arrays first
-  this.keysToAdd = Util.array.subtract(this.keysToAdd, this.selectedKeys);
-  this.keysToRemove = Util.array.intersect(this.keysToRemove, this.selectedKeys);
+  Util.array.subtract(this.keysToAdd, this.selectedKeys);
+  Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
   // remove items first
   for (var ii = 0; ii < this.keysToRemove.length; ++ii) {
@@ -336,7 +342,7 @@ Tree.prototype.render = function(noCallbacks) {
     selectionNode.getElementsByTagName('INPUT')[0].checked = false;
   }
 
-  this.selectedKeys = Util.array.subtract(this.selectedKeys, this.keysToRemove);
+  Util.array.subtract(this.selectedKeys, this.keysToRemove);
 
   // now add items
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
@@ -353,7 +359,8 @@ Tree.prototype.render = function(noCallbacks) {
     (this.selectNodes[this.keysToAdd[jj]]).getElementsByTagName('INPUT')[0].checked = true;
   }
 
-  this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
+  this.selectedKeys.push(...this.keysToAdd);
+  Util.array.uniq(this.selectedKeys);
 
   // redraw section checkboxes
   this.redrawSectionCheckboxes();

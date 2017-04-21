@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - 5
+  - node
 
 before_script:
   - yarn global add grunt-cli eslint codecov

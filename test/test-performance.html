@@ -33,7 +33,9 @@
         var $option = $('<option value="fruit' + ii +'" data-section="Smoothies/' + ii + '" data-description="The greatest flavor" selected="selected">Passion Fruit</option>');
         $select.append($option);
       }
+      var time = new Date();
       $select.treeMultiselect({ enableSelectAll: true, sortable: true, searchable: true });
+      console.log("time elapsed - " + (new Date() - time) + "ms");
     </script>
   </body>
 </html>

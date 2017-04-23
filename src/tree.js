@@ -1,5 +1,5 @@
+var Ast = require('./ast');
 var Search = require('./search');
-var Option = require('./option');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
 
@@ -64,7 +64,10 @@ Tree.prototype.generateSelections = function(parentNode) {
 };
 
 Tree.prototype.createAst = function(options) {
-  var data = [[], {}];
+  var data = [];
+  var lookup = Ast.createLookup(data);
+  //var data = [[], {}];
+
   var self = this;
   var id = 0;
   var keysToAddAtEnd = [];
@@ -78,7 +81,7 @@ Tree.prototype.createAst = function(options) {
     var optionName = option.text;
     var optionDescription = option.getAttribute('data-description');
     var optionIndex = parseInt(option.getAttribute('data-index'));
-    var optionObj = new Option(id, optionValue, optionName, optionDescription, optionIndex, section);
+    var optionObj = Ast.createItem(id, optionValue, optionName, optionDescription, optionIndex, section);
 
     if (optionIndex) {
       self.keysToAdd[optionIndex] = id;
@@ -87,18 +90,23 @@ Tree.prototype.createAst = function(options) {
     }
     self.selectOptions[id] = optionObj;
 
-    var currentPosition = data;
-    var path = (section && section.length > 0) ? section.split(self.params.sectionDelimiter) : [];
-    for (var ii = 0; ii < path.length; ++ii) {
-      var pathPart = path[ii];
-      if (!currentPosition[1][pathPart]) {
-        currentPosition[1][pathPart] = [[], {}];
-      }
-      currentPosition = currentPosition[1][pathPart];
-    }
-    currentPosition[0].push(optionObj);
-
     ++id;
+
+    var lookupPosition = lookup;
+    var sectionParts = (section && section.length > 0) ? section.split(self.params.sectionDelimiter) : [];
+    for (var ii = 0; ii < sectionParts.length; ++ii) {
+      var sectionPart = sectionParts[ii];
+      if (lookupPosition.children[sectionPart]) {
+        lookupPosition = lookupPosition.children[sectionPart];
+      } else {
+        var newSection = Ast.createSection(sectionPart);
+        lookupPosition.arr.push(newSection);
+        var newLookupNode = Ast.createLookup(newSection.items);
+        lookupPosition.children[sectionPart] = newLookupNode;
+        lookupPosition = newLookupNode;
+      }
+    }
+    lookupPosition.arr.push(optionObj);
   });
   Util.array.removeFalseyExceptZero(this.keysToAdd);
   this.keysToAdd.push(...keysToAddAtEnd);
@@ -106,29 +114,28 @@ Tree.prototype.createAst = function(options) {
   return data;
 };
 
-Tree.prototype.generateHtml = function(ast, parentNode, sectionIdStart) {
+Tree.prototype.generateHtml = function(astArr, parentNode, sectionIdStart) {
   sectionIdStart = sectionIdStart || 0;
-  var numItems = 0;
+  var numSections = 0;
 
-  for (var ii = 0; ii < ast[0].length; ++ii) {
-    var option = ast[0][ii];
-    var selection = Util.dom.createSelection(option, this.id, !this.params.onlyBatchSelection, this.params.freeze);
-    this.selectNodes[option.id] = selection;
-    parentNode.appendChild(selection);
+  for (var ii = 0; ii < astArr.length; ++ii) {
+    var obj = astArr[ii];
+    if (Ast.isSection(obj)) {
+      var title = Ast.getSectionName(obj);
+      var id = numSections + sectionIdStart;
+      var sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
+      this.sectionNodes[id] = sectionNode;
+      ++numSections;
+      parentNode.appendChild(sectionNode);
+      numSections += this.generateHtml(Ast.getSectionItems(obj), sectionNode, sectionIdStart + numSections);
+    } else if (Ast.isItem(obj)) {
+      var selection = Util.dom.createSelection(obj, this.id, !this.params.onlyBatchSelection, this.params.freeze);
+      this.selectNodes[obj.id] = selection;
+      parentNode.appendChild(selection);
+    }
   }
 
-  var keys = Object.keys(ast[1]);
-  for (var jj = 0; jj < keys.length; ++jj) {
-    var title = keys[jj];
-    var id = numItems + sectionIdStart;
-    var sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
-    this.sectionNodes[id] = sectionNode;
-    ++numItems;
-    parentNode.appendChild(sectionNode);
-    numItems += this.generateHtml(ast[1][keys[jj]], sectionNode, sectionIdStart + numItems);
-  }
-
-  return numItems;
+  return numSections;
 };
 
 Tree.prototype.popupDescriptionHover = function() {

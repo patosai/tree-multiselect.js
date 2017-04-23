@@ -1,5 +1,51 @@
-/* jQuery Tree Multiselect v2.1.6 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.2.0 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+exports.createLookup = function (arr) {
+  return {
+    arr: arr,
+    children: {}
+  };
+};
+
+exports.createSection = function (name) {
+  return {
+    type: 'section',
+    name: name,
+    items: []
+  };
+};
+
+exports.isSection = function (obj) {
+  return obj && obj.type === 'section';
+};
+
+exports.getSectionName = function (section) {
+  return section.name;
+};
+
+exports.getSectionItems = function (section) {
+  return section.items;
+};
+
+exports.createItem = function (id, value, text, description, initialIndex, section) {
+  return {
+    type: 'item',
+    id: id,
+    value: value,
+    text: text,
+    description: description,
+    initialIndex: initialIndex,
+    section: section
+  };
+};
+
+exports.isItem = function (obj) {
+  return obj && obj.type === 'item';
+};
+
+},{}],2:[function(require,module,exports){
 'use strict';
 
 var Tree = require('./tree');
@@ -12,7 +58,7 @@ var treeMultiselect = function treeMultiselect(opts) {
   var options = mergeDefaultOptions(opts);
 
   this.each(function () {
-    var $originalSelect = jQuery(_this);
+    var $originalSelect = _this;
     $originalSelect.attr('multiple', '').css('display', 'none');
 
     var tree = new Tree(uniqueId, $originalSelect, options);
@@ -47,19 +93,7 @@ function mergeDefaultOptions(options) {
 
 module.exports = treeMultiselect;
 
-},{"./tree":5}],2:[function(require,module,exports){
-"use strict";
-
-module.exports = function (id, value, text, description, initialIndex, section) {
-  this.id = id;
-  this.value = value;
-  this.text = text;
-  this.description = description;
-  this.initialIndex = initialIndex;
-  this.section = section;
-};
-
-},{}],3:[function(require,module,exports){
+},{"./tree":5}],3:[function(require,module,exports){
 'use strict';
 
 var Util = require('./utility');
@@ -111,7 +145,8 @@ Search.prototype.buildIndex = function () {
     _this.searchParams.forEach(function (searchParam) {
       searchItems.push(option[searchParam]);
     });
-    var searchWords = Util.array.removeFalseyExceptZero(searchItems).map(function (item) {
+    Util.array.removeFalseyExceptZero(searchItems);
+    var searchWords = searchItems.map(function (item) {
       return item.toLowerCase();
     });
 
@@ -241,10 +276,12 @@ module.exports = Search;
   $.fn.treeMultiselect = require('./main');
 })(jQuery);
 
-},{"./main":1}],5:[function(require,module,exports){
+},{"./main":2}],5:[function(require,module,exports){
 'use strict';
 
-var Option = require('./option');
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var Ast = require('./ast');
 var Search = require('./search');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
@@ -253,9 +290,9 @@ function Tree(id, $originalSelect, params) {
   this.id = id;
   this.$originalSelect = $originalSelect;
 
-  var uiBuilder = new UiBuilder($originalSelect, params.hideSidePanel);
-  this.$selectionContainer = uiBuilder.$selectionContainer;
-  this.$selectedContainer = uiBuilder.$selectedContainer;
+  this.uiBuilder = new UiBuilder($originalSelect, params.hideSidePanel);
+  this.$selectionContainer = this.uiBuilder.$selectionContainer;
+  this.$selectedContainer = this.uiBuilder.$selectedContainer;
 
   this.params = params;
 
@@ -272,8 +309,7 @@ function Tree(id, $originalSelect, params) {
 }
 
 Tree.prototype.initialize = function () {
-  var data = this.generateSelections();
-  this.generateHtmlFromData(data, this.$selectionContainer[0]);
+  this.generateSelections(this.$selectionContainer[0]);
 
   this.popupDescriptionHover();
 
@@ -302,30 +338,37 @@ Tree.prototype.initialize = function () {
   this.updateSelectedAndOnChange();
 
   this.render(true);
+  this.uiBuilder.attach();
 };
 
-Tree.prototype.generateSelections = function () {
-  // nested objects and arrays
-  // [ [options directly under this section], {nested sections}]
-  var data = [[], {}];
+Tree.prototype.generateSelections = function (parentNode) {
+  var options = this.$originalSelect.children('option');
+  var ast = this.createAst(options);
+  this.generateHtml(ast, parentNode);
+};
 
-  var sectionDelimiter = this.params.sectionDelimiter;
+Tree.prototype.createAst = function (options) {
+  var _keysToAdd;
+
+  var data = [];
+  var lookup = Ast.createLookup(data);
+  //var data = [[], {}];
 
   var self = this;
   var id = 0;
   var keysToAddAtEnd = [];
-  this.$originalSelect.find('> option').each(function () {
+  options.each(function () {
     var option = this;
     option.setAttribute('data-key', id);
 
     var section = option.getAttribute('data-section');
-    var path = section && section.length > 0 ? section.split(sectionDelimiter) : [];
 
     var optionValue = option.value;
     var optionName = option.text;
     var optionDescription = option.getAttribute('data-description');
     var optionIndex = parseInt(option.getAttribute('data-index'));
-    var optionObj = new Option(id, optionValue, optionName, optionDescription, optionIndex, section);
+    var optionObj = Ast.createItem(id, optionValue, optionName, optionDescription, optionIndex, section);
+
     if (optionIndex) {
       self.keysToAdd[optionIndex] = id;
     } else if (option.hasAttribute('selected')) {
@@ -333,45 +376,52 @@ Tree.prototype.generateSelections = function () {
     }
     self.selectOptions[id] = optionObj;
 
-    var currentPosition = data;
-    for (var ii = 0; ii < path.length; ++ii) {
-      if (!currentPosition[1][path[ii]]) {
-        currentPosition[1][path[ii]] = [[], {}];
-      }
-      currentPosition = currentPosition[1][path[ii]];
-    }
-    currentPosition[0].push(optionObj);
-
     ++id;
-  });
-  this.keysToAdd = Util.array.uniq(Util.array.removeFalseyExceptZero(this.keysToAdd).concat(keysToAddAtEnd));
 
+    var lookupPosition = lookup;
+    var sectionParts = section && section.length > 0 ? section.split(self.params.sectionDelimiter) : [];
+    for (var ii = 0; ii < sectionParts.length; ++ii) {
+      var sectionPart = sectionParts[ii];
+      if (lookupPosition.children[sectionPart]) {
+        lookupPosition = lookupPosition.children[sectionPart];
+      } else {
+        var newSection = Ast.createSection(sectionPart);
+        lookupPosition.arr.push(newSection);
+        var newLookupNode = Ast.createLookup(newSection.items);
+        lookupPosition.children[sectionPart] = newLookupNode;
+        lookupPosition = newLookupNode;
+      }
+    }
+    lookupPosition.arr.push(optionObj);
+  });
+  Util.array.removeFalseyExceptZero(this.keysToAdd);
+  (_keysToAdd = this.keysToAdd).push.apply(_keysToAdd, keysToAddAtEnd);
+  Util.array.uniq(this.keysToAdd);
   return data;
 };
 
-Tree.prototype.generateHtmlFromData = function (data, parentNode, sectionIdStart) {
+Tree.prototype.generateHtml = function (astArr, parentNode, sectionIdStart) {
   sectionIdStart = sectionIdStart || 0;
-  var numItems = 0;
+  var numSections = 0;
 
-  for (var ii = 0; ii < data[0].length; ++ii) {
-    var option = data[0][ii];
-    var selection = Util.dom.createSelection(option, this.id, !this.params.onlyBatchSelection, this.params.freeze);
-    this.selectNodes[option.id] = selection;
-    parentNode.appendChild(selection);
+  for (var ii = 0; ii < astArr.length; ++ii) {
+    var obj = astArr[ii];
+    if (Ast.isSection(obj)) {
+      var title = Ast.getSectionName(obj);
+      var id = numSections + sectionIdStart;
+      var sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
+      this.sectionNodes[id] = sectionNode;
+      ++numSections;
+      parentNode.appendChild(sectionNode);
+      numSections += this.generateHtml(Ast.getSectionItems(obj), sectionNode, sectionIdStart + numSections);
+    } else if (Ast.isItem(obj)) {
+      var selection = Util.dom.createSelection(obj, this.id, !this.params.onlyBatchSelection, this.params.freeze);
+      this.selectNodes[obj.id] = selection;
+      parentNode.appendChild(selection);
+    }
   }
 
-  var keys = Object.keys(data[1]);
-  for (var jj = 0; jj < keys.length; ++jj) {
-    var title = keys[jj];
-    var id = numItems + sectionIdStart;
-    var sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
-    this.sectionNodes[id] = sectionNode;
-    ++numItems;
-    parentNode.appendChild(sectionNode);
-    numItems += this.generateHtmlFromData(data[1][keys[jj]], sectionNode, sectionIdStart + numItems);
-  }
-
-  return numItems;
+  return numSections;
 };
 
 Tree.prototype.popupDescriptionHover = function () {
@@ -404,9 +454,15 @@ Tree.prototype.handleSectionCheckboxMarkings = function () {
       keys.push(Util.getKey(el));
     });
     if (this.checked) {
-      self.keysToAdd = Util.array.uniq(self.keysToAdd.concat(keys));
+      var _self$keysToAdd;
+
+      (_self$keysToAdd = self.keysToAdd).push.apply(_self$keysToAdd, keys);
+      Util.array.uniq(self.keysToAdd);
     } else {
-      self.keysToRemove = Util.array.uniq(self.keysToRemove.concat(keys));
+      var _self$keysToRemove;
+
+      (_self$keysToRemove = self.keysToRemove).push.apply(_self$keysToRemove, keys);
+      Util.array.uniq(self.keysToRemove);
     }
     self.render();
   });
@@ -415,32 +471,38 @@ Tree.prototype.handleSectionCheckboxMarkings = function () {
 Tree.prototype.redrawSectionCheckboxes = function ($section) {
   $section = $section || this.$selectionContainer;
 
-  // returns array; 0th el is all children are true, 1st el is all children are false
-  var returnVal = [true, true];
-  var $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
-  $childCheckboxes.each(function () {
-    if (this.checked) {
-      returnVal[1] = false;
-    } else {
-      returnVal[0] = false;
-    }
-  });
+  // returns array; bit 1 is all children are true, bit 0 is all children are false
+  var returnVal = 3;
 
   var self = this;
   var $childSections = $section.find('> div.section');
   $childSections.each(function () {
     var result = self.redrawSectionCheckboxes(jQuery(this));
-    returnVal[0] = returnVal[0] && result[0];
-    returnVal[1] = returnVal[1] && result[1];
+    returnVal &= result;
   });
+
+  if (returnVal) {
+    var $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
+    for (var ii = 0; ii < $childCheckboxes.length; ++ii) {
+      if ($childCheckboxes[ii].checked) {
+        returnVal &= ~2;
+      } else {
+        returnVal &= ~1;
+      }
+
+      if (returnVal == 0) {
+        break;
+      }
+    }
+  }
 
   var sectionCheckbox = $section.find('> div.title > input[type=checkbox]');
   if (sectionCheckbox.length) {
     sectionCheckbox = sectionCheckbox[0];
-    if (returnVal[0]) {
+    if (returnVal & 1) {
       sectionCheckbox.checked = true;
       sectionCheckbox.indeterminate = false;
-    } else if (returnVal[1]) {
+    } else if (returnVal & 2) {
       sectionCheckbox.checked = false;
       sectionCheckbox.indeterminate = false;
     } else {
@@ -504,12 +566,15 @@ Tree.prototype.createSelectAllButtons = function (parentNode) {
     for (var ii = 0; ii < self.selectOptions.length; ++ii) {
       self.keysToAdd.push(ii);
     }
-    self.keysToAdd = Util.array.uniq(self.keysToAdd);
+    Util.array.uniq(self.keysToAdd);
     self.render();
   });
 
   this.$selectionContainer.on('click', 'span.unselect-all', function () {
-    self.keysToRemove = Util.array.uniq(self.keysToRemove.concat(self.selectedKeys));
+    var _self$keysToRemove2;
+
+    (_self$keysToRemove2 = self.keysToRemove).push.apply(_self$keysToRemove2, _toConsumableArray(self.selectedKeys));
+    Util.array.uniq(self.keysToRemove);
     self.render();
   });
 };
@@ -562,11 +627,12 @@ Tree.prototype.updateSelectedAndOnChange = function () {
 };
 
 Tree.prototype.render = function (noCallbacks) {
-  var _this = this;
+  var _selectedKeys,
+      _this = this;
 
   // fix arrays first
-  this.keysToAdd = Util.array.subtract(this.keysToAdd, this.selectedKeys);
-  this.keysToRemove = Util.array.intersect(this.keysToRemove, this.selectedKeys);
+  Util.array.subtract(this.keysToAdd, this.selectedKeys);
+  Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
   // remove items first
   for (var ii = 0; ii < this.keysToRemove.length; ++ii) {
@@ -583,7 +649,7 @@ Tree.prototype.render = function (noCallbacks) {
     selectionNode.getElementsByTagName('INPUT')[0].checked = false;
   }
 
-  this.selectedKeys = Util.array.subtract(this.selectedKeys, this.keysToRemove);
+  Util.array.subtract(this.selectedKeys, this.keysToRemove);
 
   // now add items
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
@@ -600,7 +666,8 @@ Tree.prototype.render = function (noCallbacks) {
     this.selectNodes[this.keysToAdd[jj]].getElementsByTagName('INPUT')[0].checked = true;
   }
 
-  this.selectedKeys = Util.array.uniq(this.selectedKeys.concat(this.keysToAdd));
+  (_selectedKeys = this.selectedKeys).push.apply(_selectedKeys, _toConsumableArray(this.keysToAdd));
+  Util.array.uniq(this.selectedKeys);
 
   // redraw section checkboxes
   this.redrawSectionCheckboxes();
@@ -653,10 +720,10 @@ Tree.prototype.render = function (noCallbacks) {
 
 module.exports = Tree;
 
-},{"./option":2,"./search":3,"./ui-builder":6,"./utility":9}],6:[function(require,module,exports){
+},{"./ast":1,"./search":3,"./ui-builder":6,"./utility":9}],6:[function(require,module,exports){
 'use strict';
 
-module.exports = function ($el, hideSidePanel) {
+function UiBuilder($el, hideSidePanel) {
   var $tree = jQuery('<div class="tree-multiselect"></div>');
 
   var $selections = jQuery('<div class="selections"></div>');
@@ -670,75 +737,87 @@ module.exports = function ($el, hideSidePanel) {
     $tree.append($selected);
   }
 
-  $el.after($tree);
-
+  this.$el = $el;
   this.$tree = $tree;
   this.$selectionContainer = $selections;
   this.$selectedContainer = $selected;
+}
+
+UiBuilder.prototype.attach = function () {
+  this.$el.after(this.$tree);
 };
+
+module.exports = UiBuilder;
 
 },{}],7:[function(require,module,exports){
 "use strict";
 
-function subtract(arr1, arr2) {
-  var hash = {};
-  var returnArr = [];
-  for (var ii = 0; ii < arr2.length; ++ii) {
-    hash[arr2[ii]] = true;
-  }
-  for (var jj = 0; jj < arr1.length; ++jj) {
-    if (!hash[arr1[jj]]) {
-      returnArr.push(arr1[jj]);
-    }
-  }
-  return returnArr;
-}
-
-function uniq(arr) {
-  var hash = {};
-  var newArr = [];
+// keeps if pred is true
+function filterInPlace(arr, pred) {
+  var idx = 0;
   for (var ii = 0; ii < arr.length; ++ii) {
-    if (!hash[arr[ii]]) {
-      hash[arr[ii]] = true;
-      newArr.push(arr[ii]);
+    if (pred(arr[ii])) {
+      arr[idx] = arr[ii];
+      ++idx;
     }
   }
-  return newArr;
+  arr.length = idx;
+  //arr.slice(0, idx);
 }
 
-function removeFalseyExceptZero(arr) {
-  var newArr = [];
-  for (var ii = 0; ii < arr.length; ++ii) {
-    if (arr[ii] || arr[ii] === 0) {
-      newArr.push(arr[ii]);
-    }
-  }
-  return newArr;
-}
+exports.uniq = function (arr) {
+  var hash = {};
 
-function moveEl(arr, oldPos, newPos) {
+  var pred = function pred(val) {
+    var returnVal = !hash[val];
+    hash[val] = true;
+    return returnVal;
+  };
+  filterInPlace(arr, pred);
+};
+
+exports.removeFalseyExceptZero = function (arr) {
+  var pred = function pred(val) {
+    return val || val === 0;
+  };
+  filterInPlace(arr, pred);
+};
+
+exports.moveEl = function (arr, oldPos, newPos) {
   var el = arr[oldPos];
   arr.splice(oldPos, 1);
   arr.splice(newPos, 0, el);
-}
+};
 
-function intersect(arr, arrExcluded) {
-  var newArr = [];
+exports.subtract = function (arr, arrExcluded) {
   var hash = {};
+
   for (var ii = 0; ii < arrExcluded.length; ++ii) {
     hash[arrExcluded[ii]] = true;
   }
-  for (var jj = 0; jj < arr.length; ++jj) {
-    if (hash[arr[jj]]) {
-      newArr.push(arr[jj]);
-    }
+
+  var pred = function pred(val) {
+    return !hash[val];
+  };
+  filterInPlace(arr, pred);
+};
+
+exports.intersect = function (arr, arrExcluded) {
+  var hash = {};
+
+  for (var ii = 0; ii < arrExcluded.length; ++ii) {
+    hash[arrExcluded[ii]] = true;
   }
-  return newArr;
-}
+
+  var pred = function pred(val) {
+    return hash[val];
+  };
+  filterInPlace(arr, pred);
+};
 
 // takes in array of arrays
 // arrays are presorted
-function intersectMany(arrays) {
+exports.intersectMany = function (arrays) {
   var indexLocations = [];
   var maxIndexLocations = [];
   arrays.forEach(function (array) {
@@ -779,21 +858,12 @@ function intersectMany(arrays) {
   }
 
   return finalOutput;
-}
-
-module.exports = {
-  subtract: subtract,
-  uniq: uniq,
-  removeFalseyExceptZero: removeFalseyExceptZero,
-  moveEl: moveEl,
-  intersect: intersect,
-  intersectMany: intersectMany
 };
 
 },{}],8:[function(require,module,exports){
 'use strict';
 
-function createNode(tag, props) {
+exports.createNode = function (tag, props) {
   var node = document.createElement(tag);
 
   if (props) {
@@ -807,9 +877,9 @@ function createNode(tag, props) {
     }
   }
   return node;
-}
+};
 
-function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
+exports.createSelection = function (option, treeId, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
     'data-key': option.id,
@@ -822,10 +892,10 @@ function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
   if (option.initialIndex) {
     props['data-index'] = option.initialIndex;
   }
-  var selectionNode = createNode('div', props);
+  var selectionNode = exports.createNode('div', props);
 
   if (hasDescription) {
-    var popup = createNode('span', { class: 'description', text: '?' });
+    var popup = exports.createNode('span', { class: 'description', text: '?' });
     selectionNode.appendChild(popup);
   }
   if (!createCheckboxes) {
@@ -840,7 +910,7 @@ function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
     if (disableCheckboxes) {
       inputCheckboxProps.disabled = true;
     }
-    var inputCheckbox = createNode('input', inputCheckboxProps);
+    var inputCheckbox = exports.createNode('input', inputCheckboxProps);
     // prepend child
     selectionNode.insertBefore(inputCheckbox, selectionNode.firstChild);
 
@@ -848,15 +918,15 @@ function createSelection(option, treeId, createCheckboxes, disableCheckboxes) {
       for: optionLabelCheckboxId,
       text: option.text || option.value
     };
-    var label = createNode('label', labelProps);
+    var label = exports.createNode('label', labelProps);
     selectionNode.appendChild(label);
   }
 
   return selectionNode;
-}
+};
 
-function createSelected(option, disableRemoval, showSectionOnSelected) {
-  var node = createNode('div', {
+exports.createSelected = function (option, disableRemoval, showSectionOnSelected) {
+  var node = exports.createNode('div', {
     class: 'item',
     'data-key': option.id,
     'data-value': option.value,
@@ -864,22 +934,22 @@ function createSelected(option, disableRemoval, showSectionOnSelected) {
   });
 
   if (!disableRemoval) {
-    var removalSpan = createNode('span', { class: 'remove-selected', text: '×' });
+    var removalSpan = exports.createNode('span', { class: 'remove-selected', text: '×' });
     node.insertBefore(removalSpan, node.firstChild);
   }
 
   if (showSectionOnSelected) {
-    var sectionSpan = createNode('span', { class: 'section-name', text: option.section });
+    var sectionSpan = exports.createNode('span', { class: 'section-name', text: option.section });
     node.appendChild(sectionSpan);
   }
 
   return node;
-}
+};
 
-function createSection(sectionName, sectionId, createCheckboxes, disableCheckboxes) {
-  var sectionNode = createNode('div', { class: 'section', 'data-key': sectionId });
+exports.createSection = function (sectionName, sectionId, createCheckboxes, disableCheckboxes) {
+  var sectionNode = exports.createNode('div', { class: 'section', 'data-key': sectionId });
 
-  var titleNode = createNode('div', { class: 'title', text: sectionName });
+  var titleNode = exports.createNode('div', { class: 'title', text: sectionName });
   if (createCheckboxes) {
     var checkboxProps = {
       class: 'section',
@@ -888,43 +958,29 @@ function createSection(sectionName, sectionId, createCheckboxes, disableCheckbox
     if (disableCheckboxes) {
       checkboxProps.disabled = true;
     }
-    var checkboxNode = createNode('input', checkboxProps);
+    var checkboxNode = exports.createNode('input', checkboxProps);
     titleNode.insertBefore(checkboxNode, titleNode.firstChild);
   }
   sectionNode.appendChild(titleNode);
   return sectionNode;
-}
-
-module.exports = {
-  createNode: createNode,
-  createSelection: createSelection,
-  createSelected: createSelected,
-  createSection: createSection
 };
 
 },{}],9:[function(require,module,exports){
 'use strict';
 
-var utilArray = require('./array');
-var utilDom = require('./dom');
+exports.array = require('./array');
 
-function assert(bool, message) {
+exports.assert = function (bool, message) {
   if (!bool) {
     throw new Error(message || 'Assertion failed');
   }
-}
+};
 
-function getKey(el) {
-  assert(el);
+exports.dom = require('./dom');
+
+exports.getKey = function (el) {
+  exports.assert(el);
   return parseInt(el.getAttribute('data-key'));
-}
-
-module.exports = {
-  assert: assert,
-  getKey: getKey,
-
-  array: utilArray,
-  dom: utilDom
 };
 
 },{"./array":7,"./dom":8}]},{},[4]);

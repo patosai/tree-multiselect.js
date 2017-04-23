@@ -7,9 +7,9 @@ function Tree(id, $originalSelect, params) {
   this.id = id;
   this.$originalSelect = $originalSelect;
 
-  var uiBuilder = new UiBuilder($originalSelect, params.hideSidePanel);
-  this.$selectionContainer = uiBuilder.$selectionContainer;
-  this.$selectedContainer = uiBuilder.$selectedContainer;
+  this.uiBuilder = new UiBuilder($originalSelect, params.hideSidePanel);
+  this.$selectionContainer = this.uiBuilder.$selectionContainer;
+  this.$selectedContainer = this.uiBuilder.$selectedContainer;
 
   this.params = params;
 
@@ -55,10 +55,11 @@ Tree.prototype.initialize = function() {
   this.updateSelectedAndOnChange();
 
   this.render(true);
+  this.uiBuilder.attach();
 };
 
 Tree.prototype.generateSelections = function(parentNode) {
-  var options = this.$originalSelect.find('> option');
+  var options = this.$originalSelect.children('option');
   var ast = this.createAst(options);
   this.generateHtml(ast, parentNode);
 };
@@ -181,32 +182,38 @@ Tree.prototype.handleSectionCheckboxMarkings = function() {
 Tree.prototype.redrawSectionCheckboxes = function($section) {
   $section = $section || this.$selectionContainer;
 
-  // returns array; 0th el is all children are true, 1st el is all children are false
-  var returnVal = [true, true];
-  var $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
-  $childCheckboxes.each(function() {
-    if (this.checked) {
-      returnVal[1] = false;
-    } else {
-      returnVal[0] = false;
-    }
-  });
+  // returns array; bit 1 is all children are true, bit 0 is all children are false
+  var returnVal = 0b11;
 
   var self = this;
   var $childSections = $section.find('> div.section');
   $childSections.each(function() {
     var result = self.redrawSectionCheckboxes(jQuery(this));
-    returnVal[0] = returnVal[0] && result[0];
-    returnVal[1] = returnVal[1] && result[1];
+    returnVal &= result;
   });
+
+  if (returnVal) {
+    var $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
+    for (var ii = 0; ii < $childCheckboxes.length; ++ii) {
+      if ($childCheckboxes[ii].checked) {
+        returnVal &= ~0b10;
+      } else {
+        returnVal &= ~0b01;
+      }
+
+      if (returnVal == 0) {
+        break;
+      }
+    }
+  }
 
   var sectionCheckbox = $section.find('> div.title > input[type=checkbox]');
   if (sectionCheckbox.length) {
     sectionCheckbox = sectionCheckbox[0];
-    if (returnVal[0]) {
+    if (returnVal & 0b01) {
       sectionCheckbox.checked = true;
       sectionCheckbox.indeterminate = false;
-    } else if (returnVal[1]) {
+    } else if (returnVal & 0b10) {
       sectionCheckbox.checked = false;
       sectionCheckbox.indeterminate = false;
     } else {

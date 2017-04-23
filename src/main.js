@@ -6,7 +6,7 @@ var treeMultiselect = function(opts) {
   var options = mergeDefaultOptions(opts);
 
   this.each(() => {
-    var $originalSelect = jQuery(this);
+    var $originalSelect = this;
     $originalSelect.attr('multiple', '').css('display', 'none');
 
     var tree = new Tree(uniqueId, $originalSelect, options);

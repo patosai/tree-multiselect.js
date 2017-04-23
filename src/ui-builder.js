@@ -1,4 +1,4 @@
-module.exports = function($el, hideSidePanel) {
+function UiBuilder($el, hideSidePanel) {
   var $tree = jQuery('<div class="tree-multiselect"></div>');
 
   var $selections = jQuery('<div class="selections"></div>');
@@ -12,9 +12,14 @@ module.exports = function($el, hideSidePanel) {
     $tree.append($selected);
   }
 
-  $el.after($tree);
-
+  this.$el = $el;
   this.$tree = $tree;
   this.$selectionContainer = $selections;
   this.$selectedContainer = $selected;
+}
+
+UiBuilder.prototype.attach = function() {
+  this.$el.after(this.$tree);
 };
+
+module.exports = UiBuilder;

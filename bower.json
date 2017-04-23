@@ -2,8 +2,8 @@
   "name": "tree-multiselect",
   "description": "jQuery multiple select with nested options",
   "main": [
-    "src/jquery.tree-multiselect.js",
-    "src/jquery.tree-multiselect.scss"
+    "src/tree-multiselect.js",
+    "src/style.scss"
   ],
   "authors": [
     "Patrick Tsai"
@@ -30,7 +30,7 @@
     "Gruntfile.js",
     "README.md",
     "release.sh",
-    "yark.lock"
+    "yarn.lock"
   ],
   "repository": {
     "type": "git",

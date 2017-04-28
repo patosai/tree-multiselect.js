@@ -161,7 +161,7 @@ Tree.prototype.popupDescriptionHover = function() {
 
 Tree.prototype.handleSectionCheckboxMarkings = function() {
   var self = this;
-  this.$selectionContainer.on('change', 'input.section[type=checkbox]', function() {
+  this.$selectionContainer.on('click', 'input.section[type=checkbox]', function() {
     var $section = jQuery(this).closest('div.section');
     var $items = $section.find('div.item');
     var keys = [];
@@ -301,7 +301,7 @@ Tree.prototype.armRemoveSelectedOnClick = function() {
 
 Tree.prototype.updateSelectedAndOnChange = function() {
   var self = this;
-  this.$selectionContainer.on('change', 'input.option[type=checkbox]', function() {
+  this.$selectionContainer.on('click', 'input.option[type=checkbox]', function() {
     var checkbox = this;
     var selection = checkbox.parentNode;
     var key = Util.getKey(selection);

@@ -14,12 +14,9 @@ The underlying `select` element can be used as it was before.
 <a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
 
 ### Usage
-```
-$("select").treeMultiselect();
-```
-
 Make sure your `select` has the `multiple` attribute set. Also, make sure you've got `<meta charset="UTF-8">` or some of the symbols may look strange.
 
+#### Options on your select
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------
 `selected`                    | Have the option pre-selected. This is actually part of the HTML spec
@@ -37,9 +34,28 @@ Ex. `data-section="top/middle/inner"` will show up as
     - `inner`
       - your option
 
-#### Params
-You can pass in params like `treeMultiselect(params)`. It is an object where you can set the following features:
+#### The JavaScript
+```
+$("select").treeMultiselect();
+```
 
+And now with some params.
+```
+$("select").treeMultiselect({searchable: true});
+```
+```
+function treeOnChange(allSelectedItems, addedItems, removedItems) {
+  console.log("something changed!");
+}
+
+$("select").treeMultiselect({
+  allowBatchSelection: false,
+  onChange: treeOnChange,
+  startCollapsed: true
+});
+```
+
+##### Params
 Name                    | Default        | Description
 ----------------------- | -------------- | ---------------
 `allowBatchSelection`   | `true`         | Sections have checkboxes which when checked, check everything within them

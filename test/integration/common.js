@@ -1,17 +1,26 @@
 chai.config.includeStack = true;
 
+var $fixture = null;
+var selectCount = 1;
+function createFixtureSelect() {
+  var select = document.createElement("select");
+  select.id = 'select-' + selectCount;
+  ++selectCount;
+  select.setAttribute("multiple", "multiple");
+  $fixture.append(select);
+  return select;
+}
+
 beforeEach(() => {
-  var $fixture = $("#fixture");
+  $fixture = $("#fixture");
   if (!$fixture.length) {
     $fixture = $("<div id='fixture'></div>");
     $("body").append($fixture);
   }
 
+  selectCount = 0;
   $fixture.empty();
-
-  var select = document.createElement("select");
-  select.setAttribute("multiple", "multiple");
-  $fixture.append(select);
+  createFixtureSelect();
 });
 
 module.exports = {
@@ -31,6 +40,8 @@ module.exports = {
     assert.equal($sectionName.length, 1);
     assert.equal(this.textOf($sectionName), params.section);
   },
+
+  createFixtureSelect: createFixtureSelect,
 
   textOf(el) {
     var $el = $(el);

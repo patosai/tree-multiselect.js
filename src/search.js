@@ -1,4 +1,4 @@
-var Util = require('./utility');
+let Util = require('./utility');
 
 const MAX_SAMPLE_SIZE = 3;
 
@@ -22,7 +22,7 @@ function Search(options, inSelectionNodeHash, inSectionNodeHash, searchParams) {
 Search.prototype.setSearchParams = function(searchParams) {
   Util.assert(Array.isArray(searchParams));
 
-  var allowedParams = {
+  let allowedParams = {
     'value': true,
     'text': true,
     'description': true,
@@ -30,7 +30,7 @@ Search.prototype.setSearchParams = function(searchParams) {
   };
 
   this.searchParams = [];
-  for (var ii = 0; ii < searchParams.length; ++ii) {
+  for (let ii = 0; ii < searchParams.length; ++ii) {
     if (allowedParams[searchParams[ii]]) {
       this.searchParams.push(searchParams[ii]);
     }
@@ -41,17 +41,17 @@ Search.prototype.buildIndex = function() {
   // options are sorted by id already
   // trigrams
   this.options.forEach((option) => {
-    var searchItems = [];
+    let searchItems = [];
     this.searchParams.forEach((searchParam) => {
       searchItems.push(option[searchParam]);
     });
     Util.array.removeFalseyExceptZero(searchItems);
-    var searchWords = searchItems.map((item) => {
+    let searchWords = searchItems.map((item) => {
       return item.toLowerCase();
     });
 
     searchWords.forEach((searchWord) => {
-      var words = searchWord.split(' ');
+      let words = searchWord.split(' ');
       words.forEach((word) => {
         this._addToIndex(word, option.id);
       });
@@ -60,9 +60,9 @@ Search.prototype.buildIndex = function() {
 };
 
 Search.prototype._addToIndex = function(key, id) {
-  for (var sample_size = 1; sample_size <= MAX_SAMPLE_SIZE; ++sample_size) {
-    for (var start_offset = 0; start_offset < key.length - sample_size + 1; ++start_offset) {
-      var minikey = key.substring(start_offset, start_offset + sample_size);
+  for (let sample_size = 1; sample_size <= MAX_SAMPLE_SIZE; ++sample_size) {
+    for (let start_offset = 0; start_offset < key.length - sample_size + 1; ++start_offset) {
+      let minikey = key.substring(start_offset, start_offset + sample_size);
 
       if (!this.index[minikey]) {
         this.index[minikey] = [];
@@ -70,7 +70,7 @@ Search.prototype._addToIndex = function(key, id) {
 
       // don't duplicate
       // this takes advantage of the fact that the minikeys with same id's are added sequentially
-      var length = this.index[minikey].length;
+      let length = this.index[minikey].length;
       if (length === 0 || this.index[minikey][length - 1] !== id) {
         this.index[minikey].push(id);
       }
@@ -92,34 +92,34 @@ Search.prototype.search = function(value) {
 
   value = value.toLowerCase();
 
-  var searchWords = value.split(' ');
-  var searchChunks = [];
+  let searchWords = value.split(' ');
+  let searchChunks = [];
   searchWords.forEach((searchWord) => {
-    var chunks = splitWord(searchWord);
+    let chunks = splitWord(searchWord);
     chunks.forEach((chunk) => {
       searchChunks.push(this.index[chunk] || []);
     });
   });
 
-  var matchedNodeIds = Util.array.intersectMany(searchChunks);
+  let matchedNodeIds = Util.array.intersectMany(searchChunks);
 
   // now we have id's that match search query
   this._handleNodeVisbilities(matchedNodeIds);
 };
 
 Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
-  var shownNodeIdsHash = {};
-  var sectionsToNotHideHash = {};
+  let shownNodeIdsHash = {};
+  let sectionsToNotHideHash = {};
   shownNodeIds.forEach((id) => {
     shownNodeIdsHash[id] = true;
-    var node = this.selectionNodeHash[id];
+    let node = this.selectionNodeHash[id];
     node.style.display = '';
 
     // now search for parent sections
     node = node.parentNode;
     while (!node.className.match(/tree-multiselect/)) {
       if (node.className.match(/section/)) {
-        var key = Util.getKey(node);
+        let key = Util.getKey(node);
         Util.assert(key || key === 0);
         if (sectionsToNotHideHash[key]) {
           break;
@@ -154,8 +154,8 @@ function splitWord(word) {
     return [word];
   }
 
-  var chunks = [];
-  for (var ii = 0; ii < word.length - MAX_SAMPLE_SIZE + 1; ++ii) {
+  let chunks = [];
+  for (let ii = 0; ii < word.length - MAX_SAMPLE_SIZE + 1; ++ii) {
     chunks.push(word.substring(ii, ii + MAX_SAMPLE_SIZE));
   }
   return chunks;

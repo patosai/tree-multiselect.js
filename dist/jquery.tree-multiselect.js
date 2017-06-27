@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.2.1 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.3.0 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -57,7 +57,7 @@ var treeMultiselect = function treeMultiselect(opts) {
 
   var options = mergeDefaultOptions(opts);
 
-  this.each(function () {
+  return this.map(function () {
     var $originalSelect = _this;
     $originalSelect.attr('multiple', '').css('display', 'none');
 
@@ -65,9 +65,17 @@ var treeMultiselect = function treeMultiselect(opts) {
     tree.initialize();
 
     ++uniqueId;
-  });
 
-  return this;
+    return {
+      reload: function reload() {
+        tree.reload();
+      },
+
+      remove: function remove() {
+        tree.remove();
+      }
+    };
+  });
 };
 
 function mergeDefaultOptions(options) {
@@ -290,22 +298,9 @@ function Tree(id, $originalSelect, params) {
   this.id = id;
   this.$originalSelect = $originalSelect;
 
-  this.uiBuilder = new UiBuilder($originalSelect, params.hideSidePanel);
-  this.$selectionContainer = this.uiBuilder.$selectionContainer;
-  this.$selectedContainer = this.uiBuilder.$selectedContainer;
-
   this.params = params;
 
-  this.selectOptions = [];
-
-  // data-key is key, provides DOM node
-  this.selectNodes = {};
-  this.sectionNodes = {};
-  this.selectedNodes = {};
-
-  this.selectedKeys = [];
-  this.keysToAdd = [];
-  this.keysToRemove = [];
+  this.resetState();
 }
 
 Tree.prototype.initialize = function () {
@@ -341,6 +336,34 @@ Tree.prototype.initialize = function () {
   this.uiBuilder.attach();
 };
 
+Tree.prototype.remove = function () {
+  this.uiBuilder.remove();
+  this.resetState();
+};
+
+Tree.prototype.reload = function () {
+  this.remove();
+  this.initialize();
+};
+
+Tree.prototype.resetState = function () {
+  this.uiBuilder = new UiBuilder(this.$originalSelect, this.params.hideSidePanel);
+  this.$treeContainer = this.uiBuilder.$treeContainer;
+  this.$selectionContainer = this.uiBuilder.$selectionContainer;
+  this.$selectedContainer = this.uiBuilder.$selectedContainer;
+
+  this.selectOptions = [];
+
+  // data-key is key, provides DOM node
+  this.selectNodes = {};
+  this.sectionNodes = {};
+  this.selectedNodes = {};
+
+  this.selectedKeys = [];
+  this.keysToAdd = [];
+  this.keysToRemove = [];
+};
+
 Tree.prototype.generateSelections = function (parentNode) {
   var options = this.$originalSelect.children('option');
   var ast = this.createAst(options);
@@ -352,7 +375,6 @@ Tree.prototype.createAst = function (options) {
 
   var data = [];
   var lookup = Ast.createLookup(data);
-  //var data = [[], {}];
 
   var self = this;
   var id = 0;
@@ -490,7 +512,7 @@ Tree.prototype.redrawSectionCheckboxes = function ($section) {
         returnVal &= ~1;
       }
 
-      if (returnVal == 0) {
+      if (returnVal === 0) {
         break;
       }
     }
@@ -529,7 +551,7 @@ Tree.prototype.addCollapsibility = function () {
   }
 
   this.$selectionContainer.on('click', titleSelector, function (event) {
-    if (event.target.nodeName == 'INPUT') {
+    if (event.target.nodeName === 'INPUT') {
       return;
     }
 
@@ -691,11 +713,7 @@ Tree.prototype.render = function (noCallbacks) {
 
   this.$originalSelect.html(options);
   this.$originalSelect.find('option').each(function (idx, el) {
-    if (originalValsHash[Util.getKey(el)]) {
-      this.selected = true;
-    } else {
-      this.selected = false;
-    }
+    this.selected = !!originalValsHash[Util.getKey(el)];
   });
   // NOTE: the following does not work since jQuery duplicates option values with the same value
   //this.$originalSelect.val(vals).change();
@@ -738,13 +756,17 @@ function UiBuilder($el, hideSidePanel) {
   }
 
   this.$el = $el;
-  this.$tree = $tree;
+  this.$treeContainer = $tree;
   this.$selectionContainer = $selections;
   this.$selectedContainer = $selected;
 }
 
 UiBuilder.prototype.attach = function () {
-  this.$el.after(this.$tree);
+  this.$el.after(this.$treeContainer);
+};
+
+UiBuilder.prototype.remove = function () {
+  this.$treeContainer.remove();
 };
 
 module.exports = UiBuilder;

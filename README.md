@@ -35,15 +35,15 @@ Ex. `data-section="top/middle/inner"` will show up as
       - your option
 
 #### The JavaScript
-```
+```javascript
 $("select").treeMultiselect();
 ```
 
 And now with some params.
-```
+```javascript
 $("select").treeMultiselect({searchable: true});
 ```
-```
+```javascript
 function treeOnChange(allSelectedItems, addedItems, removedItems) {
   console.log("something changed!");
 }
@@ -53,6 +53,18 @@ $("select").treeMultiselect({
   onChange: treeOnChange,
   startCollapsed: true
 });
+```
+
+The function returns returns an array of objects, each of which contains two functions, `remove` and `reload`. `remove` removes the tree, and `reload` reinitializes the tree from its `select` element. *User-changed options will be lost!*
+```javascript
+var trees = $("select").treeMultiselect();
+var firstTree = trees[0];
+
+// remove the tree
+firstTree.remove();
+
+// or, change the select element with new options, then...
+firstTree.reload();
 ```
 
 ##### Params
@@ -82,9 +94,6 @@ You can also use bower - `bower install tree-multiselect`
 ### FAQ
 `Help! The first element is selected when I create the tree. How do I make the first element not selected?`
 You didn't set the `multiple` attribute on your `select`. This is a property of single-option select nodes - the first option is selected.
-
-`How do I dynamically change ___?`
-Not supported... yet.
 
 ### License
 MIT licensed.

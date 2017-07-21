@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.3.0 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.3.1 | (c) Patrick Tsai | MIT Licensed */
 div.tree-multiselect {
   border: 2px solid #D8D8D8;
   border-radius: 5px;
@@ -20,7 +20,8 @@ div.tree-multiselect {
     div.tree-multiselect > div.selections div.item {
       margin-left: 16px; }
       div.tree-multiselect > div.selections div.item label {
-        cursor: pointer; }
+        cursor: pointer;
+        display: inline; }
     div.tree-multiselect > div.selections.no-border {
       border-right: none; }
   div.tree-multiselect > div.selected > div.item {

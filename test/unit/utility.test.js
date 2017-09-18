@@ -155,16 +155,35 @@ describe('Utility', () => {
       assert.equal(node.textContent, props.text);
     });
 
-    it('creates selection node with all properties', () => {
+    it('can tell that AST item is not a section', () => {
       var option = Ast.createItem({
         id: 0,
         value: 'val',
         text: 'text',
         description: 'description'
       });
-      var node = Util.dom.createSelection(option, 0, true, true);
-      assert.equal(node.getAttribute('data-value'), 'val');
-      assert.equal(node.getAttribute('data-description'), 'description');
+
+      assert(option.isItem());
+      assert.isFalse(option.isSection());
+    });
+
+    it('can tell that AST item is not a section', () => {
+      var option = Ast.createItem({
+        id: 0,
+        value: 'val',
+        text: 'text',
+        description: 'description'
+      });
+
+      assert(option.isItem());
+      assert.isFalse(option.isSection());
+    });
+
+    it('creates selection node with all properties', () => {
+      var section = Ast.createSection('name');
+
+      assert(section.isSection());
+      assert.isFalse(section.isItem());
     });
 
     it('creates selection node with value as text', () => {

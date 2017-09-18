@@ -42,7 +42,7 @@ exports.createSelection = function(option, treeId, createCheckboxes, disableChec
       type: 'checkbox',
       id: optionLabelCheckboxId,
     };
-    if (disableCheckboxes) {
+    if (disableCheckboxes || option.disabled) {
       inputCheckboxProps.disabled = true;
     }
     var inputCheckbox = exports.createNode('input', inputCheckboxProps);

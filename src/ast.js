@@ -1,3 +1,37 @@
+function Section(name) {
+  this.name = name;
+  this.items = [];
+}
+
+Section.prototype.isSection = function() {
+  return true;
+};
+
+Section.prototype.isItem = function() {
+  return false;
+};
+
+function Item(obj) {
+  obj = obj || {};
+
+  this.type = 'item';
+  this.id = obj.id;
+  this.value = obj.value;
+  this.text = obj.text;
+  this.description = obj.description;
+  this.initialIndex = parseInt(obj.initialIndex);
+  this.section = obj.section;
+  this.disabled = obj.disabled;
+}
+
+Item.prototype.isSection = function() {
+  return false;
+};
+
+Item.prototype.isItem = function() {
+  return true;
+};
+
 exports.createLookup = function(arr) {
   return {
     arr: arr,
@@ -6,37 +40,9 @@ exports.createLookup = function(arr) {
 };
 
 exports.createSection = function(name) {
-  return {
-    type: 'section',
-    name: name,
-    items: []
-  };
+  return new Section(name);
 };
 
-exports.isSection = function(obj) {
-  return obj && obj.type === 'section';
-};
-
-exports.getSectionName = function(section) {
-  return section.name;
-};
-
-exports.getSectionItems = function(section) {
-  return section.items;
-};
-
-exports.createItem = function(id, value, text, description, initialIndex, section) {
-  return {
-    type: 'item',
-    id: id,
-    value: value,
-    text: text,
-    description: description,
-    initialIndex: initialIndex,
-    section: section
-  };
-};
-
-exports.isItem = function(obj) {
-  return obj && obj.type === 'item';
+exports.createItem = function(obj) {
+  return new Item(obj);
 };

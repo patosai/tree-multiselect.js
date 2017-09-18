@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 
       local: {},
 
-      continuous: {
+      watch: {
         autoWatch: true,
         singleRun: false
       }
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.registerTask('test', ['eslint', 'karma:local']);
-  grunt.registerTask('test-watch', ['karma:continuous']);
+  grunt.registerTask('test-watch', ['karma:watch']);
 
   grunt.registerTask('build', ['browserify']);
 

@@ -387,4 +387,18 @@ describe('Options', () => {
     var $unselectAll = $(".unselect-all");
     assert.equal($unselectAll.text(), unselectAllText);
   });
+
+  it('can have individual disabled attributes', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected' disabled>Two</option>");
+    $("select").treeMultiselect();
+
+    var $firstSelectionCheckbox = Common.selectionCheckbox({value: 'one'});
+    assert.equal($firstSelectionCheckbox.length, 1);
+    assert.isFalse($firstSelectionCheckbox.prop('disabled'));
+
+    var $firstSelectionCheckbox = Common.selectionCheckbox({value: 'two'});
+    assert.equal($firstSelectionCheckbox.length, 1);
+    assert.isTrue($firstSelectionCheckbox.prop('disabled'));
+  });
 });

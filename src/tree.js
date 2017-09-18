@@ -90,24 +90,27 @@ Tree.prototype.createAst = function(options) {
     let option = this;
     option.setAttribute('data-key', id);
 
-    let section = option.getAttribute('data-section');
+    let item = Ast.createItem({
+      id: id,
+      value: option.value,
+      text: option.text,
+      description: option.getAttribute('data-description'),
+      initialIndex: option.getAttribute('data-index'),
+      section: option.getAttribute('data-section'),
+      disabled: option.hasAttribute('disabled')
+    });
 
-    let optionValue = option.value;
-    let optionName = option.text;
-    let optionDescription = option.getAttribute('data-description');
-    let optionIndex = parseInt(option.getAttribute('data-index'));
-    let optionObj = Ast.createItem(id, optionValue, optionName, optionDescription, optionIndex, section);
-
-    if (optionIndex) {
-      self.keysToAdd[optionIndex] = id;
+    if (item.initialIndex) {
+      self.keysToAdd[item.initialIndex] = id;
     } else if (option.hasAttribute('selected')) {
       keysToAddAtEnd.push(id);
     }
-    self.selectOptions[id] = optionObj;
+    self.selectOptions[id] = item;
 
     ++id;
 
     let lookupPosition = lookup;
+    let section = item.section;
     let sectionParts = (section && section.length > 0) ? section.split(self.params.sectionDelimiter) : [];
     for (let ii = 0; ii < sectionParts.length; ++ii) {
       let sectionPart = sectionParts[ii];
@@ -121,7 +124,7 @@ Tree.prototype.createAst = function(options) {
         lookupPosition = newLookupNode;
       }
     }
-    lookupPosition.arr.push(optionObj);
+    lookupPosition.arr.push(item);
   });
   Util.array.removeFalseyExceptZero(this.keysToAdd);
   this.keysToAdd.push(...keysToAddAtEnd);
@@ -135,15 +138,15 @@ Tree.prototype.generateHtml = function(astArr, parentNode, sectionIdStart) {
 
   for (let ii = 0; ii < astArr.length; ++ii) {
     let obj = astArr[ii];
-    if (Ast.isSection(obj)) {
-      let title = Ast.getSectionName(obj);
+    if (obj.isSection()) {
+      let title = obj.name;
       let id = numSections + sectionIdStart;
       let sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
       this.sectionNodes[id] = sectionNode;
       ++numSections;
       parentNode.appendChild(sectionNode);
-      numSections += this.generateHtml(Ast.getSectionItems(obj), sectionNode, sectionIdStart + numSections);
-    } else if (Ast.isItem(obj)) {
+      numSections += this.generateHtml(obj.items, sectionNode, sectionIdStart + numSections);
+    } else if (obj.isItem()) {
       let selection = Util.dom.createSelection(obj, this.id, !this.params.onlyBatchSelection, this.params.freeze);
       this.selectNodes[obj.id] = selection;
       parentNode.appendChild(selection);

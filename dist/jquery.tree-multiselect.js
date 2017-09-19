@@ -2,6 +2,65 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+var Util = require('./utility');
+
+function Section(obj) {
+  obj = obj || {};
+
+  this.treeId = obj.treeId;
+  this.id = obj.id;
+  this.name = obj.name;
+  this.items = [];
+
+  this.node = null;
+}
+
+Section.prototype.isSection = function () {
+  return true;
+};
+
+Section.prototype.isItem = function () {
+  return false;
+};
+
+Section.prototype.render = function (createCheckboxes, disableCheckboxes) {
+  if (!this.node) {
+    this.node = Util.dom.createSection(this, createCheckboxes, disableCheckboxes);
+  }
+  return this.node;
+};
+
+function Item(obj) {
+  obj = obj || {};
+
+  this.treeId = obj.treeId;
+  this.id = obj.id;
+  this.value = obj.value;
+  this.text = obj.text;
+  this.description = obj.description;
+  this.initialIndex = obj.initialIndex ? parseInt(obj.initialIndex) : null;
+  this.section = obj.section;
+  this.disabled = obj.disabled;
+  this.selected = obj.selected;
+
+  this.node = null;
+}
+
+Item.prototype.isSection = function () {
+  return false;
+};
+
+Item.prototype.isItem = function () {
+  return true;
+};
+
+Item.prototype.render = function (createCheckboxes, disableCheckboxes) {
+  if (!this.node) {
+    this.node = Util.dom.createSelection(this, createCheckboxes, disableCheckboxes);
+  }
+  return this.node;
+};
+
 exports.createLookup = function (arr) {
   return {
     arr: arr,
@@ -9,43 +68,15 @@ exports.createLookup = function (arr) {
   };
 };
 
-exports.createSection = function (name) {
-  return {
-    type: 'section',
-    name: name,
-    items: []
-  };
+exports.createSection = function (obj) {
+  return new Section(obj);
 };
 
-exports.isSection = function (obj) {
-  return obj && obj.type === 'section';
+exports.createItem = function (obj) {
+  return new Item(obj);
 };
 
-exports.getSectionName = function (section) {
-  return section.name;
-};
-
-exports.getSectionItems = function (section) {
-  return section.items;
-};
-
-exports.createItem = function (id, value, text, description, initialIndex, section) {
-  return {
-    type: 'item',
-    id: id,
-    value: value,
-    text: text,
-    description: description,
-    initialIndex: initialIndex,
-    section: section
-  };
-};
-
-exports.isItem = function (obj) {
-  return obj && obj.type === 'item';
-};
-
-},{}],2:[function(require,module,exports){
+},{"./utility":9}],2:[function(require,module,exports){
 'use strict';
 
 var Tree = require('./tree');
@@ -108,17 +139,15 @@ var Util = require('./utility');
 
 var MAX_SAMPLE_SIZE = 3;
 
-function Search(options, inSelectionNodeHash, inSectionNodeHash, searchParams) {
-  this.options = options;
-
+function Search(astItems, astSections, searchParams) {
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
 
   // key: data-key, value: DOM node
-  this.selectionNodeHash = inSelectionNodeHash;
-  this.selectionNodeHashKeys = Object.keys(inSelectionNodeHash);
+  this.astItems = astItems;
+  this.astItemKeys = Object.keys(astItems);
 
-  this.sectionNodeHash = inSectionNodeHash;
-  this.sectionNodeHashKeys = Object.keys(inSectionNodeHash);
+  this.astSections = astSections;
+  this.astSectionKeys = Object.keys(astSections);
 
   this.setSearchParams(searchParams);
 
@@ -146,12 +175,11 @@ Search.prototype.setSearchParams = function (searchParams) {
 Search.prototype.buildIndex = function () {
   var _this = this;
 
-  // options are sorted by id already
-  // trigrams
-  this.options.forEach(function (option) {
+  var _loop = function _loop(astItemKey) {
+    var astItem = _this.astItems[astItemKey];
     var searchItems = [];
     _this.searchParams.forEach(function (searchParam) {
-      searchItems.push(option[searchParam]);
+      searchItems.push(astItem[searchParam]);
     });
     Util.array.removeFalseyExceptZero(searchItems);
     var searchWords = searchItems.map(function (item) {
@@ -161,10 +189,15 @@ Search.prototype.buildIndex = function () {
     searchWords.forEach(function (searchWord) {
       var words = searchWord.split(' ');
       words.forEach(function (word) {
-        _this._addToIndex(word, option.id);
+        _this._addToIndex(word, astItem.id);
       });
     });
-  });
+  };
+
+  // trigrams
+  for (var astItemKey in this.astItems) {
+    _loop(astItemKey);
+  }
 };
 
 Search.prototype._addToIndex = function (key, id) {
@@ -190,12 +223,12 @@ Search.prototype.search = function (value) {
   var _this2 = this;
 
   if (!value) {
-    this.selectionNodeHashKeys.forEach(function (id) {
-      _this2.selectionNodeHash[id].style.display = '';
+    this.astItemKeys.forEach(function (id) {
+      _this2.astItems[id].node.style.display = '';
     });
-    this.sectionNodeHashKeys.forEach(function (id) {
-      _this2.sectionNodeHash[id].style.display = '';
-      _this2.sectionNodeHash[id].removeAttribute('searchhit');
+    this.astSectionKeys.forEach(function (id) {
+      _this2.astSections[id].node.style.display = '';
+      _this2.astSections[id].node.removeAttribute('searchhit');
     });
     return;
   }
@@ -224,7 +257,7 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
   var sectionsToNotHideHash = {};
   shownNodeIds.forEach(function (id) {
     shownNodeIdsHash[id] = true;
-    var node = _this3.selectionNodeHash[id];
+    var node = _this3.astItems[id].node;
     node.style.display = '';
 
     // now search for parent sections
@@ -246,14 +279,14 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
   });
 
   // hide selections
-  this.selectionNodeHashKeys.forEach(function (id) {
+  this.astItemKeys.forEach(function (id) {
     if (!shownNodeIdsHash[id]) {
-      _this3.selectionNodeHash[id].style.display = 'none';
+      _this3.astItems[id].node.style.display = 'none';
     }
   });
-  this.sectionNodeHashKeys.forEach(function (id) {
+  this.astSectionKeys.forEach(function (id) {
     if (!sectionsToNotHideHash[id]) {
-      _this3.sectionNodeHash[id].style.display = 'none';
+      _this3.astSections[id].node.style.display = 'none';
     }
   });
 };
@@ -352,11 +385,9 @@ Tree.prototype.resetState = function () {
   this.$selectionContainer = this.uiBuilder.$selectionContainer;
   this.$selectedContainer = this.uiBuilder.$selectedContainer;
 
-  this.selectOptions = [];
-
   // data-key is key, provides DOM node
-  this.selectNodes = {};
-  this.sectionNodes = {};
+  this.astItems = {};
+  this.astSections = {};
   this.selectedNodes = {};
 
   this.selectedKeys = [];
@@ -377,44 +408,56 @@ Tree.prototype.createAst = function (options) {
   var lookup = Ast.createLookup(data);
 
   var self = this;
-  var id = 0;
+  var itemId = 0;
+  var sectionId = 0;
   var keysToAddAtEnd = [];
   options.each(function () {
     var option = this;
-    option.setAttribute('data-key', id);
+    option.setAttribute('data-key', itemId);
 
-    var section = option.getAttribute('data-section');
+    var item = Ast.createItem({
+      treeId: self.id,
+      id: itemId,
+      value: option.value,
+      text: option.text,
+      description: option.getAttribute('data-description'),
+      initialIndex: option.getAttribute('data-index'),
+      section: option.getAttribute('data-section'),
+      disabled: option.hasAttribute('disabled'),
+      selected: option.hasAttribute('selected')
+    });
 
-    var optionValue = option.value;
-    var optionName = option.text;
-    var optionDescription = option.getAttribute('data-description');
-    var optionIndex = parseInt(option.getAttribute('data-index'));
-    var optionObj = Ast.createItem(id, optionValue, optionName, optionDescription, optionIndex, section);
-
-    if (optionIndex) {
-      self.keysToAdd[optionIndex] = id;
-    } else if (option.hasAttribute('selected')) {
-      keysToAddAtEnd.push(id);
+    if (item.initialIndex) {
+      self.keysToAdd[item.initialIndex] = itemId;
+    } else if (item.selected) {
+      keysToAddAtEnd.push(itemId);
     }
-    self.selectOptions[id] = optionObj;
+    self.astItems[itemId] = item;
 
-    ++id;
+    ++itemId;
 
     var lookupPosition = lookup;
+    var section = item.section;
     var sectionParts = section && section.length > 0 ? section.split(self.params.sectionDelimiter) : [];
     for (var ii = 0; ii < sectionParts.length; ++ii) {
       var sectionPart = sectionParts[ii];
       if (lookupPosition.children[sectionPart]) {
         lookupPosition = lookupPosition.children[sectionPart];
       } else {
-        var newSection = Ast.createSection(sectionPart);
+        var newSection = Ast.createSection({
+          treeId: self.id,
+          id: sectionId,
+          name: sectionPart
+        });
+        ++sectionId;
+
         lookupPosition.arr.push(newSection);
         var newLookupNode = Ast.createLookup(newSection.items);
         lookupPosition.children[sectionPart] = newLookupNode;
         lookupPosition = newLookupNode;
       }
     }
-    lookupPosition.arr.push(optionObj);
+    lookupPosition.arr.push(item);
   });
   Util.array.removeFalseyExceptZero(this.keysToAdd);
   (_keysToAdd = this.keysToAdd).push.apply(_keysToAdd, keysToAddAtEnd);
@@ -422,28 +465,26 @@ Tree.prototype.createAst = function (options) {
   return data;
 };
 
-Tree.prototype.generateHtml = function (astArr, parentNode, sectionIdStart) {
-  sectionIdStart = sectionIdStart || 0;
-  var numSections = 0;
-
+Tree.prototype.generateHtml = function (astArr, parentNode) {
   for (var ii = 0; ii < astArr.length; ++ii) {
-    var obj = astArr[ii];
-    if (Ast.isSection(obj)) {
-      var title = Ast.getSectionName(obj);
-      var id = numSections + sectionIdStart;
-      var sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
-      this.sectionNodes[id] = sectionNode;
-      ++numSections;
-      parentNode.appendChild(sectionNode);
-      numSections += this.generateHtml(Ast.getSectionItems(obj), sectionNode, sectionIdStart + numSections);
-    } else if (Ast.isItem(obj)) {
-      var selection = Util.dom.createSelection(obj, this.id, !this.params.onlyBatchSelection, this.params.freeze);
-      this.selectNodes[obj.id] = selection;
-      parentNode.appendChild(selection);
+    var astObj = astArr[ii];
+    if (astObj.isSection()) {
+      this.astSections[astObj.id] = astObj;
+
+      var createCheckboxes = this.params.allowBatchSelection;
+      var disableCheckboxes = this.params.freeze;
+      var node = astObj.render(createCheckboxes, disableCheckboxes);
+      parentNode.appendChild(node);
+      this.generateHtml(astObj.items, node);
+    } else if (astObj.isItem()) {
+      this.astItems[astObj.id] = astObj;
+
+      var _createCheckboxes = !this.params.onlyBatchSelection;
+      var _disableCheckboxes = this.params.freeze;
+      var _node = astObj.render(_createCheckboxes, _disableCheckboxes);
+      parentNode.appendChild(_node);
     }
   }
-
-  return numSections;
 };
 
 Tree.prototype.popupDescriptionHover = function () {
@@ -471,19 +512,24 @@ Tree.prototype.handleSectionCheckboxMarkings = function () {
   this.$selectionContainer.on('click', 'input.section[type=checkbox]', function () {
     var $section = jQuery(this).closest('div.section');
     var $items = $section.find('div.item');
-    var keys = [];
-    $items.each(function (idx, el) {
-      keys.push(Util.getKey(el));
-    });
+    var keys = $items.map(function (idx, el) {
+      var key = Util.getKey(el);
+      var astItem = self.astItems[key];
+      if (!astItem.disabled) {
+        return key;
+      }
+    }).get();
+
     if (this.checked) {
       var _self$keysToAdd;
 
-      (_self$keysToAdd = self.keysToAdd).push.apply(_self$keysToAdd, keys);
+      // TODO why does this always take this branch
+      (_self$keysToAdd = self.keysToAdd).push.apply(_self$keysToAdd, _toConsumableArray(keys));
       Util.array.uniq(self.keysToAdd);
     } else {
       var _self$keysToRemove;
 
-      (_self$keysToRemove = self.keysToRemove).push.apply(_self$keysToRemove, keys);
+      (_self$keysToRemove = self.keysToRemove).push.apply(_self$keysToRemove, _toConsumableArray(keys));
       Util.array.uniq(self.keysToRemove);
     }
     self.render();
@@ -506,7 +552,9 @@ Tree.prototype.redrawSectionCheckboxes = function ($section) {
   if (returnVal) {
     var $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
     for (var ii = 0; ii < $childCheckboxes.length; ++ii) {
-      if ($childCheckboxes[ii].checked) {
+      if ($childCheckboxes[ii].disabled) {
+        // do nothing
+      } else if ($childCheckboxes[ii].checked) {
         returnVal &= ~2;
       } else {
         returnVal &= ~1;
@@ -562,7 +610,7 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSearchBar = function (parentNode) {
-  var searchObj = new Search(this.selectOptions, this.selectNodes, this.sectionNodes, this.params.searchParams);
+  var searchObj = new Search(this.astItems, this.astSections, this.params.searchParams);
 
   var searchNode = Util.dom.createNode('input', { class: 'search', placeholder: 'Search...' });
   parentNode.appendChild(searchNode);
@@ -585,9 +633,7 @@ Tree.prototype.createSelectAllButtons = function (parentNode) {
 
   var self = this;
   this.$selectionContainer.on('click', 'span.select-all', function () {
-    for (var ii = 0; ii < self.selectOptions.length; ++ii) {
-      self.keysToAdd.push(ii);
-    }
+    self.keysToAdd = Object.keys(self.astItems);
     Util.array.uniq(self.keysToAdd);
     self.render();
   });
@@ -667,7 +713,7 @@ Tree.prototype.render = function (noCallbacks) {
     }
 
     // uncheck these checkboxes
-    var selectionNode = this.selectNodes[this.keysToRemove[ii]];
+    var selectionNode = this.astItems[this.keysToRemove[ii]].node;
     selectionNode.getElementsByTagName('INPUT')[0].checked = false;
   }
 
@@ -677,15 +723,18 @@ Tree.prototype.render = function (noCallbacks) {
   for (var jj = 0; jj < this.keysToAdd.length; ++jj) {
     // create selected divs
     var key = this.keysToAdd[jj];
-    var option = this.selectOptions[key];
+    var astItem = this.astItems[key];
     this.selectedKeys.push(key);
 
-    var selectedNode = Util.dom.createSelected(option, this.params.freeze, this.params.showSectionOnSelected);
-    this.selectedNodes[option.id] = selectedNode;
+    var selectedNode = Util.dom.createSelected(astItem, this.params.freeze, this.params.showSectionOnSelected);
+    this.selectedNodes[astItem.id] = selectedNode;
     this.$selectedContainer.append(selectedNode);
 
     // check the checkboxes
-    this.selectNodes[this.keysToAdd[jj]].getElementsByTagName('INPUT')[0].checked = true;
+    var inputNode = astItem.node.getElementsByTagName('INPUT')[0];
+    if (inputNode) {
+      inputNode.checked = true;
+    }
   }
 
   (_selectedKeys = this.selectedKeys).push.apply(_selectedKeys, _toConsumableArray(this.keysToAdd));
@@ -699,7 +748,7 @@ Tree.prototype.render = function (noCallbacks) {
   // valHash hashes a value to an index
   var valHash = {};
   for (var kk = 0; kk < this.selectedKeys.length; ++kk) {
-    var value = this.selectOptions[this.selectedKeys[kk]].value;
+    var value = this.astItems[this.selectedKeys[kk]].value;
     originalValsHash[this.selectedKeys[kk]] = true;
     valHash[value] = kk;
   }
@@ -721,13 +770,13 @@ Tree.prototype.render = function (noCallbacks) {
 
   if (!noCallbacks && this.params.onChange) {
     var optionsSelected = this.selectedKeys.map(function (key) {
-      return _this.selectOptions[key];
+      return _this.astItems[key];
     });
     var optionsAdded = this.keysToAdd.map(function (key) {
-      return _this.selectOptions[key];
+      return _this.astItems[key];
     });
     var optionsRemoved = this.keysToRemove.map(function (key) {
-      return _this.selectOptions[key];
+      return _this.astItems[key];
     });
     this.params.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }
@@ -901,18 +950,18 @@ exports.createNode = function (tag, props) {
   return node;
 };
 
-exports.createSelection = function (option, treeId, createCheckboxes, disableCheckboxes) {
+exports.createSelection = function (astItem, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
-    'data-key': option.id,
-    'data-value': option.value
+    'data-key': astItem.id,
+    'data-value': astItem.value
   };
-  var hasDescription = !!option.description;
+  var hasDescription = !!astItem.description;
   if (hasDescription) {
-    props['data-description'] = option.description;
+    props['data-description'] = astItem.description;
   }
-  if (option.initialIndex) {
-    props['data-index'] = option.initialIndex;
+  if (astItem.initialIndex) {
+    props['data-index'] = astItem.initialIndex;
   }
   var selectionNode = exports.createNode('div', props);
 
@@ -921,15 +970,15 @@ exports.createSelection = function (option, treeId, createCheckboxes, disableChe
     selectionNode.appendChild(popup);
   }
   if (!createCheckboxes) {
-    selectionNode.innerText = option.text || option.value;
+    selectionNode.innerText = astItem.text || astItem.value;
   } else {
-    var optionLabelCheckboxId = 'treemultiselect-' + treeId + '-' + option.id;
+    var optionLabelCheckboxId = 'treemultiselect-' + astItem.treeId + '-' + astItem.id;
     var inputCheckboxProps = {
       class: 'option',
       type: 'checkbox',
       id: optionLabelCheckboxId
     };
-    if (disableCheckboxes) {
+    if (disableCheckboxes || astItem.disabled) {
       inputCheckboxProps.disabled = true;
     }
     var inputCheckbox = exports.createNode('input', inputCheckboxProps);
@@ -938,7 +987,7 @@ exports.createSelection = function (option, treeId, createCheckboxes, disableChe
 
     var labelProps = {
       for: optionLabelCheckboxId,
-      text: option.text || option.value
+      text: astItem.text || astItem.value
     };
     var label = exports.createNode('label', labelProps);
     selectionNode.appendChild(label);
@@ -947,12 +996,12 @@ exports.createSelection = function (option, treeId, createCheckboxes, disableChe
   return selectionNode;
 };
 
-exports.createSelected = function (option, disableRemoval, showSectionOnSelected) {
+exports.createSelected = function (astItem, disableRemoval, showSectionOnSelected) {
   var node = exports.createNode('div', {
     class: 'item',
-    'data-key': option.id,
-    'data-value': option.value,
-    text: option.text
+    'data-key': astItem.id,
+    'data-value': astItem.value,
+    text: astItem.text
   });
 
   if (!disableRemoval) {
@@ -961,17 +1010,17 @@ exports.createSelected = function (option, disableRemoval, showSectionOnSelected
   }
 
   if (showSectionOnSelected) {
-    var sectionSpan = exports.createNode('span', { class: 'section-name', text: option.section });
+    var sectionSpan = exports.createNode('span', { class: 'section-name', text: astItem.section });
     node.appendChild(sectionSpan);
   }
 
   return node;
 };
 
-exports.createSection = function (sectionName, sectionId, createCheckboxes, disableCheckboxes) {
-  var sectionNode = exports.createNode('div', { class: 'section', 'data-key': sectionId });
+exports.createSection = function (astSection, createCheckboxes, disableCheckboxes) {
+  var sectionNode = exports.createNode('div', { class: 'section', 'data-key': astSection.id });
 
-  var titleNode = exports.createNode('div', { class: 'title', text: sectionName });
+  var titleNode = exports.createNode('div', { class: 'title', text: astSection.name });
   if (createCheckboxes) {
     var checkboxProps = {
       class: 'section',

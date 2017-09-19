@@ -2,17 +2,15 @@ let Util = require('./utility');
 
 const MAX_SAMPLE_SIZE = 3;
 
-function Search(options, inSelectionNodeHash, inSectionNodeHash, searchParams) {
-  this.options = options;
-
+function Search(astItems, astSections, searchParams) {
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
 
   // key: data-key, value: DOM node
-  this.selectionNodeHash = inSelectionNodeHash;
-  this.selectionNodeHashKeys = Object.keys(inSelectionNodeHash);
+  this.astItems = astItems;
+  this.astItemKeys = Object.keys(astItems);
 
-  this.sectionNodeHash = inSectionNodeHash;
-  this.sectionNodeHashKeys = Object.keys(inSectionNodeHash);
+  this.astSections = astSections;
+  this.astSectionKeys = Object.keys(astSections);
 
   this.setSearchParams(searchParams);
 
@@ -38,12 +36,12 @@ Search.prototype.setSearchParams = function(searchParams) {
 };
 
 Search.prototype.buildIndex = function() {
-  // options are sorted by id already
   // trigrams
-  this.options.forEach((option) => {
+  for (const astItemKey in this.astItems) {
+    const astItem = this.astItems[astItemKey];
     let searchItems = [];
     this.searchParams.forEach((searchParam) => {
-      searchItems.push(option[searchParam]);
+      searchItems.push(astItem[searchParam]);
     });
     Util.array.removeFalseyExceptZero(searchItems);
     let searchWords = searchItems.map((item) => {
@@ -53,10 +51,10 @@ Search.prototype.buildIndex = function() {
     searchWords.forEach((searchWord) => {
       let words = searchWord.split(' ');
       words.forEach((word) => {
-        this._addToIndex(word, option.id);
+        this._addToIndex(word, astItem.id);
       });
     });
-  });
+  }
 };
 
 Search.prototype._addToIndex = function(key, id) {
@@ -80,12 +78,12 @@ Search.prototype._addToIndex = function(key, id) {
 
 Search.prototype.search = function(value) {
   if (!value) {
-    this.selectionNodeHashKeys.forEach((id) => {
-      this.selectionNodeHash[id].style.display = '';
+    this.astItemKeys.forEach((id) => {
+      this.astItems[id].node.style.display = '';
     });
-    this.sectionNodeHashKeys.forEach((id) => {
-      this.sectionNodeHash[id].style.display = '';
-      this.sectionNodeHash[id].removeAttribute('searchhit');
+    this.astSectionKeys.forEach((id) => {
+      this.astSections[id].node.style.display = '';
+      this.astSections[id].node.removeAttribute('searchhit');
     });
     return;
   }
@@ -112,7 +110,7 @@ Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
   let sectionsToNotHideHash = {};
   shownNodeIds.forEach((id) => {
     shownNodeIdsHash[id] = true;
-    let node = this.selectionNodeHash[id];
+    let node = this.astItems[id].node;
     node.style.display = '';
 
     // now search for parent sections
@@ -134,14 +132,14 @@ Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
   });
 
   // hide selections
-  this.selectionNodeHashKeys.forEach((id) => {
+  this.astItemKeys.forEach((id) => {
     if (!shownNodeIdsHash[id]) {
-      this.selectionNodeHash[id].style.display = 'none';
+      this.astItems[id].node.style.display = 'none';
     }
   });
-  this.sectionNodeHashKeys.forEach((id) => {
+  this.astSectionKeys.forEach((id) => {
     if (!sectionsToNotHideHash[id]) {
-      this.sectionNodeHash[id].style.display = 'none';
+      this.astSections[id].node.style.display = 'none';
     }
   });
 };

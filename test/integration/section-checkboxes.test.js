@@ -54,14 +54,13 @@ describe('Section Checkboxes', () => {
     $("select").append("<option value='one' data-section='top/middle/inner'>One</option>");
     $("select").treeMultiselect();
 
-    assert.equal($("div.title > input[type=checkbox]").length, 3);
-    assert.equal($("div.item > input[type=checkbox]").length, 1);
+    assert.equal(Common.sectionCheckbox().length, 3);
+    assert.equal(Common.selectionCheckbox().length, 1);
     assert.equal($("input[type=checkbox]").length, 4);
     assert.equal($("input[type=checkbox]:checked").length, 0);
 
-    var $middleSection = Common.section({text: 'middle'});
-
-    $middleSection.find("> div.title > input[type=checkbox]").click();
+    var $middleSectionCheckbox = Common.sectionCheckbox({text: 'middle'});
+    $middleSectionCheckbox.click();
 
     assert.equal($("div.title > input[type=checkbox]:checked").length, 3);
     assert.equal($("div.item > input[type=checkbox]:checked").length, 1);
@@ -114,5 +113,33 @@ describe('Section Checkboxes', () => {
 
     var $titleCheckbox = Common.sectionCheckbox({text: 'top'});
     assert.notOk($titleCheckbox.prop('indeterminate'));
+  });
+
+  it('checkbox doesn\'t select unselected disabled children', () => {
+    $("select").append("<option value='one' data-section='top' disabled>One</option>");
+    $("select").append("<option value='two' data-section='top'>Two</option>");
+    $("select").treeMultiselect();
+
+    assert.equal(Common.selected().length, 0);
+
+    var $titleCheckbox = Common.sectionCheckbox({text: 'top'});
+    $titleCheckbox.click();
+
+    assert.equal(Common.selected().length, 1);
+    assert.equal(Common.selected({value: 'two'}).length, 1);
+  });
+
+  it('checkbox doesn\'t unselect selected disabled children', () => {
+    $("select").append("<option value='one' data-section='top' selected disabled>One</option>");
+    $("select").append("<option value='two' data-section='top' selected>Two</option>");
+    $("select").treeMultiselect();
+
+    assert.equal(Common.selected().length, 2);
+
+    var $titleCheckbox = Common.sectionCheckbox({text: 'top'});
+    $titleCheckbox.click();
+
+    assert.equal(Common.selected().length, 1);
+    assert.equal(Common.selected({value: 'one'}).length, 1);
   });
 });

@@ -61,11 +61,9 @@ Tree.prototype.resetState = function() {
   this.$selectionContainer = this.uiBuilder.$selectionContainer;
   this.$selectedContainer = this.uiBuilder.$selectedContainer;
 
-  this.selectOptions = [];
-
   // data-key is key, provides DOM node
-  this.selectNodes = {};
-  this.sectionNodes = {};
+  this.astItems = {};
+  this.astSections = {};
   this.selectedNodes = {};
 
   this.selectedKeys = [];
@@ -84,30 +82,33 @@ Tree.prototype.createAst = function(options) {
   let lookup = Ast.createLookup(data);
 
   let self = this;
-  let id = 0;
+  let itemId = 0;
+  let sectionId = 0;
   let keysToAddAtEnd = [];
   options.each(function() {
     let option = this;
-    option.setAttribute('data-key', id);
+    option.setAttribute('data-key', itemId);
 
     let item = Ast.createItem({
-      id: id,
+      treeId: self.id,
+      id: itemId,
       value: option.value,
       text: option.text,
       description: option.getAttribute('data-description'),
       initialIndex: option.getAttribute('data-index'),
       section: option.getAttribute('data-section'),
-      disabled: option.hasAttribute('disabled')
+      disabled: option.hasAttribute('disabled'),
+      selected: option.hasAttribute('selected')
     });
 
     if (item.initialIndex) {
-      self.keysToAdd[item.initialIndex] = id;
-    } else if (option.hasAttribute('selected')) {
-      keysToAddAtEnd.push(id);
+      self.keysToAdd[item.initialIndex] = itemId;
+    } else if (item.selected) {
+      keysToAddAtEnd.push(itemId);
     }
-    self.selectOptions[id] = item;
+    self.astItems[itemId] = item;
 
-    ++id;
+    ++itemId;
 
     let lookupPosition = lookup;
     let section = item.section;
@@ -117,7 +118,13 @@ Tree.prototype.createAst = function(options) {
       if (lookupPosition.children[sectionPart]) {
         lookupPosition = lookupPosition.children[sectionPart];
       } else {
-        let newSection = Ast.createSection(sectionPart);
+        let newSection = Ast.createSection({
+          treeId: self.id,
+          id: sectionId,
+          name: sectionPart
+        });
+        ++sectionId;
+
         lookupPosition.arr.push(newSection);
         let newLookupNode = Ast.createLookup(newSection.items);
         lookupPosition.children[sectionPart] = newLookupNode;
@@ -132,28 +139,26 @@ Tree.prototype.createAst = function(options) {
   return data;
 };
 
-Tree.prototype.generateHtml = function(astArr, parentNode, sectionIdStart) {
-  sectionIdStart = sectionIdStart || 0;
-  let numSections = 0;
-
+Tree.prototype.generateHtml = function(astArr, parentNode) {
   for (let ii = 0; ii < astArr.length; ++ii) {
-    let obj = astArr[ii];
-    if (obj.isSection()) {
-      let title = obj.name;
-      let id = numSections + sectionIdStart;
-      let sectionNode = Util.dom.createSection(title, id, this.params.onlyBatchSelection || this.params.allowBatchSelection, this.params.freeze);
-      this.sectionNodes[id] = sectionNode;
-      ++numSections;
-      parentNode.appendChild(sectionNode);
-      numSections += this.generateHtml(obj.items, sectionNode, sectionIdStart + numSections);
-    } else if (obj.isItem()) {
-      let selection = Util.dom.createSelection(obj, this.id, !this.params.onlyBatchSelection, this.params.freeze);
-      this.selectNodes[obj.id] = selection;
-      parentNode.appendChild(selection);
+    const astObj = astArr[ii];
+    if (astObj.isSection()) {
+      this.astSections[astObj.id] = astObj;
+
+      let createCheckboxes = this.params.allowBatchSelection;
+      let disableCheckboxes = this.params.freeze;
+      let node = astObj.render(createCheckboxes, disableCheckboxes);
+      parentNode.appendChild(node);
+      this.generateHtml(astObj.items, node);
+    } else if (astObj.isItem()) {
+      this.astItems[astObj.id] = astObj;
+
+      let createCheckboxes = !this.params.onlyBatchSelection;
+      let disableCheckboxes = this.params.freeze;
+      let node = astObj.render(createCheckboxes, disableCheckboxes);
+      parentNode.appendChild(node);
     }
   }
-
-  return numSections;
 };
 
 Tree.prototype.popupDescriptionHover = function() {
@@ -181,11 +186,16 @@ Tree.prototype.handleSectionCheckboxMarkings = function() {
   this.$selectionContainer.on('click', 'input.section[type=checkbox]', function() {
     let $section = jQuery(this).closest('div.section');
     let $items = $section.find('div.item');
-    let keys = [];
-    $items.each((idx, el) => {
-      keys.push(Util.getKey(el));
-    });
+    let keys = $items.map((idx, el) => {
+      let key = Util.getKey(el);
+      let astItem = self.astItems[key];
+      if (!astItem.disabled) {
+        return key;
+      }
+    }).get();
+
     if (this.checked) {
+      // TODO why does this always take this branch
       self.keysToAdd.push(...keys);
       Util.array.uniq(self.keysToAdd);
     } else {
@@ -212,7 +222,9 @@ Tree.prototype.redrawSectionCheckboxes = function($section) {
   if (returnVal) {
     let $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
     for (let ii = 0; ii < $childCheckboxes.length; ++ii) {
-      if ($childCheckboxes[ii].checked) {
+      if ($childCheckboxes[ii].disabled) {
+        // do nothing
+      } else if ($childCheckboxes[ii].checked) {
         returnVal &= ~0b10;
       } else {
         returnVal &= ~0b01;
@@ -268,7 +280,7 @@ Tree.prototype.addCollapsibility = function() {
 };
 
 Tree.prototype.createSearchBar = function(parentNode) {
-  let searchObj = new Search(this.selectOptions, this.selectNodes, this.sectionNodes, this.params.searchParams);
+  let searchObj = new Search(this.astItems, this.astSections, this.params.searchParams);
 
   let searchNode = Util.dom.createNode('input', {class: 'search', placeholder: 'Search...'});
   parentNode.appendChild(searchNode);
@@ -291,9 +303,7 @@ Tree.prototype.createSelectAllButtons = function(parentNode) {
 
   let self = this;
   this.$selectionContainer.on('click', 'span.select-all', function() {
-    for (let ii = 0; ii < self.selectOptions.length; ++ii) {
-      self.keysToAdd.push(ii);
-    }
+    self.keysToAdd = Object.keys(self.astItems);
     Util.array.uniq(self.keysToAdd);
     self.render();
   });
@@ -369,7 +379,7 @@ Tree.prototype.render = function(noCallbacks) {
     }
 
     // uncheck these checkboxes
-    let selectionNode = this.selectNodes[this.keysToRemove[ii]];
+    let selectionNode = this.astItems[this.keysToRemove[ii]].node;
     selectionNode.getElementsByTagName('INPUT')[0].checked = false;
   }
 
@@ -379,15 +389,18 @@ Tree.prototype.render = function(noCallbacks) {
   for (let jj = 0; jj < this.keysToAdd.length; ++jj) {
     // create selected divs
     let key = this.keysToAdd[jj];
-    let option = this.selectOptions[key];
+    let astItem = this.astItems[key];
     this.selectedKeys.push(key);
 
-    let selectedNode = Util.dom.createSelected(option, this.params.freeze, this.params.showSectionOnSelected);
-    this.selectedNodes[option.id] = selectedNode;
+    let selectedNode = Util.dom.createSelected(astItem, this.params.freeze, this.params.showSectionOnSelected);
+    this.selectedNodes[astItem.id] = selectedNode;
     this.$selectedContainer.append(selectedNode);
 
     // check the checkboxes
-    (this.selectNodes[this.keysToAdd[jj]]).getElementsByTagName('INPUT')[0].checked = true;
+    let inputNode = astItem.node.getElementsByTagName('INPUT')[0];
+    if (inputNode) {
+      inputNode.checked = true;
+    }
   }
 
   this.selectedKeys.push(...this.keysToAdd);
@@ -401,7 +414,7 @@ Tree.prototype.render = function(noCallbacks) {
   // valHash hashes a value to an index
   let valHash = {};
   for (let kk = 0; kk < this.selectedKeys.length; ++kk) {
-    let value = this.selectOptions[this.selectedKeys[kk]].value;
+    let value = this.astItems[this.selectedKeys[kk]].value;
     originalValsHash[this.selectedKeys[kk]] = true;
     valHash[value] = kk;
   }
@@ -423,13 +436,13 @@ Tree.prototype.render = function(noCallbacks) {
 
   if (!noCallbacks && this.params.onChange) {
     let optionsSelected = this.selectedKeys.map((key) => {
-      return this.selectOptions[key];
+      return this.astItems[key];
     });
     let optionsAdded = this.keysToAdd.map((key) => {
-      return this.selectOptions[key];
+      return this.astItems[key];
     });
     let optionsRemoved = this.keysToRemove.map((key) => {
-      return this.selectOptions[key];
+      return this.astItems[key];
     });
     this.params.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }

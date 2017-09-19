@@ -57,7 +57,7 @@ div.tree-multiselect {
   div.tree-multiselect input[type=checkbox] {
     display: inline;
     margin-right: 5px; }
-    div.tree-multiselect input[type=checkbox]:hover {
+    div.tree-multiselect input[type=checkbox]:not([disabled]):hover {
       cursor: pointer; }
   div.tree-multiselect span.remove-selected,
   div.tree-multiselect span.description {

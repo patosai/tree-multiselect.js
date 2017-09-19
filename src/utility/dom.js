@@ -14,18 +14,18 @@ exports.createNode = function(tag, props) {
   return node;
 };
 
-exports.createSelection = function(option, treeId, createCheckboxes, disableCheckboxes) {
+exports.createSelection = function(astItem, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
-    'data-key': option.id,
-    'data-value': option.value
+    'data-key': astItem.id,
+    'data-value': astItem.value
   };
-  var hasDescription = !!option.description;
+  var hasDescription = !!astItem.description;
   if (hasDescription) {
-    props['data-description'] = option.description;
+    props['data-description'] = astItem.description;
   }
-  if (option.initialIndex) {
-    props['data-index'] = option.initialIndex;
+  if (astItem.initialIndex) {
+    props['data-index'] = astItem.initialIndex;
   }
   var selectionNode = exports.createNode('div', props);
 
@@ -34,15 +34,15 @@ exports.createSelection = function(option, treeId, createCheckboxes, disableChec
     selectionNode.appendChild(popup);
   }
   if (!createCheckboxes) {
-    selectionNode.innerText = option.text || option.value;
+    selectionNode.innerText = astItem.text || astItem.value;
   } else {
-    var optionLabelCheckboxId = `treemultiselect-${treeId}-${option.id}`;
+    var optionLabelCheckboxId = `treemultiselect-${astItem.treeId}-${astItem.id}`;
     var inputCheckboxProps = {
       class: 'option',
       type: 'checkbox',
       id: optionLabelCheckboxId,
     };
-    if (disableCheckboxes || option.disabled) {
+    if (disableCheckboxes || astItem.disabled) {
       inputCheckboxProps.disabled = true;
     }
     var inputCheckbox = exports.createNode('input', inputCheckboxProps);
@@ -51,7 +51,7 @@ exports.createSelection = function(option, treeId, createCheckboxes, disableChec
 
     var labelProps = {
       for: optionLabelCheckboxId,
-      text: option.text || option.value
+      text: astItem.text || astItem.value
     };
     var label = exports.createNode('label', labelProps);
     selectionNode.appendChild(label);
@@ -60,12 +60,12 @@ exports.createSelection = function(option, treeId, createCheckboxes, disableChec
   return selectionNode;
 };
 
-exports.createSelected = function(option, disableRemoval, showSectionOnSelected) {
+exports.createSelected = function(astItem, disableRemoval, showSectionOnSelected) {
   var node = exports.createNode('div', {
     class: 'item',
-    'data-key': option.id,
-    'data-value': option.value,
-    text: option.text
+    'data-key': astItem.id,
+    'data-value': astItem.value,
+    text: astItem.text
   });
 
   if (!disableRemoval) {
@@ -74,17 +74,17 @@ exports.createSelected = function(option, disableRemoval, showSectionOnSelected)
   }
 
   if (showSectionOnSelected) {
-    var sectionSpan = exports.createNode('span', {class: 'section-name', text: option.section});
+    var sectionSpan = exports.createNode('span', {class: 'section-name', text: astItem.section});
     node.appendChild(sectionSpan);
   }
 
   return node;
 };
 
-exports.createSection = function(sectionName, sectionId, createCheckboxes, disableCheckboxes) {
-  var sectionNode = exports.createNode('div', {class: 'section', 'data-key': sectionId});
+exports.createSection = function(astSection, createCheckboxes, disableCheckboxes) {
+  var sectionNode = exports.createNode('div', {class: 'section', 'data-key': astSection.id});
 
-  var titleNode = exports.createNode('div', {class: 'title', text: sectionName});
+  var titleNode = exports.createNode('div', {class: 'title', text: astSection.name});
   if (createCheckboxes) {
     var checkboxProps = {
       class: 'section',

@@ -207,12 +207,12 @@ describe('Options', () => {
                     var selection = expectedSecondSelections[i];
                     assert.equal(selection.text, 'Two');
                     assert.equal(selection.value, 'two');
-                    assert(isNaN(selection.initialIndex));
+                    assert.isNull(selection.initialIndex);
                     assert.equal(selection.section, 'test');
                   }
                   assert.equal(all[0].text, 'One');
                   assert.equal(all[0].value, 'one');
-                  assert(isNaN(all[0].initialIndex));
+                  assert.isNull(all[0].initialIndex);
                   assert.equal(all[0].section, 'test');
                   done();
                 }
@@ -234,7 +234,7 @@ describe('Options', () => {
                   assert.equal(removed.length, 1);
                   assert.equal(removed[0].text, 'One');
                   assert.equal(removed[0].value, 'one');
-                  assert(isNaN(removed[0].initialIndex));
+                  assert.isNull(removed[0].initialIndex);
                   assert.equal(removed[0].section, 'test');
                   done();
                 }

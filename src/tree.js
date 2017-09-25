@@ -304,13 +304,11 @@ Tree.prototype.createSelectAllButtons = function(parentNode) {
   let self = this;
   this.$selectionContainer.on('click', 'span.select-all', function() {
     self.keysToAdd = Object.keys(self.astItems);
-    Util.array.uniq(self.keysToAdd);
     self.render();
   });
 
   this.$selectionContainer.on('click', 'span.unselect-all', function() {
     self.keysToRemove.push(...self.selectedKeys);
-    Util.array.uniq(self.keysToRemove);
     self.render();
   });
 };
@@ -365,6 +363,9 @@ Tree.prototype.updateSelectedAndOnChange = function() {
 
 Tree.prototype.render = function(noCallbacks) {
   // fix arrays first
+  Util.array.uniq(this.keysToAdd);
+  Util.array.uniq(this.keysToRemove);
+
   Util.array.subtract(this.keysToAdd, this.selectedKeys);
   Util.array.intersect(this.keysToRemove, this.selectedKeys);
 

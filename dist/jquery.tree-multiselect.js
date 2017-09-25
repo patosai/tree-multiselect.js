@@ -634,7 +634,6 @@ Tree.prototype.createSelectAllButtons = function (parentNode) {
   var self = this;
   this.$selectionContainer.on('click', 'span.select-all', function () {
     self.keysToAdd = Object.keys(self.astItems);
-    Util.array.uniq(self.keysToAdd);
     self.render();
   });
 
@@ -642,7 +641,6 @@ Tree.prototype.createSelectAllButtons = function (parentNode) {
     var _self$keysToRemove2;
 
     (_self$keysToRemove2 = self.keysToRemove).push.apply(_self$keysToRemove2, _toConsumableArray(self.selectedKeys));
-    Util.array.uniq(self.keysToRemove);
     self.render();
   });
 };
@@ -699,6 +697,9 @@ Tree.prototype.render = function (noCallbacks) {
       _this = this;
 
   // fix arrays first
+  Util.array.uniq(this.keysToAdd);
+  Util.array.uniq(this.keysToRemove);
+
   Util.array.subtract(this.keysToAdd, this.selectedKeys);
   Util.array.intersect(this.keysToRemove, this.selectedKeys);
 

@@ -34,7 +34,9 @@
         $select.append($option);
       }
       var time = new Date();
+      console.profile('tree-multiselect');
       $select.treeMultiselect({ enableSelectAll: true, sortable: true, searchable: true });
+      console.profileEnd();
       console.log("time elapsed - " + (new Date() - time) + "ms");
     </script>
   </body>

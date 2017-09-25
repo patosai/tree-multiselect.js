@@ -100,10 +100,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('test', ['eslint', 'karma:local']);
-  grunt.registerTask('test-watch', ['karma:watch']);
-
+  grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('build', ['browserify']);
+
+  grunt.registerTask('test', ['lint', 'karma:local']);
+  grunt.registerTask('test-watch', ['karma:watch']);
 
   grunt.registerTask('release', ['test', 'build', 'uglify', 'sass:build', 'sass:min', 'usebanner']);
   grunt.registerTask('watch', ['test-watch']);

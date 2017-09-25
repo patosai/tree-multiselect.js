@@ -7,7 +7,7 @@ before_script:
   - yarn global add grunt-cli eslint codecov
 
 script:
-  - grunt test --verbose
+  - npm run test
 
 after_script:
   - codecov

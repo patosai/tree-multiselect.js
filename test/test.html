@@ -31,6 +31,8 @@
     <select id="test-select-2" multiple="multiple">
       <option value="foo" data-section="section/ayy/lmao">foo</option>
       <option value="bar" data-section="section/ayy/lmao" disabled>bar</option>
+      <option value="disabled1" selected disabled>disabled and selected item</option>
+      <option value="disabled1" disabled>disabled item</option>
     </select>
 
     <select id="test-select-3" multiple="multiple">
@@ -52,8 +54,15 @@
 
     <script type="text/javascript">
       var tree1 = $("#test-select").treeMultiselect({ enableSelectAll: true, sortable: true });
-      var tree2 = $("#test-select-2").treeMultiselect({searchable: true});
-      var tree3 = $("#test-select-3").treeMultiselect({enableSelectAll: true, allowBatchSelection: false, searchable: true, startCollapsed: true});
+      var tree2 = $("#test-select-2").treeMultiselect({
+        searchable: true
+      });
+      var tree3 = $("#test-select-3").treeMultiselect({
+        allowBatchSelection: false,
+        enableSelectAll: true,
+        searchable: true,
+        startCollapsed: true
+      });
     </script>
   </body>
 </html>

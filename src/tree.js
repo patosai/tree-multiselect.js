@@ -97,7 +97,7 @@ Tree.prototype.createAst = function(options) {
       description: option.getAttribute('data-description'),
       initialIndex: option.getAttribute('data-index'),
       section: option.getAttribute('data-section'),
-      disabled: option.hasAttribute('disabled'),
+      disabled: option.hasAttribute('readonly'),
       selected: option.hasAttribute('selected')
     });
 

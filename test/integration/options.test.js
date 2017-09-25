@@ -388,9 +388,9 @@ describe('Options', () => {
     assert.equal($unselectAll.text(), unselectAllText);
   });
 
-  it('can have individual disabled attributes', () => {
+  it('can have individual readonly attributes', () => {
     $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
-    $("select").append("<option value='two' data-section='test' selected='selected' disabled>Two</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected' readonly>Two</option>");
     $("select").treeMultiselect();
 
     var $firstSelectionCheckbox = Common.selectionCheckbox({value: 'one'});
@@ -402,8 +402,15 @@ describe('Options', () => {
     assert.isTrue($firstSelectionCheckbox.prop('disabled'));
   });
 
-  it('cannot remove disabled elements by selected elements', () => {
-    $("select").append("<option value='one' data-section='test' selected='selected' disabled>One</option>");
+  it('has readonly attributes that still appear in select val', () => {
+    $("select").append("<option value='one' data-section='test' selected readonly>One</option>");
+    $("select").treeMultiselect();
+
+    assert.deepEqual($("select").val(), ['one'])
+  });
+
+  it('cannot remove readonly elements by selected elements', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected' readonly>One</option>");
     $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
     $("select").treeMultiselect();
 

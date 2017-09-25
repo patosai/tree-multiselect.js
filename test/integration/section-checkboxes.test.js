@@ -115,8 +115,8 @@ describe('Section Checkboxes', () => {
     assert.notOk($titleCheckbox.prop('indeterminate'));
   });
 
-  it('checkbox doesn\'t select unselected disabled children', () => {
-    $("select").append("<option value='one' data-section='top' disabled>One</option>");
+  it('checkbox doesn\'t select unselected readonly children', () => {
+    $("select").append("<option value='one' data-section='top' readonly>One</option>");
     $("select").append("<option value='two' data-section='top'>Two</option>");
     $("select").treeMultiselect();
 
@@ -129,8 +129,8 @@ describe('Section Checkboxes', () => {
     assert.equal(Common.selected({value: 'two'}).length, 1);
   });
 
-  it('checkbox doesn\'t unselect selected disabled children', () => {
-    $("select").append("<option value='one' data-section='top' selected disabled>One</option>");
+  it('checkbox doesn\'t unselect selected readonly children', () => {
+    $("select").append("<option value='one' data-section='top' selected readonly>One</option>");
     $("select").append("<option value='two' data-section='top' selected>Two</option>");
     $("select").treeMultiselect();
 

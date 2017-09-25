@@ -20,6 +20,7 @@ Make sure your `select` has the `multiple` attribute set. Also, make sure you've
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------
 `selected`                    | Have the option pre-selected. This is actually part of the HTML spec
+`readonly`                    | User cannot modify the value of the option. Option can be selected (ex. `<option selected readonly ...`)
 `data-section`                | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect
 `data-index`                  | For pre-selected options, display options in this order, lowest index first. Conflicts will be overwritten by the last item with the same `data-index`

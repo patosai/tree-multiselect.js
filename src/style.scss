@@ -32,6 +32,9 @@ div.tree-multiselect {
       label {
         cursor: pointer;
         display: inline;
+        &.disabled {
+          color: $color-border-light;
+        }
       }
     }
 

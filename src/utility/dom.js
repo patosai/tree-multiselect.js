@@ -50,8 +50,9 @@ exports.createSelection = function(astItem, createCheckboxes, disableCheckboxes)
     selectionNode.insertBefore(inputCheckbox, selectionNode.firstChild);
 
     var labelProps = {
+      class: astItem.disabled ? 'disabled' : '',
       for: optionLabelCheckboxId,
-      text: astItem.text || astItem.value
+      text: astItem.text || astItem.value,
     };
     var label = exports.createNode('label', labelProps);
     selectionNode.appendChild(label);
@@ -68,7 +69,7 @@ exports.createSelected = function(astItem, disableRemoval, showSectionOnSelected
     text: astItem.text
   });
 
-  if (!disableRemoval) {
+  if (!disableRemoval && !astItem.disabled) {
     var removalSpan = exports.createNode('span', {class: 'remove-selected', text: '×'});
     node.insertBefore(removalSpan, node.firstChild);
   }

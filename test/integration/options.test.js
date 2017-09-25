@@ -401,4 +401,23 @@ describe('Options', () => {
     assert.equal($firstSelectionCheckbox.length, 1);
     assert.isTrue($firstSelectionCheckbox.prop('disabled'));
   });
+
+  it('cannot remove disabled elements by selected elements', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected' disabled>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    $("select").treeMultiselect();
+
+    var $selected = Common.selected();
+    assert.equal($selected.length, 2);
+
+    var $selectedCheckboxes = $selected.children("span.remove-selected");
+    assert.equal($selectedCheckboxes.length, 1);
+    $selectedCheckboxes.click();
+
+    $selected = Common.selected();
+    assert.equal($selected.length, 1);
+
+    $selected = Common.selected({value: 'one'});
+    assert.equal($selected.length, 1);
+  });
 });

@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.3.1 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.4.0 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -987,6 +987,7 @@ exports.createSelection = function (astItem, createCheckboxes, disableCheckboxes
     selectionNode.insertBefore(inputCheckbox, selectionNode.firstChild);
 
     var labelProps = {
+      class: astItem.disabled ? 'disabled' : '',
       for: optionLabelCheckboxId,
       text: astItem.text || astItem.value
     };
@@ -1005,7 +1006,7 @@ exports.createSelected = function (astItem, disableRemoval, showSectionOnSelecte
     text: astItem.text
   });
 
-  if (!disableRemoval) {
+  if (!disableRemoval && !astItem.disabled) {
     var removalSpan = exports.createNode('span', { class: 'remove-selected', text: '×' });
     node.insertBefore(removalSpan, node.firstChild);
   }

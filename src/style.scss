@@ -14,12 +14,10 @@ div.tree-multiselect {
   > div.selected,
   > div.selections {
     display: inline-block;
-    vertical-align: top;
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    display: table-cell;
+    overflow: auto;
     padding: 1%;
+    vertical-align: top;
     width: 50%;
   }
 
@@ -45,9 +43,10 @@ div.tree-multiselect {
 
   > div.selected {
     > div.item {
-      padding: 2px 5px;
-      border-radius: 2px;
       background: $color-bg-light;
+      border-radius: 2px;
+      padding: 2px 5px;
+      overflow: auto;
     }
 
     &.ui-sortable > div.item:hover {
@@ -116,11 +115,11 @@ div.tree-multiselect {
 
   span.remove-selected,
   span.description {
-    padding: 0 3px;
-    margin-right: 5px;
     background: $color-bg-dark;
-    color: white;
     border-radius: 2px;
+    color: white;
+    margin-right: 5px;
+    padding: 0 3px;
   }
 
   span.remove-selected {
@@ -137,9 +136,9 @@ div.tree-multiselect {
 
   div.temp-description-popup {
     background: $color-bg-light;
-    padding: 5px;
     border: 2px solid $color-border-dark;
     border-radius: 3px;
+    padding: 5px;
   }
 
   span.section-name {
@@ -152,10 +151,10 @@ div.tree-multiselect {
     width: 100%;
 
     input.search {
-      padding: 5px;
-      margin: 0;
       border: 2px solid $color-border-light;
       display: table-cell;
+      margin: 0;
+      padding: 5px;
       width: 100%;
     }
 
@@ -165,8 +164,8 @@ div.tree-multiselect {
 
       span.select-all,
       span.unselect-all {
-        padding-right: 5px;
         margin-right: 5px;
+        padding-right: 5px;
 
         &:hover {
           cursor: pointer;

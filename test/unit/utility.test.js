@@ -131,8 +131,10 @@ describe('Utility', () => {
     });
 
     it('flatten', () => {
-      assert.deepEqual(Util.array.flatten([[1], [2], [3, [[4], 5]]]), [1, 2, 3, 4, 5]);
+      assert.deepEqual(Util.array.flatten([[1], [2], [3, [[4], 'foo', 'bar']]]), [1, 2, 3, 4, 'foo', 'bar']);
       assert.deepEqual(Util.array.flatten([]), []);
+      assert.deepEqual(Util.array.flatten(null), null);
+      assert.deepEqual(Util.array.flatten('foo'), 'foo');
     });
   });
 

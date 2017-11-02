@@ -11,6 +11,24 @@ function filterInPlace(arr, pred) {
   //arr.slice(0, idx);
 }
 
+exports.flatten = function(arr, r) {
+  if (!Array.isArray(arr)) {
+    return arr;
+  }
+
+  r = r || [];
+
+  for (var ii = 0; ii < arr.length; ++ii) {
+    if (Array.isArray(arr[ii])) {
+      r.concat(exports.flatten(arr[ii], r));
+    } else {
+      r.push(arr[ii]);
+    }
+  }
+
+  return r;
+};
+
 exports.uniq = function(arr) {
   var hash = {};
 

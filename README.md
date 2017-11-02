@@ -22,7 +22,7 @@ Option Attribute name         | Description
 `readonly`                    | User cannot modify the value of the option. Option can be selected (ex. `<option selected readonly ...`)
 `data-section`                | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect
-`data-index`                  | For pre-selected options, display options in this order, lowest index first. Conflicts will be overwritten by the last item with the same `data-index`
+`data-index`                  | For pre-selected options, display options in this order, lowest index first. Repeated items with the same index will be shown before items with a higher index
 
 All of the above are optional.
 

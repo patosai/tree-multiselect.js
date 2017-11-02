@@ -84,6 +84,8 @@ Tree.prototype.createAst = function(options) {
   let self = this;
   let itemId = 0;
   let sectionId = 0;
+
+  let initialIndexItems = [];
   let keysToAddAtEnd = [];
   options.each(function() {
     let option = this;
@@ -102,7 +104,8 @@ Tree.prototype.createAst = function(options) {
     });
 
     if (item.initialIndex) {
-      self.keysToAdd[item.initialIndex] = itemId;
+      initialIndexItems[item.initialIndex] = initialIndexItems[item.initialIndex] || [];
+      initialIndexItems[item.initialIndex].push(itemId);
     } else if (item.selected) {
       keysToAddAtEnd.push(itemId);
     }
@@ -133,6 +136,7 @@ Tree.prototype.createAst = function(options) {
     }
     lookupPosition.arr.push(item);
   });
+  this.keysToAdd = Util.array.flatten(initialIndexItems);
   Util.array.removeFalseyExceptZero(this.keysToAdd);
   this.keysToAdd.push(...keysToAddAtEnd);
   Util.array.uniq(this.keysToAdd);

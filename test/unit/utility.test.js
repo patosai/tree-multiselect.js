@@ -129,6 +129,11 @@ describe('Utility', () => {
       var arrays = [[9, 10, 11, 12], [1, 2, 3, 4], [1, 2, 3, 4]];
       assert.deepEqual(Util.array.intersectMany(arrays), []);
     });
+
+    it('flatten', () => {
+      assert.deepEqual(Util.array.flatten([[1], [2], [3, [[4], 5]]]), [1, 2, 3, 4, 5]);
+      assert.deepEqual(Util.array.flatten([]), []);
+    });
   });
 
   describe('dom', () => {

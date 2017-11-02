@@ -190,4 +190,40 @@ describe('Initial Load', () => {
 
     assert.deepEqual($("select").val(), ['one', 'two']);
   });
+
+  it("repeated data-index results in original order", () => {
+    $("select").append("<option value='two' data-section='section' data-index='2'>Two</option>");
+    $("select").append("<option value='one' data-section='section' data-index='2'>One</option>");
+    $("select").treeMultiselect();
+
+    var $selections = Common.selection();
+    assert.equal($selections.length, 2);
+
+    var $selected = Common.selected();
+    assert.equal($selected.length, 2);
+
+    Common.assertSelection($selected[0], {text: 'Two', value: 'two'});
+    Common.assertSelection($selected[1], {text: 'One', value: 'one'});
+
+    assert.deepEqual($("select").val(), ['two', 'one']);
+  });
+
+  it("repeated data-index comes before sequential data-index", () => {
+    $("select").append("<option value='one' data-section='section' data-index='2'>One</option>");
+    $("select").append("<option value='two' data-section='section' data-index='3'>Two</option>");
+    $("select").append("<option value='three' data-section='section' data-index='2'>Three</option>");
+    $("select").treeMultiselect();
+
+    var $selections = Common.selection();
+    assert.equal($selections.length, 3);
+
+    var $selected = Common.selected();
+    assert.equal($selected.length, 3);
+
+    Common.assertSelection($selected[0], {text: 'One', value: 'one'});
+    Common.assertSelection($selected[1], {text: 'Three', value: 'three'});
+    Common.assertSelection($selected[2], {text: 'Two', value: 'two'});
+
+    assert.deepEqual($("select").val(), ['one', 'three', 'two']);
+  });
 });

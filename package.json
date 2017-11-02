@@ -1,6 +1,6 @@
 {
   "name": "tree-multiselect",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "jQuery multiple select with nested options",
   "browser": "dist/jquery.tree-multiselect.min.js",
   "keywords": [

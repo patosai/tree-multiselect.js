@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.4.1 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.4.2 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -410,6 +410,8 @@ Tree.prototype.createAst = function (options) {
   var self = this;
   var itemId = 0;
   var sectionId = 0;
+
+  var initialIndexItems = [];
   var keysToAddAtEnd = [];
   options.each(function () {
     var option = this;
@@ -428,7 +430,8 @@ Tree.prototype.createAst = function (options) {
     });
 
     if (item.initialIndex) {
-      self.keysToAdd[item.initialIndex] = itemId;
+      initialIndexItems[item.initialIndex] = initialIndexItems[item.initialIndex] || [];
+      initialIndexItems[item.initialIndex].push(itemId);
     } else if (item.selected) {
       keysToAddAtEnd.push(itemId);
     }
@@ -459,6 +462,7 @@ Tree.prototype.createAst = function (options) {
     }
     lookupPosition.arr.push(item);
   });
+  this.keysToAdd = Util.array.flatten(initialIndexItems);
   Util.array.removeFalseyExceptZero(this.keysToAdd);
   (_keysToAdd = this.keysToAdd).push.apply(_keysToAdd, keysToAddAtEnd);
   Util.array.uniq(this.keysToAdd);
@@ -836,6 +840,24 @@ function filterInPlace(arr, pred) {
   arr.length = idx;
   //arr.slice(0, idx);
 }
+
+exports.flatten = function (arr, r) {
+  if (!Array.isArray(arr)) {
+    return arr;
+  }
+
+  r = r || [];
+
+  for (var ii = 0; ii < arr.length; ++ii) {
+    if (Array.isArray(arr[ii])) {
+      r.concat(exports.flatten(arr[ii], r));
+    } else {
+      r.push(arr[ii]);
+    }
+  }
+
+  return r;
+};
 
 exports.uniq = function (arr) {
   var hash = {};

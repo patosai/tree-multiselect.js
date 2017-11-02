@@ -51,6 +51,22 @@
       <option value="disabled2" selected readonly>also readonly!</option>
     </select>
 
+    <select id="test-select-4" multiple="multiple">
+      <option value="baz1" data-section="hidden stuff" selected data-index="1">baz1</option>
+      <option value="baz2" data-section="hidden stuff" selected data-index="1">baz2</option>
+      <option value="baz3" data-section="hidden stuff" selected data-index="1">baz3</option>
+      <option value="baz4" data-section="hidden stuff" selected data-index="1">baz4</option>
+      <option value="quux1" data-section="section" selected data-index="1">quux1</option>
+      <option value="quux2" data-section="section" selected data-index="1">quux2</option>
+      <option value="quux3" data-section="section" selected data-index="1">quux3</option>
+      <option value="quux4" data-section="section" selected data-index="1">quux4</option>
+      <option value="abc" data-section="section/ayy" selected data-index="1">abc</option>
+      <option value="ayyy" >ayyy</option>
+      <option value="disabled1" readonly>wow it's readonly</option>
+      <option value="disabled2" selected readonly>also readonly!</option>
+    </select>
+
+
 
     <script type="text/javascript">
       var tree1 = $("#test-select").treeMultiselect({ enableSelectAll: true, sortable: true });
@@ -58,6 +74,13 @@
         searchable: true
       });
       var tree3 = $("#test-select-3").treeMultiselect({
+        allowBatchSelection: false,
+        enableSelectAll: true,
+        searchable: true,
+        sortable: true,
+        startCollapsed: true
+      });
+      var tree4 = $("#test-select-4").treeMultiselect({
         allowBatchSelection: false,
         enableSelectAll: true,
         searchable: true,

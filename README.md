@@ -18,11 +18,11 @@ Make sure your `select` has the `multiple` attribute set. Also, make sure you've
 #### Options on your select
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------
-`selected`                    | Have the option pre-selected. This is actually part of the HTML spec
+`selected`                    | Have the option pre-selected. This is actually part of the HTML spec. For specified ordering of these, use `data-index`
 `readonly`                    | User cannot modify the value of the option. Option can be selected (ex. `<option selected readonly ...`)
 `data-section`                | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect
-`data-index`                  | For pre-selected options, display options in this order, lowest index first. Repeated items with the same index will be shown before items with a higher index
+`data-index`                  | For pre-selected options, display options in this order, lowest index first. Repeated items with the same index will be shown before items with a higher index. Otherwise items will be displayed in the order of the original `select`
 
 All of the above are optional.
 

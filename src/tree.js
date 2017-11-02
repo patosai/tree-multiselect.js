@@ -103,7 +103,7 @@ Tree.prototype.createAst = function(options) {
       selected: option.hasAttribute('selected')
     });
 
-    if (item.initialIndex) {
+    if (item.initialIndex && item.selected) {
       initialIndexItems[item.initialIndex] = initialIndexItems[item.initialIndex] || [];
       initialIndexItems[item.initialIndex].push(itemId);
     } else if (item.selected) {

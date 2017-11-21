@@ -19,18 +19,11 @@
   ],
   "homepage": "https://github.com/patosai/tree-multiselect",
   "ignore": [
-    "**/.*",
-    "conf",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tmp",
-    "bower.json",
-    "package.json",
-    "Gruntfile.js",
-    "README.md",
-    "release.sh",
-    "yarn.lock"
+    "*",
+    "!dist/",
+    "!src/",
+    "!package.json"
+    "!LICENSE"
   ],
   "repository": {
     "type": "git",

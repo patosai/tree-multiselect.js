@@ -9,6 +9,8 @@ The underlying `select` element can be used as it was before.
 
 * Requires jQuery v1.8+
 
+![demo image](demo.jpg "demo image")
+
 ### Demo
 <a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
 

@@ -427,4 +427,41 @@ describe('Options', () => {
     $selected = Common.selected({value: 'one'});
     assert.equal($selected.length, 1);
   });
+
+  it('can set a maximum number of selections', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    $("select").append("<option value='three' data-section='test' selected='selected'>Three</option>");
+    $("select").append("<option value='four' data-section='test' selected='selected'>Four</option>");
+    $("select").treeMultiselect({maxSelections: 2});
+
+    assert.equal(Common.selected().length, 2);
+    assert.deepEqual($("select").val(), ['three', 'four'])
+
+    var $checkbox = Common.selectionCheckbox();
+    $checkbox.first().click();
+
+    assert.equal(Common.selected().length, 2);
+    assert.deepEqual($("select").val(), ['four', 'one'])
+  })
+
+  it('maximum number of selections doesn\'t work with negative numbers', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    $("select").append("<option value='three' data-section='test' selected='selected'>Three</option>");
+    $("select").append("<option value='four' data-section='test' selected='selected'>Four</option>");
+    $("select").treeMultiselect({maxSelections: -1});
+
+    assert.equal(Common.selected().length, 4);
+  })
+
+  it('maximum number of selections doesn\'t work with non-numerical truthy values', () => {
+    $("select").append("<option value='one' data-section='test' selected='selected'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    $("select").append("<option value='three' data-section='test' selected='selected'>Three</option>");
+    $("select").append("<option value='four' data-section='test' selected='selected'>Four</option>");
+    $("select").treeMultiselect({maxSelections: true});
+
+    assert.equal(Common.selected().length, 4);
+  })
 });

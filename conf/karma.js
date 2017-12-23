@@ -62,7 +62,7 @@ module.exports = function(config) {
       ],
 
       paths: [
-        'src',
+        'src/tree-multiselect',
         'node_modules'
       ]
     },

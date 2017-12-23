@@ -12,3 +12,12 @@ exports.getKey = function(el) {
   exports.assert(el);
   return parseInt(el.getAttribute('data-key'));
 };
+
+exports.isInteger = function(value) {
+  var x;
+  if (isNaN(value)) {
+    return false;
+  }
+  x = parseFloat(value);
+  return (x | 0) === x;
+};

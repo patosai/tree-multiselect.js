@@ -51,7 +51,7 @@ module.exports = function(grunt) {
         },
 
         files: {
-          'dist/jquery.tree-multiselect.min.css': 'src/style.scss'
+          'dist/jquery.tree-multiselect.min.css': 'sass/style.scss'
         }
       },
 
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
         },
 
         files: {
-          'dist/jquery.tree-multiselect.css': 'src/style.scss'
+          'dist/jquery.tree-multiselect.css': 'sass/style.scss'
         }
       }
     },

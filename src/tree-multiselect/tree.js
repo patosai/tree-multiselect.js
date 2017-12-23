@@ -373,6 +373,23 @@ Tree.prototype.render = function(noCallbacks) {
   Util.array.subtract(this.keysToAdd, this.selectedKeys);
   Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
+  // check for max number of selections
+  if (Util.isInteger(this.params.maxSelections) && this.params.maxSelections > 0) {
+    const currentLength = this.keysToAdd.length - this.keysToRemove.length + this.selectedKeys.length;
+    if (currentLength > this.params.maxSelections) {
+      let lengthToCut = currentLength - this.params.maxSelections;
+      let keysToCut = [];
+      if (lengthToCut > this.selectedKeys.length) {
+        keysToCut.push(...this.selectedKeys);
+        lengthToCut -= this.selectedKeys.length;
+        keysToCut.push(...(this.keysToAdd.splice(0, lengthToCut)));
+      } else {
+        keysToCut.push(...this.selectedKeys.slice(0, lengthToCut));
+      }
+      this.keysToRemove.push(...keysToCut);
+    }
+  }
+
   // remove items first
   for (let ii = 0; ii < this.keysToRemove.length; ++ii) {
     // remove the selected divs
@@ -424,6 +441,8 @@ Tree.prototype.render = function(noCallbacks) {
     valHash[value] = kk;
   }
   // TODO is there a better way to sort the values other than by HTML?
+  // NOTE: the following does not work since jQuery duplicates option values with the same value
+  // this.$originalSelect.val(vals);
   let options = this.$originalSelect.find('option').toArray();
   options.sort(function(a, b) {
     let aValue = valHash[a.value] || 0;
@@ -435,8 +454,6 @@ Tree.prototype.render = function(noCallbacks) {
   this.$originalSelect.find('option').each(function(idx, el) {
     this.selected = !!originalValsHash[Util.getKey(el)];
   });
-  // NOTE: the following does not work since jQuery duplicates option values with the same value
-  //this.$originalSelect.val(vals).change();
   this.$originalSelect.change();
 
   if (!noCallbacks && this.params.onChange) {

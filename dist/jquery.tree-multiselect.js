@@ -1,34 +1,38 @@
-/* jQuery Tree Multiselect v2.5.0 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.5.1 | (c) Patrick Tsai | MIT Licensed */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var Util = require('./utility');
+(function ($) {
+  'use strict';
 
-function Section(obj) {
-  obj = obj || {};
+  $.fn.treeMultiselect = require('./tree-multiselect/main');
+})(jQuery);
 
-  this.treeId = obj.treeId;
-  this.id = obj.id;
-  this.name = obj.name;
-  this.items = [];
+},{"./tree-multiselect/main":5}],2:[function(require,module,exports){
+'use strict';
 
-  this.node = null;
-}
+var Item = require('./item');
+var Section = require('./section');
 
-Section.prototype.isSection = function () {
-  return true;
+exports.createLookup = function (arr) {
+  return {
+    arr: arr,
+    children: {}
+  };
 };
 
-Section.prototype.isItem = function () {
-  return false;
+exports.createSection = function (obj) {
+  return new Section(obj);
 };
 
-Section.prototype.render = function (createCheckboxes, disableCheckboxes) {
-  if (!this.node) {
-    this.node = Util.dom.createSection(this, createCheckboxes, disableCheckboxes);
-  }
-  return this.node;
+exports.createItem = function (obj) {
+  return new Item(obj);
 };
+
+},{"./item":3,"./section":4}],3:[function(require,module,exports){
+'use strict';
+
+var Util = require('../utility');
 
 function Item(obj) {
   obj = obj || {};
@@ -61,22 +65,42 @@ Item.prototype.render = function (createCheckboxes, disableCheckboxes) {
   return this.node;
 };
 
-exports.createLookup = function (arr) {
-  return {
-    arr: arr,
-    children: {}
-  };
+module.exports = Item;
+
+},{"../utility":11}],4:[function(require,module,exports){
+'use strict';
+
+var Util = require('../utility');
+
+function Section(obj) {
+  obj = obj || {};
+
+  this.treeId = obj.treeId;
+  this.id = obj.id;
+  this.name = obj.name;
+  this.items = [];
+
+  this.node = null;
+}
+
+Section.prototype.isSection = function () {
+  return true;
 };
 
-exports.createSection = function (obj) {
-  return new Section(obj);
+Section.prototype.isItem = function () {
+  return false;
 };
 
-exports.createItem = function (obj) {
-  return new Item(obj);
+Section.prototype.render = function (createCheckboxes, disableCheckboxes) {
+  if (!this.node) {
+    this.node = Util.dom.createSection(this, createCheckboxes, disableCheckboxes);
+  }
+  return this.node;
 };
 
-},{"./utility":9}],2:[function(require,module,exports){
+module.exports = Section;
+
+},{"../utility":11}],5:[function(require,module,exports){
 'use strict';
 
 var Tree = require('./tree');
@@ -118,6 +142,7 @@ function mergeDefaultOptions(options) {
     unselectAllText: 'Unselect All',
     freeze: false,
     hideSidePanel: false,
+    maxSelections: 0,
     onChange: null,
     onlyBatchSelection: false,
     searchable: false,
@@ -132,7 +157,7 @@ function mergeDefaultOptions(options) {
 
 module.exports = treeMultiselect;
 
-},{"./tree":5}],3:[function(require,module,exports){
+},{"./tree":7}],6:[function(require,module,exports){
 'use strict';
 
 var Util = require('./utility');
@@ -308,16 +333,7 @@ function splitWord(word) {
 
 module.exports = Search;
 
-},{"./utility":9}],4:[function(require,module,exports){
-'use strict';
-
-(function ($) {
-  'use strict';
-
-  $.fn.treeMultiselect = require('./main');
-})(jQuery);
-
-},{"./main":2}],5:[function(require,module,exports){
+},{"./utility":11}],7:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -707,6 +723,25 @@ Tree.prototype.render = function (noCallbacks) {
   Util.array.subtract(this.keysToAdd, this.selectedKeys);
   Util.array.intersect(this.keysToRemove, this.selectedKeys);
 
+  // check for max number of selections
+  if (Util.isInteger(this.params.maxSelections) && this.params.maxSelections > 0) {
+    var currentLength = this.keysToAdd.length - this.keysToRemove.length + this.selectedKeys.length;
+    if (currentLength > this.params.maxSelections) {
+      var _keysToRemove;
+
+      var lengthToCut = currentLength - this.params.maxSelections;
+      var keysToCut = [];
+      if (lengthToCut > this.selectedKeys.length) {
+        keysToCut.push.apply(keysToCut, _toConsumableArray(this.selectedKeys));
+        lengthToCut -= this.selectedKeys.length;
+        keysToCut.push.apply(keysToCut, _toConsumableArray(this.keysToAdd.splice(0, lengthToCut)));
+      } else {
+        keysToCut.push.apply(keysToCut, _toConsumableArray(this.selectedKeys.slice(0, lengthToCut)));
+      }
+      (_keysToRemove = this.keysToRemove).push.apply(_keysToRemove, keysToCut);
+    }
+  }
+
   // remove items first
   for (var ii = 0; ii < this.keysToRemove.length; ++ii) {
     // remove the selected divs
@@ -758,6 +793,8 @@ Tree.prototype.render = function (noCallbacks) {
     valHash[value] = kk;
   }
   // TODO is there a better way to sort the values other than by HTML?
+  // NOTE: the following does not work since jQuery duplicates option values with the same value
+  // this.$originalSelect.val(vals);
   var options = this.$originalSelect.find('option').toArray();
   options.sort(function (a, b) {
     var aValue = valHash[a.value] || 0;
@@ -769,8 +806,6 @@ Tree.prototype.render = function (noCallbacks) {
   this.$originalSelect.find('option').each(function (idx, el) {
     this.selected = !!originalValsHash[Util.getKey(el)];
   });
-  // NOTE: the following does not work since jQuery duplicates option values with the same value
-  //this.$originalSelect.val(vals).change();
   this.$originalSelect.change();
 
   if (!noCallbacks && this.params.onChange) {
@@ -792,7 +827,7 @@ Tree.prototype.render = function (noCallbacks) {
 
 module.exports = Tree;
 
-},{"./ast":1,"./search":3,"./ui-builder":6,"./utility":9}],6:[function(require,module,exports){
+},{"./ast":2,"./search":6,"./ui-builder":8,"./utility":11}],8:[function(require,module,exports){
 'use strict';
 
 function UiBuilder($el, hideSidePanel) {
@@ -825,7 +860,7 @@ UiBuilder.prototype.remove = function () {
 
 module.exports = UiBuilder;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 // keeps if pred is true
@@ -954,7 +989,7 @@ exports.intersectMany = function (arrays) {
   return finalOutput;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 exports.createNode = function (tag, props) {
@@ -1060,7 +1095,7 @@ exports.createSection = function (astSection, createCheckboxes, disableCheckboxe
   return sectionNode;
 };
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 exports.array = require('./array');
@@ -1078,4 +1113,13 @@ exports.getKey = function (el) {
   return parseInt(el.getAttribute('data-key'));
 };
 
-},{"./array":7,"./dom":8}]},{},[4]);
+exports.isInteger = function (value) {
+  var x;
+  if (isNaN(value)) {
+    return false;
+  }
+  x = parseFloat(value);
+  return (x | 0) === x;
+};
+
+},{"./array":9,"./dom":10}]},{},[1]);

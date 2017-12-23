@@ -35,6 +35,7 @@ function mergeDefaultOptions(options) {
     unselectAllText: 'Unselect All',
     freeze: false,
     hideSidePanel: false,
+    maxSelections: 0,
     onChange: null,
     onlyBatchSelection: false,
     searchable: false,

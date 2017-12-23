@@ -174,18 +174,6 @@ describe('Utility', () => {
       assert.isFalse(option.isSection());
     });
 
-    it('can tell that AST item is not a section', () => {
-      var option = Ast.createItem({
-        id: 0,
-        value: 'val',
-        text: 'text',
-        description: 'description'
-      });
-
-      assert(option.isItem());
-      assert.isFalse(option.isSection());
-    });
-
     it('creates selection node with all properties', () => {
       var section = Ast.createSection('name');
 

@@ -79,6 +79,7 @@ Name                    | Default        | Description
 `unselectAllText`       | `Unselect All` | Only used if `enableSelectAll` is active
 `freeze`                | `false`        | Disables selection/deselection of options; aka display-only
 `hideSidePanel`         | `false`        | Hide the right panel showing all the selected items
+`maxSelections`         | `0`            | A number that sets the maximum number of options that can be selected. Any positive integer is valid; anything else (such as `0` or `-1`) means no limit
 `onChange`              | `null`         | Callback for when select is changed. Called with (allSelectedItems, addedItems, removedItems), each of which is an array of objects with the properties `text`, `value`, `initialIndex`, and `section`
 `onlyBatchSelection`    | `false`        | Only sections can be checked, not individual items
 `sortable`              | `false`        | Selected options can be sorted by dragging (requires jQuery UI)

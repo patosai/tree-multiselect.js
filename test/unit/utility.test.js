@@ -30,6 +30,18 @@ describe('Utility', () => {
      assert.isNaN(Util.getKey(el));
   });
 
+  it('isInteger', () => {
+     assert.isTrue(Util.isInteger(1));
+     assert.isTrue(Util.isInteger(-1));
+     assert.isTrue(Util.isInteger(0));
+     assert.isTrue(Util.isInteger(" 3 "));
+
+     assert.isFalse(Util.isInteger(true));
+     assert.isFalse(Util.isInteger(null));
+     assert.isFalse(Util.isInteger([]));
+     assert.isFalse(Util.isInteger(function () {}));
+  })
+
   describe('array', () => {
     it('subtract', () => {
       var arr1 = [1, 2, 5, 7, 0];

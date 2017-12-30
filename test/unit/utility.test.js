@@ -129,16 +129,16 @@ describe('Utility', () => {
       var arrays = [[1, 3, 5, 7], [2, 3, 6, 7], [3, 9]];
       assert.deepEqual(Util.array.intersectMany(arrays), [3]);
 
-      var arrays = [[1, 3, 5, 7], [2, 3, 6, 7], [9]];
+      arrays = [[1, 3, 5, 7], [2, 3, 6, 7], [9]];
       assert.deepEqual(Util.array.intersectMany(arrays), []);
 
-      var arrays = [[1, 2, 3, 4], [4, 5, 6, 7], [8, 9]];
+      arrays = [[1, 2, 3, 4], [4, 5, 6, 7], [8, 9]];
       assert.deepEqual(Util.array.intersectMany(arrays), []);
 
-      var arrays = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]];
+      arrays = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]];
       assert.deepEqual(Util.array.intersectMany(arrays), [1, 2, 3, 4]);
 
-      var arrays = [[9, 10, 11, 12], [1, 2, 3, 4], [1, 2, 3, 4]];
+      arrays = [[9, 10, 11, 12], [1, 2, 3, 4], [1, 2, 3, 4]];
       assert.deepEqual(Util.array.intersectMany(arrays), []);
     });
 

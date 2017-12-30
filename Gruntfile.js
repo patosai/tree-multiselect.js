@@ -1,6 +1,3 @@
-var browserify = require("browserify");
-var fs = require("fs");
-
 module.exports = function(grunt) {
   grunt.initConfig({
 

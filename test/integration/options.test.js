@@ -296,10 +296,8 @@ describe('Options', () => {
 
     $selected = Common.selected();
     assert.equal($selected.length, 2);
-    var $two = $selected.first();
-    var $one = $selected.last();
-    Common.assertSelected($two, {text: 'Two', value: 'two', section: 'test'})
-    Common.assertSelected($one, {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelected($selected.first(), {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelected($selected.last(), {text: 'One', value: 'one', section: 'test'})
   });
 
   it("doesn't do anything when sorted in same order", () => {
@@ -326,10 +324,8 @@ describe('Options', () => {
 
     $selected = Common.selected();
     assert.equal($selected.length, 2);
-    var $one = $selected.first();
-    var $two = $selected.last();
-    Common.assertSelected($one, {text: 'One', value: 'one', section: 'test'})
-    Common.assertSelected($two, {text: 'Two', value: 'two', section: 'test'})
+    Common.assertSelected($selected.first(), {text: 'One', value: 'one', section: 'test'})
+    Common.assertSelected($selected.last(), {text: 'Two', value: 'two', section: 'test'})
   });
 
   it('select all button works', () => {
@@ -397,7 +393,7 @@ describe('Options', () => {
     assert.equal($firstSelectionCheckbox.length, 1);
     assert.isFalse($firstSelectionCheckbox.prop('disabled'));
 
-    var $firstSelectionCheckbox = Common.selectionCheckbox({value: 'two'});
+    $firstSelectionCheckbox = Common.selectionCheckbox({value: 'two'});
     assert.equal($firstSelectionCheckbox.length, 1);
     assert.isTrue($firstSelectionCheckbox.prop('disabled'));
   });

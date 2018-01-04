@@ -1,6 +1,6 @@
 const Util = require('../utility');
 
-function Section(obj) {
+function Section (obj) {
   obj = obj || {};
 
   this.treeId = obj.treeId;
@@ -11,15 +11,15 @@ function Section(obj) {
   this.node = null;
 }
 
-Section.prototype.isSection = function() {
+Section.prototype.isSection = function () {
   return true;
 };
 
-Section.prototype.isItem = function() {
+Section.prototype.isItem = function () {
   return false;
 };
 
-Section.prototype.render = function(createCheckboxes, disableCheckboxes) {
+Section.prototype.render = function (createCheckboxes, disableCheckboxes) {
   if (!this.node) {
     this.node = Util.dom.createSection(this, createCheckboxes, disableCheckboxes);
   }

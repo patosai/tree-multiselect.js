@@ -1,4 +1,4 @@
-function UiBuilder($el, hideSidePanel) {
+function UiBuilder ($el, hideSidePanel) {
   let $tree = jQuery('<div class="tree-multiselect"></div>');
 
   let $selections = jQuery('<div class="selections"></div>');
@@ -18,11 +18,11 @@ function UiBuilder($el, hideSidePanel) {
   this.$selectedContainer = $selected;
 }
 
-UiBuilder.prototype.attach = function() {
+UiBuilder.prototype.attach = function () {
   this.$el.after(this.$treeContainer);
 };
 
-UiBuilder.prototype.remove = function() {
+UiBuilder.prototype.remove = function () {
   this.$treeContainer.remove();
 };
 

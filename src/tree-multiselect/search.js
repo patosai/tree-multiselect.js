@@ -2,7 +2,7 @@ let Util = require('./utility');
 
 const MAX_SAMPLE_SIZE = 3;
 
-function Search(astItems, astSections, searchParams) {
+function Search (astItems, astSections, searchParams) {
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
 
   // key: data-key, value: DOM node
@@ -17,14 +17,14 @@ function Search(astItems, astSections, searchParams) {
   this.buildIndex();
 }
 
-Search.prototype.setSearchParams = function(searchParams) {
+Search.prototype.setSearchParams = function (searchParams) {
   Util.assert(Array.isArray(searchParams));
 
   let allowedParams = {
     'value': true,
     'text': true,
     'description': true,
-    'section': true,
+    'section': true
   };
 
   this.searchParams = [];
@@ -35,7 +35,7 @@ Search.prototype.setSearchParams = function(searchParams) {
   }
 };
 
-Search.prototype.buildIndex = function() {
+Search.prototype.buildIndex = function () {
   // trigrams
   for (const astItemKey in this.astItems) {
     const astItem = this.astItems[astItemKey];
@@ -57,10 +57,10 @@ Search.prototype.buildIndex = function() {
   }
 };
 
-Search.prototype._addToIndex = function(key, id) {
-  for (let sample_size = 1; sample_size <= MAX_SAMPLE_SIZE; ++sample_size) {
-    for (let start_offset = 0; start_offset < key.length - sample_size + 1; ++start_offset) {
-      let minikey = key.substring(start_offset, start_offset + sample_size);
+Search.prototype._addToIndex = function (key, id) {
+  for (let sampleSize = 1; sampleSize <= MAX_SAMPLE_SIZE; ++sampleSize) {
+    for (let startOffset = 0; startOffset < key.length - sampleSize + 1; ++startOffset) {
+      let minikey = key.substring(startOffset, startOffset + sampleSize);
 
       if (!this.index[minikey]) {
         this.index[minikey] = [];
@@ -76,7 +76,7 @@ Search.prototype._addToIndex = function(key, id) {
   }
 };
 
-Search.prototype.search = function(value) {
+Search.prototype.search = function (value) {
   if (!value) {
     this.astItemKeys.forEach((id) => {
       this.astItems[id].node.style.display = '';
@@ -105,7 +105,7 @@ Search.prototype.search = function(value) {
   this._handleNodeVisbilities(matchedNodeIds);
 };
 
-Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
+Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
   let shownNodeIdsHash = {};
   let sectionsToNotHideHash = {};
   shownNodeIds.forEach((id) => {
@@ -145,7 +145,7 @@ Search.prototype._handleNodeVisbilities = function(shownNodeIds) {
 };
 
 // split word into three letter (or less) pieces
-function splitWord(word) {
+function splitWord (word) {
   Util.assert(word);
 
   if (word.length < MAX_SAMPLE_SIZE) {

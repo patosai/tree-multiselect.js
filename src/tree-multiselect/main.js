@@ -2,7 +2,7 @@ let Tree = require('./tree');
 
 let uniqueId = 0;
 
-let treeMultiselect = function(opts) {
+function treeMultiselect (opts) {
   let options = mergeDefaultOptions(opts);
 
   return this.map(() => {
@@ -15,18 +15,18 @@ let treeMultiselect = function(opts) {
     ++uniqueId;
 
     return {
-      reload: function() {
+      reload: function () {
         tree.reload();
       },
 
-      remove: function() {
+      remove: function () {
         tree.remove();
       }
     };
   });
 };
 
-function mergeDefaultOptions(options) {
+function mergeDefaultOptions (options) {
   let defaults = {
     allowBatchSelection: true,
     collapsible: true,

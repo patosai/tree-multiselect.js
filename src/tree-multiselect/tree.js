@@ -3,7 +3,7 @@ let Search = require('./search');
 let UiBuilder = require('./ui-builder');
 let Util = require('./utility');
 
-function Tree(id, $originalSelect, params) {
+function Tree (id, $originalSelect, params) {
   this.id = id;
   this.$originalSelect = $originalSelect;
 
@@ -12,7 +12,7 @@ function Tree(id, $originalSelect, params) {
   this.resetState();
 }
 
-Tree.prototype.initialize = function() {
+Tree.prototype.initialize = function () {
   this.generateSelections(this.$selectionContainer[0]);
 
   this.popupDescriptionHover();
@@ -45,17 +45,17 @@ Tree.prototype.initialize = function() {
   this.uiBuilder.attach();
 };
 
-Tree.prototype.remove = function() {
+Tree.prototype.remove = function () {
   this.uiBuilder.remove();
   this.resetState();
 };
 
-Tree.prototype.reload = function() {
+Tree.prototype.reload = function () {
   this.remove();
   this.initialize();
 };
 
-Tree.prototype.resetState = function() {
+Tree.prototype.resetState = function () {
   this.uiBuilder = new UiBuilder(this.$originalSelect, this.params.hideSidePanel);
   this.$treeContainer = this.uiBuilder.$treeContainer;
   this.$selectionContainer = this.uiBuilder.$selectionContainer;
@@ -71,13 +71,13 @@ Tree.prototype.resetState = function() {
   this.keysToRemove = [];
 };
 
-Tree.prototype.generateSelections = function(parentNode) {
+Tree.prototype.generateSelections = function (parentNode) {
   let options = this.$originalSelect.children('option');
   let ast = this.createAst(options);
   this.generateHtml(ast, parentNode);
 };
 
-Tree.prototype.createAst = function(options) {
+Tree.prototype.createAst = function (options) {
   let data = [];
   let lookup = Ast.createLookup(data);
 
@@ -87,7 +87,7 @@ Tree.prototype.createAst = function(options) {
 
   let initialIndexItems = [];
   let keysToAddAtEnd = [];
-  options.each(function() {
+  options.each(function () {
     let option = this;
     option.setAttribute('data-key', itemId);
 
@@ -143,7 +143,7 @@ Tree.prototype.createAst = function(options) {
   return data;
 };
 
-Tree.prototype.generateHtml = function(astArr, parentNode) {
+Tree.prototype.generateHtml = function (astArr, parentNode) {
   for (let ii = 0; ii < astArr.length; ++ii) {
     const astObj = astArr[ii];
     if (astObj.isSection()) {
@@ -165,8 +165,8 @@ Tree.prototype.generateHtml = function(astArr, parentNode) {
   }
 };
 
-Tree.prototype.popupDescriptionHover = function() {
-  this.$selectionContainer.on('mouseenter', 'div.item > span.description', function() {
+Tree.prototype.popupDescriptionHover = function () {
+  this.$selectionContainer.on('mouseenter', 'div.item > span.description', function () {
     let $item = jQuery(this).parent();
     let description = $item.attr('data-description');
 
@@ -179,15 +179,15 @@ Tree.prototype.popupDescriptionHover = function() {
     $item.append(descriptionDiv);
   });
 
-  this.$selectionContainer.on('mouseleave', 'div.item > span.description', function() {
+  this.$selectionContainer.on('mouseleave', 'div.item > span.description', function () {
     let $item = jQuery(this).parent();
     $item.find('div.temp-description-popup').remove();
   });
 };
 
-Tree.prototype.handleSectionCheckboxMarkings = function() {
+Tree.prototype.handleSectionCheckboxMarkings = function () {
   let self = this;
-  this.$selectionContainer.on('click', 'input.section[type=checkbox]', function() {
+  this.$selectionContainer.on('click', 'input.section[type=checkbox]', function () {
     let $section = jQuery(this).closest('div.section');
     let $items = $section.find('div.item');
     let keys = $items.map((idx, el) => {
@@ -210,7 +210,7 @@ Tree.prototype.handleSectionCheckboxMarkings = function() {
   });
 };
 
-Tree.prototype.redrawSectionCheckboxes = function($section) {
+Tree.prototype.redrawSectionCheckboxes = function ($section) {
   $section = $section || this.$selectionContainer;
 
   // returns array; bit 1 is all children are true, bit 0 is all children are false
@@ -218,7 +218,7 @@ Tree.prototype.redrawSectionCheckboxes = function($section) {
 
   let self = this;
   let $childSections = $section.find('> div.section');
-  $childSections.each(function() {
+  $childSections.each(function () {
     let result = self.redrawSectionCheckboxes(jQuery(this));
     returnVal &= result;
   });
@@ -258,7 +258,7 @@ Tree.prototype.redrawSectionCheckboxes = function($section) {
   return returnVal;
 };
 
-Tree.prototype.addCollapsibility = function() {
+Tree.prototype.addCollapsibility = function () {
   let titleSelector = 'div.title';
   let $titleDivs = this.$selectionContainer.find(titleSelector);
 
@@ -272,7 +272,7 @@ Tree.prototype.addCollapsibility = function() {
     $sectionDivs.addClass('collapsed');
   }
 
-  this.$selectionContainer.on('click', titleSelector, function(event) {
+  this.$selectionContainer.on('click', titleSelector, function (event) {
     if (event.target.nodeName === 'INPUT') {
       return;
     }
@@ -283,19 +283,19 @@ Tree.prototype.addCollapsibility = function() {
   });
 };
 
-Tree.prototype.createSearchBar = function(parentNode) {
+Tree.prototype.createSearchBar = function (parentNode) {
   let searchObj = new Search(this.astItems, this.astSections, this.params.searchParams);
 
   let searchNode = Util.dom.createNode('input', {class: 'search', placeholder: 'Search...'});
   parentNode.appendChild(searchNode);
 
-  this.$selectionContainer.on('input', 'input.search', function() {
+  this.$selectionContainer.on('input', 'input.search', function () {
     let searchText = this.value;
     searchObj.search(searchText);
   });
 };
 
-Tree.prototype.createSelectAllButtons = function(parentNode) {
+Tree.prototype.createSelectAllButtons = function (parentNode) {
   let selectAllNode = Util.dom.createNode('span', {class: 'select-all', text: this.params.selectAllText});
   let unselectAllNode = Util.dom.createNode('span', {class: 'unselect-all', text: this.params.unselectAllText});
 
@@ -306,20 +306,20 @@ Tree.prototype.createSelectAllButtons = function(parentNode) {
   parentNode.appendChild(selectAllContainer);
 
   let self = this;
-  this.$selectionContainer.on('click', 'span.select-all', function() {
+  this.$selectionContainer.on('click', 'span.select-all', function () {
     self.keysToAdd = Object.keys(self.astItems);
     self.render();
   });
 
-  this.$selectionContainer.on('click', 'span.unselect-all', function() {
+  this.$selectionContainer.on('click', 'span.unselect-all', function () {
     self.keysToRemove.push(...self.selectedKeys);
     self.render();
   });
 };
 
-Tree.prototype.armRemoveSelectedOnClick = function() {
+Tree.prototype.armRemoveSelectedOnClick = function () {
   let self = this;
-  this.$selectedContainer.on('click', 'span.remove-selected', function() {
+  this.$selectedContainer.on('click', 'span.remove-selected', function () {
     let parentNode = this.parentNode;
     let key = Util.getKey(parentNode);
     self.keysToRemove.push(key);
@@ -327,10 +327,9 @@ Tree.prototype.armRemoveSelectedOnClick = function() {
   });
 };
 
-
-Tree.prototype.updateSelectedAndOnChange = function() {
+Tree.prototype.updateSelectedAndOnChange = function () {
   let self = this;
-  this.$selectionContainer.on('click', 'input.option[type=checkbox]', function() {
+  this.$selectionContainer.on('click', 'input.option[type=checkbox]', function () {
     let checkbox = this;
     let selection = checkbox.parentNode;
     let key = Util.getKey(selection);
@@ -349,11 +348,11 @@ Tree.prototype.updateSelectedAndOnChange = function() {
     let startIndex = null;
     let endIndex = null;
     this.$selectedContainer.sortable({
-      start: function(event, ui) {
+      start: function (event, ui) {
         startIndex = ui.item.index();
       },
 
-      stop: function(event, ui) {
+      stop: function (event, ui) {
         endIndex = ui.item.index();
         if (startIndex === endIndex) {
           return;
@@ -365,7 +364,7 @@ Tree.prototype.updateSelectedAndOnChange = function() {
   }
 };
 
-Tree.prototype.render = function(noCallbacks) {
+Tree.prototype.render = function (noCallbacks) {
   // fix arrays first
   Util.array.uniq(this.keysToAdd);
   Util.array.uniq(this.keysToRemove);
@@ -444,14 +443,14 @@ Tree.prototype.render = function(noCallbacks) {
   // NOTE: the following does not work since jQuery duplicates option values with the same value
   // this.$originalSelect.val(vals);
   let options = this.$originalSelect.find('option').toArray();
-  options.sort(function(a, b) {
+  options.sort(function (a, b) {
     let aValue = valHash[a.value] || 0;
     let bValue = valHash[b.value] || 0;
     return aValue - bValue;
   });
 
   this.$originalSelect.html(options);
-  this.$originalSelect.find('option').each(function(idx, el) {
+  this.$originalSelect.find('option').each(function (idx, el) {
     this.selected = !!originalValsHash[Util.getKey(el)];
   });
   this.$originalSelect.change();

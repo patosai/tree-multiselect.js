@@ -1,4 +1,4 @@
-exports.createNode = function(tag, props) {
+exports.createNode = function (tag, props) {
   var node = document.createElement(tag);
 
   if (props) {
@@ -14,7 +14,7 @@ exports.createNode = function(tag, props) {
   return node;
 };
 
-exports.createSelection = function(astItem, createCheckboxes, disableCheckboxes) {
+exports.createSelection = function (astItem, createCheckboxes, disableCheckboxes) {
   var props = {
     class: 'item',
     'data-key': astItem.id,
@@ -40,7 +40,7 @@ exports.createSelection = function(astItem, createCheckboxes, disableCheckboxes)
     var inputCheckboxProps = {
       class: 'option',
       type: 'checkbox',
-      id: optionLabelCheckboxId,
+      id: optionLabelCheckboxId
     };
     if (disableCheckboxes || astItem.disabled) {
       inputCheckboxProps.disabled = true;
@@ -52,7 +52,7 @@ exports.createSelection = function(astItem, createCheckboxes, disableCheckboxes)
     var labelProps = {
       class: astItem.disabled ? 'disabled' : '',
       for: optionLabelCheckboxId,
-      text: astItem.text || astItem.value,
+      text: astItem.text || astItem.value
     };
     var label = exports.createNode('label', labelProps);
     selectionNode.appendChild(label);
@@ -61,7 +61,7 @@ exports.createSelection = function(astItem, createCheckboxes, disableCheckboxes)
   return selectionNode;
 };
 
-exports.createSelected = function(astItem, disableRemoval, showSectionOnSelected) {
+exports.createSelected = function (astItem, disableRemoval, showSectionOnSelected) {
   var node = exports.createNode('div', {
     class: 'item',
     'data-key': astItem.id,
@@ -82,7 +82,7 @@ exports.createSelected = function(astItem, disableRemoval, showSectionOnSelected
   return node;
 };
 
-exports.createSection = function(astSection, createCheckboxes, disableCheckboxes) {
+exports.createSection = function (astSection, createCheckboxes, disableCheckboxes) {
   var sectionNode = exports.createNode('div', {class: 'section', 'data-key': astSection.id});
 
   var titleNode = exports.createNode('div', {class: 'title', text: astSection.name});

@@ -1,5 +1,5 @@
 // keeps if pred is true
-function filterInPlace(arr, pred) {
+function filterInPlace (arr, pred) {
   var idx = 0;
   for (var ii = 0; ii < arr.length; ++ii) {
     if (pred(arr[ii])) {
@@ -8,10 +8,9 @@ function filterInPlace(arr, pred) {
     }
   }
   arr.length = idx;
-  //arr.slice(0, idx);
 }
 
-exports.flatten = function(arr, r) {
+exports.flatten = function (arr, r) {
   if (!Array.isArray(arr)) {
     return arr;
   }
@@ -29,10 +28,10 @@ exports.flatten = function(arr, r) {
   return r;
 };
 
-exports.uniq = function(arr) {
+exports.uniq = function (arr) {
   var hash = {};
 
-  var pred = function(val) {
+  var pred = function (val) {
     var returnVal = !hash[val];
     hash[val] = true;
     return returnVal;
@@ -40,40 +39,40 @@ exports.uniq = function(arr) {
   filterInPlace(arr, pred);
 };
 
-exports.removeFalseyExceptZero = function(arr) {
-  var pred = function(val) {
+exports.removeFalseyExceptZero = function (arr) {
+  var pred = function (val) {
     return val || val === 0;
   };
   filterInPlace(arr, pred);
 };
 
-exports.moveEl = function(arr, oldPos, newPos) {
+exports.moveEl = function (arr, oldPos, newPos) {
   var el = arr[oldPos];
   arr.splice(oldPos, 1);
   arr.splice(newPos, 0, el);
 };
 
-exports.subtract = function(arr, arrExcluded) {
+exports.subtract = function (arr, arrExcluded) {
   var hash = {};
 
   for (var ii = 0; ii < arrExcluded.length; ++ii) {
     hash[arrExcluded[ii]] = true;
   }
 
-  var pred = function(val) {
+  var pred = function (val) {
     return !hash[val];
   };
   filterInPlace(arr, pred);
 };
 
-exports.intersect = function(arr, arrExcluded) {
+exports.intersect = function (arr, arrExcluded) {
   var hash = {};
 
   for (var ii = 0; ii < arrExcluded.length; ++ii) {
     hash[arrExcluded[ii]] = true;
   }
 
-  var pred = function(val) {
+  var pred = function (val) {
     return hash[val];
   };
   filterInPlace(arr, pred);
@@ -81,7 +80,7 @@ exports.intersect = function(arr, arrExcluded) {
 
 // takes in array of arrays
 // arrays are presorted
-exports.intersectMany = function(arrays) {
+exports.intersectMany = function (arrays) {
   var indexLocations = [];
   var maxIndexLocations = [];
   arrays.forEach((array) => {

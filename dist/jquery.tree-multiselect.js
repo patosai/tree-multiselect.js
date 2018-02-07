@@ -442,7 +442,7 @@ Tree.prototype.createAst = function (options) {
       initialIndex: option.getAttribute('data-index'),
       section: option.getAttribute('data-section'),
       disabled: option.hasAttribute('readonly'),
-      selected: option.hasAttribute('selected')
+      selected: option.selected
     });
 
     if (item.initialIndex && item.selected) {

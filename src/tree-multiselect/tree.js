@@ -3,6 +3,8 @@ let Search = require('./search');
 let UiBuilder = require('./ui-builder');
 let Util = require('./utility');
 
+const SEARCH_HIT_ATTR = 'searchhit';
+
 function Tree (id, $originalSelect, params) {
   this.id = id;
   this.$originalSelect = $originalSelect;
@@ -193,7 +195,7 @@ Tree.prototype.handleSectionCheckboxMarkings = function () {
     let keys = $items.map((idx, el) => {
       let key = Util.getKey(el);
       let astItem = self.astItems[key];
-      if (!astItem.disabled) {
+      if (!astItem.disabled && !astItem.isNotSearchHit()) {
         return key;
       }
     }).get();
@@ -284,7 +286,7 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSearchBar = function (parentNode) {
-  let searchObj = new Search(this.astItems, this.astSections, this.params.searchParams);
+  let searchObj = new Search(SEARCH_HIT_ATTR, this.astItems, this.astSections, this.params.searchParams);
 
   let searchNode = Util.dom.createNode('input', {class: 'search', placeholder: 'Search...'});
   parentNode.appendChild(searchNode);
@@ -307,13 +309,21 @@ Tree.prototype.createSelectAllButtons = function (parentNode) {
 
   let self = this;
   this.$selectionContainer.on('click', 'span.select-all', function () {
-    self.keysToAdd = Object.keys(self.astItems);
+    self.keysToAdd.push(...self.unfilteredNodeIds());
     self.render();
   });
 
   this.$selectionContainer.on('click', 'span.unselect-all', function () {
-    self.keysToRemove.push(...self.selectedKeys);
+    self.keysToRemove.push(...self.unfilteredNodeIds());
     self.render();
+  });
+};
+
+Tree.prototype.unfilteredNodeIds = function () {
+  let self = this;
+  return Object.keys(self.astItems).filter((key) => {
+    return !self.astItems[key].node.hasAttribute(SEARCH_HIT_ATTR) ||
+      self.astItems[key].node.getAttribute(SEARCH_HIT_ATTR) === 'true';
   });
 };
 

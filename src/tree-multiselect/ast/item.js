@@ -1,3 +1,5 @@
+const AstCommon = require('./common');
+
 const Util = require('../utility');
 
 function Item (obj) {
@@ -22,6 +24,18 @@ Item.prototype.isSection = function () {
 
 Item.prototype.isItem = function () {
   return true;
+};
+
+Item.prototype.addSearchHitMarker = function (isSearchHit) {
+  AstCommon.addSearchHitMarker(this.node, isSearchHit);
+};
+
+Item.prototype.removeSearchHitMarker = function (isSearchHit) {
+  AstCommon.removeSearchHitMarker(this.node, isSearchHit);
+};
+
+Item.prototype.isNotSearchHit = function () {
+  return AstCommon.isNotSearchHit(this.node);
 };
 
 Item.prototype.render = function (createCheckboxes, disableCheckboxes) {

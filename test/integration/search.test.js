@@ -1,5 +1,17 @@
 var Common = require('./common');
 
+function getVisibleSelections(props) {
+  return Common.selection(props).filter((_, el) => {
+    return el.getAttribute('searchhit') === 'true';
+  })
+}
+
+function getHiddenSelections(props) {
+  return Common.selection(props).filter((_, el) => {
+    return el.getAttribute('searchhit') === 'false';
+  })
+}
+
 describe('Search', () => {
   var $input;
 
@@ -26,75 +38,83 @@ describe('Search', () => {
     it('matches on value', () => {
       ['a', 'c', 'abc', 'cde', 'bcd', 'abcde', 'abcd'].forEach((searchTerm) => {
         $input.val(searchTerm).trigger('input');
-        assert(Common.selection({value: 'abcde'}).is(':visible'));
-        assert(Common.selection({value: 'fghij'}).is(':hidden'));
-        assert(Common.selection({value: 'KLMNOP'}).is(':hidden'));
-        assert(Common.selection({value: 'QRS'}).is(':hidden'));
+        assert.equal(Common.selection({value: 'abcde'}).attr('searchhit'), 'true');
+        assert.equal(Common.selection({value: 'fghij'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'KLMNOP'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'QRS'}).attr('searchhit'), 'false');
       });
 
       ['fghij', 'ghi', 'fgh'].forEach((searchTerm) => {
         $input.val(searchTerm).trigger('input');
-        assert(Common.selection({value: 'abcde'}).is(':hidden'));
-        assert(Common.selection({value: 'fghij'}).is(':visible'));
-        assert(Common.selection({value: 'KLMNOP'}).is(':hidden'));
-        assert(Common.selection({value: 'QRS'}).is(':hidden'));
+        assert.equal(Common.selection({value: 'abcde'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'fghij'}).attr('searchhit'), 'true');
+        assert.equal(Common.selection({value: 'KLMNOP'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'QRS'}).attr('searchhit'), 'false');
       });
 
       ['q', 'qr', 'qrs', 'rs'].forEach((searchTerm) => {
         $input.val(searchTerm).trigger('input');
-        assert(Common.selection({value: 'abcde'}).is(':hidden'));
-        assert(Common.selection({value: 'fghij'}).is(':hidden'));
-        assert(Common.selection({value: 'KLMNOP'}).is(':hidden'));
-        assert(Common.selection({value: 'QRS'}).is(':visible'));
+        assert.equal(Common.selection({value: 'abcde'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'fghij'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'KLMNOP'}).attr('searchhit'), 'false');
+        assert.equal(Common.selection({value: 'QRS'}).attr('searchhit'), 'true');
       });
     });
 
     it('matches on section', () => {
       $input.val('s1').trigger('input');
-      assert(Common.selection({value: 'abcde'}).is(':visible'));
-      assert(Common.selection({value: 'fghij'}).is(':visible'));
-      assert(Common.selection({value: 'KLMNOP'}).is(':hidden'));
-      assert(Common.selection({value: 'QRS'}).is(':hidden'));
+      assert.equal(Common.selection({value: 'abcde'}).attr('searchhit'), 'true');
+      assert.equal(Common.selection({value: 'fghij'}).attr('searchhit'), 'true');
+      assert.equal(Common.selection({value: 'KLMNOP'}).attr('searchhit'), 'false');
+      assert.equal(Common.selection({value: 'QRS'}).attr('searchhit'), 'false');
     });
 
     it('matches on text', () => {
       $input.val('yyy').trigger('input');
-      assert(Common.selection({value: 'abcde'}).is(':hidden'));
-      assert(Common.selection({value: 'fghij'}).is(':visible'));
-      assert(Common.selection({value: 'KLMNOP'}).is(':hidden'));
-      assert(Common.selection({value: 'QRS'}).is(':hidden'));
+      assert.equal(Common.selection({value: 'abcde'}).attr('searchhit'), 'false');
+      assert.equal(Common.selection({value: 'fghij'}).attr('searchhit'), 'true');
+      assert.equal(Common.selection({value: 'KLMNOP'}).attr('searchhit'), 'false');
+      assert.equal(Common.selection({value: 'QRS'}).attr('searchhit'), 'false');
     });
 
     it('matches on description', () => {
       $input.val('fox').trigger('input');
-      assert(Common.selection({value: 'abcde'}).is(':hidden'));
-      assert(Common.selection({value: 'fghij'}).is(':hidden'));
-      assert(Common.selection({value: 'KLMNOP'}).is(':hidden'));
-      assert(Common.selection({value: 'QRS'}).is(':visible'));
+      assert.equal(Common.selection({value: 'abcde'}).attr('searchhit'), 'false');
+      assert.equal(Common.selection({value: 'fghij'}).attr('searchhit'), 'false');
+      assert.equal(Common.selection({value: 'KLMNOP'}).attr('searchhit'), 'false');
+      assert.equal(Common.selection({value: 'QRS'}).attr('searchhit'), 'true');
     });
 
     it('hides sections with no nodes visible', () => {
       $input.val('s1').trigger('input');
-      assert(Common.section({text: 's1'}).is(':visible'));
-      assert(Common.section({text: 's2'}).is(':hidden'));
-      assert(Common.section({text: 'ttt'}).is(':hidden'));
-      assert(Common.section({text: 'uuu'}).is(':hidden'));
-      assert(Common.section({text: 'vvv'}).is(':hidden'));
+      assert.equal(Common.section({text: 's1'}).attr('searchhit'), 'true');
+      assert.equal(Common.section({text: 's2'}).attr('searchhit'), 'false');
+      assert.equal(Common.section({text: 'ttt'}).attr('searchhit'), 'false');
+      assert.equal(Common.section({text: 'uuu'}).attr('searchhit'), 'false');
+      assert.equal(Common.section({text: 'vvv'}).attr('searchhit'), 'false');
 
       $input.val('uuu').trigger('input');
-      assert(Common.section({text: 's1'}).is(':hidden'));
-      assert(Common.section({text: 's2'}).is(':hidden'));
-      assert(Common.section({text: 'ttt'}).is(':visible'));
-      assert(Common.section({text: 'uuu'}).is(':visible'));
-      assert(Common.section({text: 'vvv'}).is(':visible'));
+      assert.equal(Common.section({text: 's1'}).attr('searchhit'), 'false');
+      assert.equal(Common.section({text: 's2'}).attr('searchhit'), 'false');
+      assert.equal(Common.section({text: 'ttt'}).attr('searchhit'), 'true');
+      assert.equal(Common.section({text: 'uuu'}).attr('searchhit'), 'true');
+      assert.equal(Common.section({text: 'vvv'}).attr('searchhit'), 'true');
     });
 
     it('shows all sections when no search term is entered', () => {
       $input.val('43t#Q%').trigger('input'); // no nodes should be shown
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('').trigger('input'); // no nodes should be shown
-      assert.equal(Common.selection().filter(':hidden').length, 0);
+      assert.equal(getHiddenSelections().length, 0);
+    });
+
+    it('only adds filtered selections when adding all', () => {
+      $input.val('abcde').trigger('input');
+
+      assert.equal(Common.selected().length, 0);
+      var $topCheckbox = Common.sectionCheckbox({text: 's1'}).click();
+      assert.equal(Common.selected().length, 1);
     });
   });
 
@@ -109,16 +129,16 @@ describe('Search', () => {
       $input = $("input.search");
 
       $input.val('s1').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 1);
+      assert.equal(getVisibleSelections().length, 1);
 
       $input.val('abc').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('ayy').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('xyz').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
     });
 
     it('value only', () => {
@@ -126,16 +146,16 @@ describe('Search', () => {
       $input = $("input.search");
 
       $input.val('s1').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('abc').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 1);
+      assert.equal(getVisibleSelections().length, 1);
 
       $input.val('ayy').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('xyz').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
     });
 
     it('text and description', () => {
@@ -143,16 +163,16 @@ describe('Search', () => {
       $input = $("input.search");
 
       $input.val('s1').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('abc').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 0);
+      assert.equal(getVisibleSelections().length, 0);
 
       $input.val('ayy').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 1);
+      assert.equal(getVisibleSelections().length, 1);
 
       $input.val('xyz').trigger('input');
-      assert.equal(Common.selection().filter(':visible').length, 1);
+      assert.equal(getVisibleSelections().length, 1);
     });
   });
 });

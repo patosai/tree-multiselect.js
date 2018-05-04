@@ -2,7 +2,8 @@ let Util = require('./utility');
 
 const MAX_SAMPLE_SIZE = 3;
 
-function Search (astItems, astSections, searchParams) {
+function Search (searchHitAttr, astItems, astSections, searchParams) {
+  this.searchHitAttr = searchHitAttr;
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
 
   // key: data-key, value: DOM node
@@ -79,11 +80,10 @@ Search.prototype._addToIndex = function (key, id) {
 Search.prototype.search = function (value) {
   if (!value) {
     this.astItemKeys.forEach((id) => {
-      this.astItems[id].node.style.display = '';
+      this.astItems[id].removeSearchHitMarker();
     });
     this.astSectionKeys.forEach((id) => {
-      this.astSections[id].node.style.display = '';
-      this.astSections[id].node.removeAttribute('searchhit');
+      this.astSections[id].removeSearchHitMarker();
     });
     return;
   }
@@ -111,7 +111,6 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
   shownNodeIds.forEach((id) => {
     shownNodeIdsHash[id] = true;
     let node = this.astItems[id].node;
-    node.style.display = '';
 
     // now search for parent sections
     node = node.parentNode;
@@ -123,8 +122,6 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
           break;
         } else {
           sectionsToNotHideHash[key] = true;
-          node.style.display = '';
-          node.setAttribute('searchhit', true);
         }
       }
       node = node.parentNode;
@@ -133,14 +130,12 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
 
   // hide selections
   this.astItemKeys.forEach((id) => {
-    if (!shownNodeIdsHash[id]) {
-      this.astItems[id].node.style.display = 'none';
-    }
+    let isSearchHit = !!shownNodeIdsHash[id];
+    this.astItems[id].addSearchHitMarker(isSearchHit);
   });
   this.astSectionKeys.forEach((id) => {
-    if (!sectionsToNotHideHash[id]) {
-      this.astSections[id].node.style.display = 'none';
-    }
+    let isSearchHit = !!sectionsToNotHideHash[id];
+    this.astSections[id].addSearchHitMarker(isSearchHit);
   });
 };
 

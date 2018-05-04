@@ -1,3 +1,5 @@
+const AstCommon = require('./common');
+
 const Util = require('../utility');
 
 function Section (obj) {
@@ -17,6 +19,18 @@ Section.prototype.isSection = function () {
 
 Section.prototype.isItem = function () {
   return false;
+};
+
+Section.prototype.addSearchHitMarker = function (isSearchHit) {
+  AstCommon.addSearchHitMarker(this.node, isSearchHit);
+};
+
+Section.prototype.removeSearchHitMarker = function (isSearchHit) {
+  AstCommon.removeSearchHitMarker(this.node, isSearchHit);
+};
+
+Section.prototype.isNotSearchHit = function () {
+  return AstCommon.isNotSearchHit(this.node);
 };
 
 Section.prototype.render = function (createCheckboxes, disableCheckboxes) {

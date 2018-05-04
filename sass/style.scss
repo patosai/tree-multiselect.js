@@ -36,6 +36,10 @@ div.tree-multiselect {
       }
     }
 
+    *[searchhit=false] {
+      display: none;
+    }
+
     &.no-border {
       border-right: none;
     }

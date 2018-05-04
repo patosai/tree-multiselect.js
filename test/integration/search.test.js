@@ -109,13 +109,30 @@ describe('Search', () => {
       assert.equal(getHiddenSelections().length, 0);
     });
 
-    it('only adds filtered selections when adding all', () => {
+    it('only adds filtered selections when using section checkbox', () => {
       $input.val('abcde').trigger('input');
 
       assert.equal(Common.selected().length, 0);
-      var $topCheckbox = Common.sectionCheckbox({text: 's1'}).click();
+      Common.sectionCheckbox({text: 's1'}).click();
       assert.equal(Common.selected().length, 1);
     });
+
+    it('only adds filtered selections when selecting and unselecting all', () => {
+      $input.val('s1').trigger('input');
+
+      var $selectAll = $(".select-all");
+      var $unselectAll = $(".unselect-all");
+      assert.equal($selectAll.length, 1);
+      assert.equal($unselectAll.length, 1);
+
+      assert.equal(Common.selected().length, 0);
+      $selectAll.click();
+      assert.equal(Common.selected().length, 2);
+
+      $input.val('abcde').trigger('input');
+      $unselectAll.click();
+      assert.equal(Common.selected().length, 1);
+    })
   });
 
   describe('custom search params', () => {

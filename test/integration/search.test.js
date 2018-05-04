@@ -29,7 +29,7 @@ describe('Search', () => {
       // description
       $("select").append("<option value='QRS' data-section='ttt/uuu/vvv' data-description='fox'></option>");
 
-      $("select").treeMultiselect({searchable: true});
+      $("select").treeMultiselect({searchable: true, enableSelectAll: true});
 
       $input = $("input.search");
       assert.equal($input.length, 1);
@@ -114,6 +114,15 @@ describe('Search', () => {
 
       assert.equal(Common.selected().length, 0);
       Common.sectionCheckbox({text: 's1'}).click();
+      assert.equal(Common.selected().length, 1);
+
+      $input.val('fox').trigger('input');
+      assert.equal(Common.selected().length, 1);
+      var $tttCheckbox = Common.sectionCheckbox({text: 'ttt'})
+      $tttCheckbox.click();
+      assert.equal(Common.selected().length, 2);
+
+      $tttCheckbox.click();
       assert.equal(Common.selected().length, 1);
     });
 

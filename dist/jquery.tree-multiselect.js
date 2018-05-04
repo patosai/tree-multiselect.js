@@ -1,5 +1,5 @@
-/* jQuery Tree Multiselect v2.5.1 | (c) Patrick Tsai | MIT Licensed */
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* jQuery Tree Multiselect v2.5.2 | (c) Patrick Tsai | MIT Licensed */
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
 (function ($) {
@@ -8,7 +8,31 @@
   $.fn.treeMultiselect = require('./tree-multiselect/main');
 })(jQuery);
 
-},{"./tree-multiselect/main":5}],2:[function(require,module,exports){
+},{"./tree-multiselect/main":6}],2:[function(require,module,exports){
+'use strict';
+
+var SEARCH_HIT_ATTR = 'searchhit';
+var SEARCH_HIT_ATTR_VAL_TRUE = 'true';
+var SEARCH_HIT_ATTR_VAL_FALSE = 'false';
+
+exports.addSearchHitMarker = function (node, isSearchHit) {
+  if (node) {
+    isSearchHit = isSearchHit ? SEARCH_HIT_ATTR_VAL_TRUE : SEARCH_HIT_ATTR_VAL_FALSE;
+    node.setAttribute(SEARCH_HIT_ATTR, isSearchHit);
+  }
+};
+
+exports.removeSearchHitMarker = function (node, isSearchHit) {
+  if (node) {
+    node.removeAttribute(SEARCH_HIT_ATTR);
+  }
+};
+
+exports.isNotSearchHit = function (node) {
+  return node && node.getAttribute(SEARCH_HIT_ATTR) === SEARCH_HIT_ATTR_VAL_FALSE;
+};
+
+},{}],3:[function(require,module,exports){
 'use strict';
 
 var Item = require('./item');
@@ -29,8 +53,10 @@ exports.createItem = function (obj) {
   return new Item(obj);
 };
 
-},{"./item":3,"./section":4}],3:[function(require,module,exports){
+},{"./item":4,"./section":5}],4:[function(require,module,exports){
 'use strict';
+
+var AstCommon = require('./common');
 
 var Util = require('../utility');
 
@@ -58,6 +84,18 @@ Item.prototype.isItem = function () {
   return true;
 };
 
+Item.prototype.addSearchHitMarker = function (isSearchHit) {
+  AstCommon.addSearchHitMarker(this.node, isSearchHit);
+};
+
+Item.prototype.removeSearchHitMarker = function (isSearchHit) {
+  AstCommon.removeSearchHitMarker(this.node, isSearchHit);
+};
+
+Item.prototype.isNotSearchHit = function () {
+  return AstCommon.isNotSearchHit(this.node);
+};
+
 Item.prototype.render = function (createCheckboxes, disableCheckboxes) {
   if (!this.node) {
     this.node = Util.dom.createSelection(this, createCheckboxes, disableCheckboxes);
@@ -67,8 +105,10 @@ Item.prototype.render = function (createCheckboxes, disableCheckboxes) {
 
 module.exports = Item;
 
-},{"../utility":11}],4:[function(require,module,exports){
+},{"../utility":12,"./common":2}],5:[function(require,module,exports){
 'use strict';
+
+var AstCommon = require('./common');
 
 var Util = require('../utility');
 
@@ -91,6 +131,18 @@ Section.prototype.isItem = function () {
   return false;
 };
 
+Section.prototype.addSearchHitMarker = function (isSearchHit) {
+  AstCommon.addSearchHitMarker(this.node, isSearchHit);
+};
+
+Section.prototype.removeSearchHitMarker = function (isSearchHit) {
+  AstCommon.removeSearchHitMarker(this.node, isSearchHit);
+};
+
+Section.prototype.isNotSearchHit = function () {
+  return AstCommon.isNotSearchHit(this.node);
+};
+
 Section.prototype.render = function (createCheckboxes, disableCheckboxes) {
   if (!this.node) {
     this.node = Util.dom.createSection(this, createCheckboxes, disableCheckboxes);
@@ -100,14 +152,14 @@ Section.prototype.render = function (createCheckboxes, disableCheckboxes) {
 
 module.exports = Section;
 
-},{"../utility":11}],5:[function(require,module,exports){
+},{"../utility":12,"./common":2}],6:[function(require,module,exports){
 'use strict';
 
 var Tree = require('./tree');
 
 var uniqueId = 0;
 
-var treeMultiselect = function treeMultiselect(opts) {
+function treeMultiselect(opts) {
   var _this = this;
 
   var options = mergeDefaultOptions(opts);
@@ -157,14 +209,15 @@ function mergeDefaultOptions(options) {
 
 module.exports = treeMultiselect;
 
-},{"./tree":7}],6:[function(require,module,exports){
+},{"./tree":8}],7:[function(require,module,exports){
 'use strict';
 
 var Util = require('./utility');
 
 var MAX_SAMPLE_SIZE = 3;
 
-function Search(astItems, astSections, searchParams) {
+function Search(searchHitAttr, astItems, astSections, searchParams) {
+  this.searchHitAttr = searchHitAttr;
   this.index = {}; // key: at most three-letter combinations, value: array of data-key
 
   // key: data-key, value: DOM node
@@ -226,9 +279,9 @@ Search.prototype.buildIndex = function () {
 };
 
 Search.prototype._addToIndex = function (key, id) {
-  for (var sample_size = 1; sample_size <= MAX_SAMPLE_SIZE; ++sample_size) {
-    for (var start_offset = 0; start_offset < key.length - sample_size + 1; ++start_offset) {
-      var minikey = key.substring(start_offset, start_offset + sample_size);
+  for (var sampleSize = 1; sampleSize <= MAX_SAMPLE_SIZE; ++sampleSize) {
+    for (var startOffset = 0; startOffset < key.length - sampleSize + 1; ++startOffset) {
+      var minikey = key.substring(startOffset, startOffset + sampleSize);
 
       if (!this.index[minikey]) {
         this.index[minikey] = [];
@@ -249,11 +302,10 @@ Search.prototype.search = function (value) {
 
   if (!value) {
     this.astItemKeys.forEach(function (id) {
-      _this2.astItems[id].node.style.display = '';
+      _this2.astItems[id].removeSearchHitMarker();
     });
     this.astSectionKeys.forEach(function (id) {
-      _this2.astSections[id].node.style.display = '';
-      _this2.astSections[id].node.removeAttribute('searchhit');
+      _this2.astSections[id].removeSearchHitMarker();
     });
     return;
   }
@@ -283,7 +335,6 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
   shownNodeIds.forEach(function (id) {
     shownNodeIdsHash[id] = true;
     var node = _this3.astItems[id].node;
-    node.style.display = '';
 
     // now search for parent sections
     node = node.parentNode;
@@ -295,8 +346,6 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
           break;
         } else {
           sectionsToNotHideHash[key] = true;
-          node.style.display = '';
-          node.setAttribute('searchhit', true);
         }
       }
       node = node.parentNode;
@@ -305,14 +354,12 @@ Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
 
   // hide selections
   this.astItemKeys.forEach(function (id) {
-    if (!shownNodeIdsHash[id]) {
-      _this3.astItems[id].node.style.display = 'none';
-    }
+    var isSearchHit = !!shownNodeIdsHash[id];
+    _this3.astItems[id].addSearchHitMarker(isSearchHit);
   });
   this.astSectionKeys.forEach(function (id) {
-    if (!sectionsToNotHideHash[id]) {
-      _this3.astSections[id].node.style.display = 'none';
-    }
+    var isSearchHit = !!sectionsToNotHideHash[id];
+    _this3.astSections[id].addSearchHitMarker(isSearchHit);
   });
 };
 
@@ -333,7 +380,7 @@ function splitWord(word) {
 
 module.exports = Search;
 
-},{"./utility":11}],7:[function(require,module,exports){
+},{"./utility":12}],8:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -342,6 +389,8 @@ var Ast = require('./ast');
 var Search = require('./search');
 var UiBuilder = require('./ui-builder');
 var Util = require('./utility');
+
+var SEARCH_HIT_ATTR = 'searchhit';
 
 function Tree(id, $originalSelect, params) {
   this.id = id;
@@ -535,7 +584,7 @@ Tree.prototype.handleSectionCheckboxMarkings = function () {
     var keys = $items.map(function (idx, el) {
       var key = Util.getKey(el);
       var astItem = self.astItems[key];
-      if (!astItem.disabled) {
+      if (!astItem.disabled && !astItem.isNotSearchHit()) {
         return key;
       }
     }).get();
@@ -630,7 +679,7 @@ Tree.prototype.addCollapsibility = function () {
 };
 
 Tree.prototype.createSearchBar = function (parentNode) {
-  var searchObj = new Search(this.astItems, this.astSections, this.params.searchParams);
+  var searchObj = new Search(SEARCH_HIT_ATTR, this.astItems, this.astSections, this.params.searchParams);
 
   var searchNode = Util.dom.createNode('input', { class: 'search', placeholder: 'Search...' });
   parentNode.appendChild(searchNode);
@@ -653,15 +702,24 @@ Tree.prototype.createSelectAllButtons = function (parentNode) {
 
   var self = this;
   this.$selectionContainer.on('click', 'span.select-all', function () {
-    self.keysToAdd = Object.keys(self.astItems);
+    var _self$keysToAdd2;
+
+    (_self$keysToAdd2 = self.keysToAdd).push.apply(_self$keysToAdd2, _toConsumableArray(self.unfilteredNodeIds()));
     self.render();
   });
 
   this.$selectionContainer.on('click', 'span.unselect-all', function () {
     var _self$keysToRemove2;
 
-    (_self$keysToRemove2 = self.keysToRemove).push.apply(_self$keysToRemove2, _toConsumableArray(self.selectedKeys));
+    (_self$keysToRemove2 = self.keysToRemove).push.apply(_self$keysToRemove2, _toConsumableArray(self.unfilteredNodeIds()));
     self.render();
+  });
+};
+
+Tree.prototype.unfilteredNodeIds = function () {
+  var self = this;
+  return Object.keys(self.astItems).filter(function (key) {
+    return !self.astItems[key].node.hasAttribute(SEARCH_HIT_ATTR) || self.astItems[key].node.getAttribute(SEARCH_HIT_ATTR) === 'true';
   });
 };
 
@@ -827,7 +885,7 @@ Tree.prototype.render = function (noCallbacks) {
 
 module.exports = Tree;
 
-},{"./ast":2,"./search":6,"./ui-builder":8,"./utility":11}],8:[function(require,module,exports){
+},{"./ast":3,"./search":7,"./ui-builder":9,"./utility":12}],9:[function(require,module,exports){
 'use strict';
 
 function UiBuilder($el, hideSidePanel) {
@@ -860,7 +918,7 @@ UiBuilder.prototype.remove = function () {
 
 module.exports = UiBuilder;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 // keeps if pred is true
@@ -873,7 +931,6 @@ function filterInPlace(arr, pred) {
     }
   }
   arr.length = idx;
-  //arr.slice(0, idx);
 }
 
 exports.flatten = function (arr, r) {
@@ -989,7 +1046,7 @@ exports.intersectMany = function (arrays) {
   return finalOutput;
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 exports.createNode = function (tag, props) {
@@ -1095,7 +1152,7 @@ exports.createSection = function (astSection, createCheckboxes, disableCheckboxe
   return sectionNode;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 exports.array = require('./array');
@@ -1122,4 +1179,4 @@ exports.isInteger = function (value) {
   return (x | 0) === x;
 };
 
-},{"./array":9,"./dom":10}]},{},[1]);
+},{"./array":10,"./dom":11}]},{},[1]);

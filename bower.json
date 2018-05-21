@@ -22,7 +22,7 @@
     "*",
     "!dist/",
     "!src/",
-    "!package.json"
+    "!package.json",
     "!LICENSE"
   ],
   "repository": {

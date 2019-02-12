@@ -53,8 +53,25 @@ Tree.prototype.remove = function () {
 };
 
 Tree.prototype.reload = function () {
+  let selectedOptions = {};
+  this.selectedKeys.forEach((key) => {
+    let value = this.astItems[key].value;
+    selectedOptions[value] = true;
+  });
+
   this.remove();
+
+  this.$originalSelect.children('option').each((idx, element) => {
+    let value = element.value;
+    if (selectedOptions[value]) {
+      element.setAttribute('selected', 'selected');
+    } else {
+      element.removeAttribute('selected');
+    }
+  });
+
   this.initialize();
+  this.render(true);
 };
 
 Tree.prototype.resetState = function () {

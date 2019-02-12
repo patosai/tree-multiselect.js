@@ -57,7 +57,7 @@ $("select").treeMultiselect({
 });
 ```
 
-The function returns returns an array of objects, each of which contains two functions, `remove` and `reload`. `remove` removes the tree, and `reload` reinitializes the tree from its `select` element. *User-changed options will be lost!*
+The function returns returns an array of objects, each of which contains two functions, `remove` and `reload`. `remove` removes the tree, and `reload` reinitializes the tree from its `select` element. User-changed options will be saved. If you want to dynamically add options to the tree, you can just add it to the original select and call `reload` on the tree.
 ```javascript
 var trees = $("select").treeMultiselect();
 var firstTree = trees[0];
@@ -66,6 +66,7 @@ var firstTree = trees[0];
 firstTree.remove();
 
 // or, change the select element with new options, then...
+$("select#id").append("<option value='newValue' data-section='New Section' selected='selected' data-description='New value'>New Value</option>");
 firstTree.reload();
 ```
 

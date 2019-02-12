@@ -1,5 +1,5 @@
 ## jQuery Tree Multiselect
-[![Build Status](https://travis-ci.org/patosai/tree-multiselect.js.svg?branch=master)](https://travis-ci.org/patosai/tree-multiselect.js)
+[![CircleCI](https://circleci.com/gh/patosai/tree-multiselect.js.svg?style=svg)](https://circleci.com/gh/patosai/tree-multiselect.js)
 [![Coverage Status](https://codecov.io/gh/patosai/tree-multiselect.js/branch/master/graph/badge.svg)](https://codecov.io/gh/patosai/tree-multiselect.js)
 [![devDependency Status](https://david-dm.org/patosai/tree-multiselect.js/dev-status.svg)](https://david-dm.org/patosai/tree-multiselect.js#info=devDependencies)
 

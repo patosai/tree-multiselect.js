@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -x
 VERSION=$(node -e "console.log(require('./package.json').version);")
 grunt release

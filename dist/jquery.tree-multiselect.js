@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.5.2 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.6.0 | (c) Patrick Tsai | MIT Licensed */
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
@@ -440,8 +440,27 @@ Tree.prototype.remove = function () {
 };
 
 Tree.prototype.reload = function () {
+  var _this = this;
+
+  var selectedOptions = {};
+  this.selectedKeys.forEach(function (key) {
+    var value = _this.astItems[key].value;
+    selectedOptions[value] = true;
+  });
+
   this.remove();
+
+  this.$originalSelect.children('option').each(function (idx, element) {
+    var value = element.value;
+    if (selectedOptions[value]) {
+      element.setAttribute('selected', 'selected');
+    } else {
+      element.removeAttribute('selected');
+    }
+  });
+
   this.initialize();
+  this.render(true);
 };
 
 Tree.prototype.resetState = function () {
@@ -772,7 +791,7 @@ Tree.prototype.updateSelectedAndOnChange = function () {
 
 Tree.prototype.render = function (noCallbacks) {
   var _selectedKeys,
-      _this = this;
+      _this2 = this;
 
   // fix arrays first
   Util.array.uniq(this.keysToAdd);
@@ -868,13 +887,13 @@ Tree.prototype.render = function (noCallbacks) {
 
   if (!noCallbacks && this.params.onChange) {
     var optionsSelected = this.selectedKeys.map(function (key) {
-      return _this.astItems[key];
+      return _this2.astItems[key];
     });
     var optionsAdded = this.keysToAdd.map(function (key) {
-      return _this.astItems[key];
+      return _this2.astItems[key];
     });
     var optionsRemoved = this.keysToRemove.map(function (key) {
-      return _this.astItems[key];
+      return _this2.astItems[key];
     });
     this.params.onChange(optionsSelected, optionsAdded, optionsRemoved);
   }

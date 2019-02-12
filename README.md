@@ -28,7 +28,7 @@ Option Attribute name         | Description
 
 All of the above are optional.
 
-Your `data-section` can have multiple section names, separated by the `sectionDelimiter` option.
+Your `data-section` can have multiple section names, separated by the `sectionDelimiter` option. If you don't have a `data-section` on an option, the option will be on the top level (no section).
 
 Ex. `data-section="top/middle/inner"` will show up as
 - `top`

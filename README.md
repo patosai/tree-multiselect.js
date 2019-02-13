@@ -40,14 +40,27 @@ Ex. `data-section="top/middle/inner"` will show up as
       - your option
 
 ### API
-#### `$.treeMultiselect()`
-Renders a tree for the given jQuery `<select>` nodes.
+#### `$.treeMultiselect(params)`
+Renders a tree for the given jQuery `<select>` nodes. `params` is optional.
 
 ```javascript
 $("select").treeMultiselect();
+```
+```javascript
+let params = {searchable: true};
 $("select").treeMultiselect(params);
 ```
-`params` is an object that can have the following keys.
+```javascript
+function treeOnChange(allSelectedItems, addedItems, removedItems) {
+  console.log("something changed!");
+}
+
+$("select").treeMultiselect({
+  allowBatchSelection: false,
+  onChange: treeOnChange,
+  startCollapsed: true
+});
+```
 
 ##### Params
 Name                    | Default        | Description
@@ -71,17 +84,6 @@ Name                    | Default        | Description
 
 #### Examples
 
-```javascript
-function treeOnChange(allSelectedItems, addedItems, removedItems) {
-  console.log("something changed!");
-}
-
-$("select").treeMultiselect({
-  allowBatchSelection: false,
-  onChange: treeOnChange,
-  startCollapsed: true
-});
-```
 
 #### `.remove()`
 Removes the tree from the DOM. Leaves the original `<select>` intact.

@@ -15,6 +15,11 @@ The underlying `<select>` node can be used as it was before. This means you can 
 ### Demo
 <a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
 
+### How To Use
+1. Set the `multiple="multiple"` attribute on your `<select>`
+2. Add attributes to `<option>` nodes
+3. Execute `$.treeMultiselect(params)` with whatever params you want
+
 ### Setting up your `<select>`
 * Make sure your `<select>` has the `multiple` attribute set.
 

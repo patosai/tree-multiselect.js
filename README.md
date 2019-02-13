@@ -4,9 +4,10 @@
 [![devDependency Status](https://david-dm.org/patosai/tree-multiselect.js/dev-status.svg)](https://david-dm.org/patosai/tree-multiselect.js#info=devDependencies)
 
 
-**This plugin allows you to add a sweet treeview frontend to a `select` element.**
-The underlying `select` element can be used as it was before.
+**This plugin allows you to add a sweet treeview frontend to a `<select>` node.**
+The underlying `<select>` node can be used as it was before. This means you can still use `$("select").val()` or `selectElement.value` to get the value, as if there was no plugin. If you want to add options dynamically, please continue reading, there are some more steps you need to take.
 
+* Make sure you've got `<meta charset="UTF-8">` in your `<head>` or some of the symbols may look strange.
 * Requires jQuery v1.8+
 
 ![demo image](demo.jpg "demo image")
@@ -14,17 +15,19 @@ The underlying `select` element can be used as it was before.
 ### Demo
 <a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
 
-### Usage
-Make sure your `select` has the `multiple` attribute set. Also, make sure you've got `<meta charset="UTF-8">` or some of the symbols may look strange.
+### Setting up your `<select>`
+* Make sure your `<select>` has the `multiple` attribute set.
 
-#### Options on your select
+The `<option>` children can have the following attributes.
+
+#### Option Attributes
 Option Attribute name         | Description
 ----------------------------- | ---------------------------------
 `selected`                    | Have the option pre-selected. This is actually part of the HTML spec. For specified ordering of these, use `data-index`
 `readonly`                    | User cannot modify the value of the option. Option can be selected (ex. `<option selected readonly ...`)
 `data-section`                | The section the option will be in; can be nested
 `data-description`            | A description of the attribute; will be shown on the multiselect
-`data-index`                  | For pre-selected options, display options in this order, lowest index first. Repeated items with the same index will be shown before items with a higher index. Otherwise items will be displayed in the order of the original `select`
+`data-index`                  | For pre-selected options, display options in this order, lowest index first. Repeated items with the same index will be shown before items with a higher index. Otherwise items will be displayed in the order of the original `<select>`
 
 All of the above are optional.
 
@@ -36,39 +39,15 @@ Ex. `data-section="top/middle/inner"` will show up as
     - `inner`
       - your option
 
-#### The JavaScript
+### API
+#### `$.treeMultiselect()`
+Renders a tree for the given jQuery `<select>` nodes.
+
 ```javascript
 $("select").treeMultiselect();
+$("select").treeMultiselect(params);
 ```
-
-And now with some params.
-```javascript
-$("select").treeMultiselect({searchable: true});
-```
-```javascript
-function treeOnChange(allSelectedItems, addedItems, removedItems) {
-  console.log("something changed!");
-}
-
-$("select").treeMultiselect({
-  allowBatchSelection: false,
-  onChange: treeOnChange,
-  startCollapsed: true
-});
-```
-
-The function returns returns an array of objects, each of which contains two functions, `remove` and `reload`. `remove` removes the tree, and `reload` reinitializes the tree from its `select` element. User-changed options will be saved. If you want to dynamically add options to the tree, you can just add it to the original select and call `reload` on the tree.
-```javascript
-var trees = $("select").treeMultiselect();
-var firstTree = trees[0];
-
-// remove the tree
-firstTree.remove();
-
-// or, change the select element with new options, then...
-$("select#id").append("<option value='newValue' data-section='New Section' selected='selected' data-description='New value'>New Value</option>");
-firstTree.reload();
-```
+`params` is an object that can have the following keys.
 
 ##### Params
 Name                    | Default        | Description
@@ -90,6 +69,40 @@ Name                    | Default        | Description
 `showSectionOnSelected` | `true`         | Show section name on the selected items
 `startCollapsed`        | `false`        | Activated only if `collapsible` is true; sections are collapsed initially
 
+#### Examples
+
+```javascript
+function treeOnChange(allSelectedItems, addedItems, removedItems) {
+  console.log("something changed!");
+}
+
+$("select").treeMultiselect({
+  allowBatchSelection: false,
+  onChange: treeOnChange,
+  startCollapsed: true
+});
+```
+
+#### `.remove()`
+Removes the tree from the DOM. Leaves the original `<select>` intact.
+```javascript
+let trees = $("select").treeMultiselect({searchable: true});
+let firstTree = trees[0];
+firstTree.remove();
+```
+
+#### `.reload()`
+Reinitializes the tree. You can add `<option>` children to the original `<select>` and call `.reload()` to render the new options. User-changed selections will be saved.
+
+```javascript
+let trees = $("select").treeMultiselect();
+let firstTree = trees[0];
+
+// add an option
+$("select#id").append("<option value='newValue' data-section='New Section' selected='selected' data-description='New value'>New Value</option>");
+firstTree.reload();
+```
+
 ### Installation
 Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optional (but recommended).
 
@@ -97,7 +110,7 @@ You can also use bower - `bower install tree-multiselect`
 
 ### FAQ
 `Help! The first element is selected when I create the tree. How do I make the first element not selected?`
-You didn't set the `multiple` attribute on your `select`. This is a property of single-option select nodes - the first option is selected.
+You didn't set the `multiple` attribute on your `<select>`. This is a property of single-option select nodes - the first option is selected.
 
 ### License
 MIT licensed.

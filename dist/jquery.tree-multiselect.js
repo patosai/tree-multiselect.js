@@ -1,4 +1,4 @@
-/* jQuery Tree Multiselect v2.6.0 | (c) Patrick Tsai | MIT Licensed */
+/* jQuery Tree Multiselect v2.6.1 | (c) Patrick Tsai | MIT Licensed */
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
@@ -640,9 +640,7 @@ Tree.prototype.redrawSectionCheckboxes = function ($section) {
   if (returnVal) {
     var $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
     for (var ii = 0; ii < $childCheckboxes.length; ++ii) {
-      if ($childCheckboxes[ii].disabled) {
-        // do nothing
-      } else if ($childCheckboxes[ii].checked) {
+      if ($childCheckboxes[ii].checked) {
         returnVal &= ~2;
       } else {
         returnVal &= ~1;

@@ -27,4 +27,4 @@ jobs:
       # run tests!
       - run: npm test
       - codecov/upload:
-          file: coverage/PhantomJS 2.1.1/lcov.info
+          file: "coverage/PhantomJS 2.1.1/lcov.info"

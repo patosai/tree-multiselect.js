@@ -146,6 +146,21 @@ describe('Options', () => {
     assert.equal(removeSpans.length, 0);
   });
 
+  it('section checkboxes are indetermine if some children are selected', () => {
+    $("select").append("<option value='one' data-section='test'>One</option>");
+    $("select").append("<option value='two' data-section='test' selected='selected'>Two</option>");
+    var options = {
+      freeze: true
+    };
+    $("select").treeMultiselect(options);
+
+    var $sectionCheckbox = Common.sectionCheckbox({text: 'test'});
+    assert.equal($sectionCheckbox.length, 1);
+    var checkbox = $sectionCheckbox[0];
+    assert(checkbox.indeterminate);
+    assert(!checkbox.checked);
+  });
+
   it('applies only to one tree and not another', () => {
     $("select").append("<option value='one' data-section='test'>One</option>");
     $("select").treeMultiselect();

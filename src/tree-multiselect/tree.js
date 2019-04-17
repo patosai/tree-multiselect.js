@@ -245,9 +245,7 @@ Tree.prototype.redrawSectionCheckboxes = function ($section) {
   if (returnVal) {
     let $childCheckboxes = $section.find('> div.item > input[type=checkbox]');
     for (let ii = 0; ii < $childCheckboxes.length; ++ii) {
-      if ($childCheckboxes[ii].disabled) {
-        // do nothing
-      } else if ($childCheckboxes[ii].checked) {
+      if ($childCheckboxes[ii].checked) {
         returnVal &= ~0b10;
       } else {
         returnVal &= ~0b01;

@@ -1,3 +1,5 @@
+const sass = require('node-sass');
+
 module.exports = function(grunt) {
   grunt.initConfig({
 
@@ -39,17 +41,8 @@ module.exports = function(grunt) {
     // SASS compiler
     sass: {
       options: {
+        implementation: sass,
         sourceMap: false
-      },
-
-      build: {
-        options: {
-          outputStyle: 'compressed'
-        },
-
-        files: {
-          'dist/jquery.tree-multiselect.min.css': 'sass/style.scss'
-        }
       },
 
       min: {
@@ -59,6 +52,16 @@ module.exports = function(grunt) {
 
         files: {
           'dist/jquery.tree-multiselect.css': 'sass/style.scss'
+        }
+      },
+
+      build: {
+        options: {
+          outputStyle: 'compressed'
+        },
+
+        files: {
+          'dist/jquery.tree-multiselect.min.css': 'sass/style.scss'
         }
       }
     },

@@ -115,6 +115,13 @@ Load `jquery.tree-multiselect.min.js` on to your web page. The css file is optio
 
 You can also use bower - `bower install tree-multiselect`
 
+### How to build
+You need to have grunt-cli installed so you can run the `grunt` command.
+- Run tests: `grunt` or `grunt test`
+- Build dist JavaScript file: `grunt build`
+- Build Sass: `grunt sass`
+- Build everything: `grunt release`
+
 ### FAQ
 `Help! The first element is selected when I create the tree. How do I make the first element not selected?`
 You didn't set the `multiple` attribute on your `<select>`. This is a property of single-option select nodes - the first option is selected.

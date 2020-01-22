@@ -13,7 +13,7 @@ The underlying `<select>` node can be used as it was before. This means you can 
 ![demo image](demo.jpg "demo image")
 
 ### Demo
-<a target="_blank" href="http://www.patosai.com/projects/tree-multiselect">My website has a simple demo running.</a>
+<a target="_blank" href="https://patosai.com/tree-multiselect">My website has a simple demo running.</a>
 
 ### How To Use
 1. Set the `multiple="multiple"` attribute on your `<select>`

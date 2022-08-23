@@ -142,6 +142,16 @@ describe('Search', () => {
       $unselectAll.click();
       assert.equal(Common.selected().length, 1);
     })
+
+
+    it('handles empty search queries', () => {
+      $input.val(' ').trigger('input');
+
+      var $selectAll = $(".select-all");
+      var $unselectAll = $(".unselect-all");
+      assert.equal($selectAll.length, 0);
+      assert.equal($unselectAll.length, 2);
+    })
   });
 
   describe('custom search params', () => {

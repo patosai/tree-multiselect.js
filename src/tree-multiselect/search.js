@@ -88,7 +88,7 @@ Search.prototype.search = function (value) {
     return;
   }
 
-  value = value.toLowerCase();
+  value = value.toLowerCase().trim();
 
   let searchWords = value.split(' ');
   let searchChunks = [];
@@ -102,10 +102,10 @@ Search.prototype.search = function (value) {
   let matchedNodeIds = Util.array.intersectMany(searchChunks);
 
   // now we have id's that match search query
-  this._handleNodeVisbilities(matchedNodeIds);
+  this.handleNodeVisibilities(matchedNodeIds);
 };
 
-Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
+Search.prototype.handleNodeVisibilities = function (shownNodeIds) {
   let shownNodeIdsHash = {};
   let sectionsToNotHideHash = {};
   shownNodeIds.forEach((id) => {

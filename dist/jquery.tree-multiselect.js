@@ -324,10 +324,10 @@ Search.prototype.search = function (value) {
   var matchedNodeIds = Util.array.intersectMany(searchChunks);
 
   // now we have id's that match search query
-  this._handleNodeVisbilities(matchedNodeIds);
+  this.handleNodeVisibilities(matchedNodeIds);
 };
 
-Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
+Search.prototype.handleNodeVisibilities = function (shownNodeIds) {
   var _this3 = this;
 
   var shownNodeIdsHash = {};

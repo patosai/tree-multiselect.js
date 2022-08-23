@@ -1,6 +1,6 @@
 {
   "name": "tree-multiselect",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "jQuery multiple select with nested options",
   "browser": "dist/jquery.tree-multiselect.min.js",
   "keywords": [
@@ -12,6 +12,7 @@
     "checkbox"
   ],
   "scripts": {
+    "release": "grunt release",
     "test": "grunt test"
   },
   "repository": {

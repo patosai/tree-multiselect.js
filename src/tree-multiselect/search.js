@@ -97,7 +97,6 @@ Search.prototype.search = function (value) {
   searchWords.forEach((searchWord) => {
     let chunks = splitWord(searchWord);
     chunks.forEach((chunk) => {
-      console.log(chunk, this.index[chunk]);
       searchChunks.push(this.index[chunk] || []);
     });
   });

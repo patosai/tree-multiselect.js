@@ -12,6 +12,7 @@
     "checkbox"
   ],
   "scripts": {
+    "release": "grunt release",
     "test": "grunt test"
   },
   "repository": {

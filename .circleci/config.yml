@@ -2,7 +2,7 @@ version: 2
 orbs:
   browser-tools: circleci/browser-tools@1.4.0
 jobs:
-  test:
+  build:
     docker:
       - image: cimg/node:18.7.0-browsers
     working_directory: ~/tree-multiselect

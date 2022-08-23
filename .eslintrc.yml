@@ -22,3 +22,6 @@ rules:
   semi:
     - error
     - always
+  prefer-const: off
+  no-var: off
+  object-curly-spacing: off

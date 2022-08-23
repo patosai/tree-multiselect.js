@@ -8,10 +8,10 @@ module.exports = function(config) {
     plugins: [
       'karma-browserify',
       'karma-chai',
+      'karma-chrome-launcher',
       'karma-coverage',
       'karma-mocha',
       'karma-mocha-reporter',
-      'karma-phantomjs-launcher'
     ],
 
     files: [
@@ -40,7 +40,7 @@ module.exports = function(config) {
 
     autoWatch: false,
 
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
 
     singleRun: true,
 

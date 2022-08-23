@@ -3,7 +3,7 @@ exports.createNode = function (tag, props) {
 
   if (props) {
     for (var key in props) {
-      if (props.hasOwnProperty(key) && key !== 'text') {
+      if (Object.prototype.hasOwnProperty.call(props, key) && key !== 'text') {
         node.setAttribute(key, props[key]);
       }
     }

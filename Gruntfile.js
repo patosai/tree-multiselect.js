@@ -6,10 +6,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     eslint: {
-      target: ['src/**/*.js'],
-      options: {
-        configFile: '.eslintrc.yml'
-      }
+      target: ['src/**/*.js']
     },
 
     browserify: {

@@ -215,6 +215,7 @@ Tree.prototype.handleSectionCheckboxMarkings = function () {
       if (!astItem.disabled && !astItem.isNotSearchHit()) {
         return key;
       }
+      return null;
     }).get();
 
     if (this.checked) {

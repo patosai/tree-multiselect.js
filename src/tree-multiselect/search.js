@@ -22,10 +22,10 @@ Search.prototype.setSearchParams = function (searchParams) {
   Util.assert(Array.isArray(searchParams));
 
   let allowedParams = {
-    'value': true,
-    'text': true,
-    'description': true,
-    'section': true
+    value: true,
+    text: true,
+    description: true,
+    section: true
   };
 
   this.searchParams = [];

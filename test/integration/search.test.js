@@ -29,6 +29,10 @@ describe('Search', () => {
       // description
       $("select").append("<option value='QRS' data-section='ttt/uuu/vvv' data-description='fox'></option>");
 
+      // description with spaces
+      $("select").append("<option value='passion' data-section='s3' data-description='Passion'></option>");
+      $("select").append("<option value='passionfruit' data-section='fruit' data-description='Passion Fruit'></option>");
+
       $("select").treeMultiselect({searchable: true, enableSelectAll: true});
 
       $input = $("input.search");
@@ -143,14 +147,21 @@ describe('Search', () => {
       assert.equal(Common.selected().length, 1);
     })
 
-
     it('handles empty search queries', () => {
       $input.val(' ').trigger('input');
 
-      var $selectAll = $(".select-all");
-      var $unselectAll = $(".unselect-all");
-      assert.equal($selectAll.length, 0);
-      assert.equal($unselectAll.length, 2);
+      assert.equal(getVisibleSelections().length, 0);
+      assert.equal(getHiddenSelections().length, 0);
+    })
+
+    it('handles search queries with spaces in them', () => {
+      $input.val('passion ').trigger('input');
+      assert.equal(getVisibleSelections().length, 2);
+      assert.equal(getHiddenSelections().length, 4);
+
+      $input.val('passion f ').trigger('input');
+      assert.equal(getVisibleSelections().length, 1);
+      assert.equal(getHiddenSelections().length, 5);
     })
   });
 

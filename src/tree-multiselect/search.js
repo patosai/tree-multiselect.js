@@ -78,6 +78,8 @@ Search.prototype._addToIndex = function (key, id) {
 };
 
 Search.prototype.search = function (value) {
+  value = value.trim();
+
   if (!value) {
     this.astItemKeys.forEach((id) => {
       this.astItems[id].removeSearchHitMarker();
@@ -88,13 +90,14 @@ Search.prototype.search = function (value) {
     return;
   }
 
-  value = value.toLowerCase().trim();
+  value = value.toLowerCase();
 
-  let searchWords = value.split(' ');
+  let searchWords = value.split(' ').filter(word => word);
   let searchChunks = [];
   searchWords.forEach((searchWord) => {
     let chunks = splitWord(searchWord);
     chunks.forEach((chunk) => {
+      console.log(chunk, this.index[chunk]);
       searchChunks.push(this.index[chunk] || []);
     });
   });

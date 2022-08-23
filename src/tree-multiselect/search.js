@@ -78,6 +78,8 @@ Search.prototype._addToIndex = function (key, id) {
 };
 
 Search.prototype.search = function (value) {
+  value = value.trim();
+
   if (!value) {
     this.astItemKeys.forEach((id) => {
       this.astItems[id].removeSearchHitMarker();
@@ -90,11 +92,12 @@ Search.prototype.search = function (value) {
 
   value = value.toLowerCase();
 
-  let searchWords = value.split(' ');
+  let searchWords = value.split(' ').filter(word => word);
   let searchChunks = [];
   searchWords.forEach((searchWord) => {
     let chunks = splitWord(searchWord);
     chunks.forEach((chunk) => {
+      console.log(chunk, this.index[chunk]);
       searchChunks.push(this.index[chunk] || []);
     });
   });
@@ -102,10 +105,10 @@ Search.prototype.search = function (value) {
   let matchedNodeIds = Util.array.intersectMany(searchChunks);
 
   // now we have id's that match search query
-  this._handleNodeVisbilities(matchedNodeIds);
+  this.handleNodeVisibilities(matchedNodeIds);
 };
 
-Search.prototype._handleNodeVisbilities = function (shownNodeIds) {
+Search.prototype.handleNodeVisibilities = function (shownNodeIds) {
   let shownNodeIdsHash = {};
   let sectionsToNotHideHash = {};
   shownNodeIds.forEach((id) => {
